@@ -1,0 +1,41 @@
+# Java
+*.class
+
+# Maven
+target/
+
+# IntelliJ IDEA
+.idea/
+*.iml
+out/
+
+# Logs
+*.log
+hs_err_pid*
+replay_pid*
+
+# Arquivos locais/de ambiente
+.env
+.env.*
+application-local.properties
+application-local.yml
+
+# Pacotes gerados
+*.war
+*.ear
+*.jar
+
+# Não ignorar o Maven Wrapper
+!/.mvn/wrapper/maven-wrapper.jar
+
+# Arquivos temporários
+*.bak
+*.tmp
+*.ini
+
+# SSH Keys
+*.pem
+*.ppk
+
+# Metadata
+.metadata/
