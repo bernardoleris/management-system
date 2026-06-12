@@ -1,6 +1,6 @@
 package br.com.system.model;
 
-import br.com.system.enums.RoleEnum;
+import br.com.system.enums.AdministratorRole;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -36,7 +36,7 @@ public class Administrator implements Serializable{
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false, length = 20)
-    private RoleEnum role;
+    private AdministratorRole role;
 
     @Column(name = "last_login")
     private LocalDateTime lastLogin;
