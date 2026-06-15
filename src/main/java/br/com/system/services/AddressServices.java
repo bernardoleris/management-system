@@ -1,6 +1,5 @@
 package br.com.system.services;
 
-import br.com.system.data.dto.PersonDTO;
 import br.com.system.data.dto.request.AddressRequestDTO;
 import br.com.system.data.dto.response.AddressResponseDTO;
 import br.com.system.exception.ResourceNotFoundException;

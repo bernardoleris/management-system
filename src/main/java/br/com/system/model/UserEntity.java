@@ -42,4 +42,11 @@ public class UserEntity implements Serializable {
 
     @Column(name = "active", nullable = false)
     private Boolean active;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.active == null) {
+            this.active = true;
+        }
+    }
 }

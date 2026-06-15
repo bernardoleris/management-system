@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "stock_movement")
 public class StockMovement implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -44,7 +46,7 @@ public class StockMovement implements Serializable {
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
-    @Column(name = "reason", nullable = false, length = 255)
+    @Column(name = "reason", nullable = false, length = 70)
     private String reason;
 
     @CreationTimestamp
