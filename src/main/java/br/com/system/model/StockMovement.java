@@ -1,23 +1,25 @@
 package br.com.system.model;
 
+import br.com.system.enums.ExitReason;
 import br.com.system.enums.MovementType;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
-@Table(name = "stock_movement")
+@Table(name = "stock_movements")
 public class StockMovement implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -27,29 +29,42 @@ public class StockMovement implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "product_id", nullable = false)
-    private Product product;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "movement_type", nullable = false)
+    private MovementType type;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "admin_id", nullable = false)
-    private Administrator admin;
+    @Column(name = "date", nullable = false)
+    private LocalDateTime date;
+
+    @Column(name = "reason")
+    private String reason;
+
+    @Column(name = "observation")
+    private String observation;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "exit_reason")
+    private ExitReason exitReason;
 
     @ManyToOne
     @JoinColumn(name = "supplier_id")
     private Supplier supplier;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "type", nullable = false, length = 30)
-    private MovementType type;
+    @OneToOne
+    @JoinColumn(name = "sale_id")
+    private Sale sale;
 
-    @Column(name = "quantity", nullable = false)
-    private Integer quantity;
+    @ManyToOne
+    @JoinColumn(name = "admin_id", nullable = false)
+    private Administrator admin;
 
-    @Column(name = "reason", nullable = false, length = 70)
-    private String reason;
+    @OneToMany(mappedBy = "stockMovement", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StockMovementItem> items = new ArrayList<>();
 
-    @CreationTimestamp
-    @Column(name = "date", nullable = false, updatable = false)
-    private LocalDateTime date;
+    @PrePersist
+    public void prePersist() {
+        if (this.date == null) {
+            this.date = LocalDateTime.now();
+        }
+    }
 }

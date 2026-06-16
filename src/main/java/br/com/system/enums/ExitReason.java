@@ -5,12 +5,13 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum MovementType {
+public enum ExitReason {
 
-    ENTRY("Entrada"),
-    EXIT("Saída"),
-    ADJUSTMENT("Ajuste"),
-    SALE("Venda");
+    DAMAGED("Danificado"),
+    EXPIRED("Vencido"),
+    DONATED("Brinde/Doação"),
+    LOST("Perda/Furto"),
+    OTHER("Outro");
 
     private final String label;
 }

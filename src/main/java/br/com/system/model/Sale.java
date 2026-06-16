@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ import java.util.List;
 @Entity
 @Table(name = "sale")
 public class Sale implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
@@ -47,7 +49,7 @@ public class Sale implements Serializable {
     @Column(name = "total_value", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalValue = BigDecimal.ZERO;
 
-    @Column(name = "notes", length = 255)
+    @Column(name = "notes", length = 200)
     private String notes;
 
     @ManyToOne(optional = false)

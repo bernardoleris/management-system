@@ -53,7 +53,6 @@ public class UserEntityServices {
         entity.setLastName(user.getLastName());
         entity.setEmail(user.getEmail());
         entity.setPhone(user.getPhone());
-        entity.setActive(user.getActive());
 
         return ObjectMapper.parseObject(repository.save(entity), UserEntityResponseDTO.class);
     }

@@ -1,20 +1,18 @@
 package br.com.system.services;
 
+import br.com.system.data.dto.request.StockMovementItemRequestDTO;
 import br.com.system.data.dto.request.StockMovementRequestDTO;
+import br.com.system.data.dto.response.StockMovementItemResponseDTO;
 import br.com.system.data.dto.response.StockMovementResponseDTO;
 import br.com.system.enums.MovementType;
 import br.com.system.exception.ResourceNotFoundException;
-import br.com.system.model.Administrator;
-import br.com.system.model.Product;
-import br.com.system.model.StockMovement;
-import br.com.system.model.Supplier;
-import br.com.system.repository.AdministratorRepository;
-import br.com.system.repository.ProductRepository;
-import br.com.system.repository.StockMovementRepository;
-import br.com.system.repository.SupplierRepository;
+import br.com.system.model.*;
+import br.com.system.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -26,6 +24,9 @@ public class StockMovementServices {
     private StockMovementRepository stockMovementRepository;
 
     @Autowired
+    private StockMovementItemRepository stockMovementItemRepository;
+
+    @Autowired
     private ProductRepository productRepository;
 
     @Autowired
@@ -34,6 +35,7 @@ public class StockMovementServices {
     @Autowired
     private SupplierRepository supplierRepository;
 
+    @Transactional(readOnly = true)
     public List<StockMovementResponseDTO> findAll() {
         logger.info("Finding stock movements!");
 
@@ -42,16 +44,7 @@ public class StockMovementServices {
                 .toList();
     }
 
-    public List<StockMovementResponseDTO> findByProduct(Long productId) {
-        logger.info("Finding stock movements by product!");
-
-        findProduct(productId);
-
-        return stockMovementRepository.findByProductId(productId).stream()
-                .map(this::toResponseDTO)
-                .toList();
-    }
-
+    @Transactional(readOnly = true)
     public List<StockMovementResponseDTO> findByAdmin(Long adminId) {
         logger.info("Finding stock movements by administrator!");
 
@@ -62,6 +55,7 @@ public class StockMovementServices {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<StockMovementResponseDTO> findBySupplier(Long supplierId) {
         logger.info("Finding stock movements by supplier!");
 
@@ -72,6 +66,7 @@ public class StockMovementServices {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<StockMovementResponseDTO> findByType(MovementType type) {
         logger.info("Finding stock movements by type!");
 
@@ -80,84 +75,167 @@ public class StockMovementServices {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public StockMovementResponseDTO findById(Long id) {
         logger.info("Finding one stock movement!");
 
         return toResponseDTO(findMovement(id));
     }
 
+    @Transactional
     public StockMovementResponseDTO create(StockMovementRequestDTO dto) {
         logger.info("Creating one stock movement!");
 
-        Product product = findProduct(dto.getProductId());
+        validateMovementRules(dto);
+
         Administrator admin = findAdministrator(dto.getAdminId());
         Supplier supplier = dto.getSupplierId() == null ? null : findSupplier(dto.getSupplierId());
 
         StockMovement entity = new StockMovement();
-        setMovementFields(entity, dto, product, admin, supplier);
-        applyMovement(entity, false);
+        entity.setType(dto.getType());
+        entity.setReason(dto.getReason());
+        entity.setObservation(dto.getObservation());
+        entity.setExitReason(dto.getExitReason());
+        entity.setAdmin(admin);
+        entity.setSupplier(supplier);
+
+        List<StockMovementItem> items = buildItems(dto.getItems(), entity, false);
+        entity.setItems(items);
 
         return toResponseDTO(stockMovementRepository.save(entity));
     }
 
-    public StockMovementResponseDTO update(Long id, StockMovementRequestDTO dto) {
-        logger.info("Updating one stock movement!");
-
-        StockMovement entity = findMovement(id);
-        reverseMovement(entity);
-
-        Product product = findProduct(dto.getProductId());
-        Administrator admin = findAdministrator(dto.getAdminId());
-        Supplier supplier = dto.getSupplierId() == null ? null : findSupplier(dto.getSupplierId());
-
-        setMovementFields(entity, dto, product, admin, supplier);
-        applyMovement(entity, false);
-
-        return toResponseDTO(stockMovementRepository.save(entity));
-    }
-
+    @Transactional
     public void delete(Long id) {
         logger.info("Deleting one stock movement!");
 
         StockMovement entity = findMovement(id);
+
+        if (entity.getType() == MovementType.SALE) {
+            throw new IllegalArgumentException("Cannot delete a movement generated by a sale!");
+        }
+
         reverseMovement(entity);
         stockMovementRepository.delete(entity);
     }
 
-    private void setMovementFields(
-            StockMovement entity,
-            StockMovementRequestDTO dto,
-            Product product,
-            Administrator admin,
-            Supplier supplier) {
-        entity.setProduct(product);
-        entity.setAdmin(admin);
-        entity.setSupplier(supplier);
-        entity.setType(dto.getType());
-        entity.setQuantity(dto.getQuantity());
-        entity.setReason(dto.getReason());
+    // ─── Método chamado internamente pelo SaleService ─────────────────────────
+
+    @Transactional
+    public void createFromSale(Sale sale) {
+        logger.info("Creating stock movement from sale!");
+
+        StockMovement entity = new StockMovement();
+        entity.setType(MovementType.SALE);
+        entity.setSale(sale);
+        entity.setAdmin(sale.getAdmin());
+
+        List<StockMovementItem> items = new ArrayList<>();
+        for (SaleItem saleItem : sale.getItems()) {
+            Product product = saleItem.getProduct();
+            int quantity = saleItem.getQuantity();
+
+            StockMovementItem item = new StockMovementItem();
+            item.setStockMovement(entity);
+            item.setProduct(product);
+            item.setQuantity(quantity);
+
+            decrementStock(product, quantity);
+            items.add(item);
+        }
+
+        entity.setItems(items);
+        stockMovementRepository.save(entity);
     }
 
-    private void applyMovement(StockMovement movement, boolean reverse) {
-        Product product = movement.getProduct();
-        int quantity = movement.getQuantity() == null ? 0 : movement.getQuantity();
-        int delta = movement.getType() == MovementType.EXIT ? -quantity : quantity;
+    // ─── Métodos internos ─────────────────────────────────────────────────────
 
-        if (reverse) {
-            delta = -delta;
+    private void validateMovementRules(StockMovementRequestDTO dto) {
+        if (dto.getItems() == null || dto.getItems().isEmpty()) {
+            throw new IllegalArgumentException("At least one item is required!");
         }
 
-        int updatedQuantity = product.getQuantity() + delta;
-        if (updatedQuantity < 0) {
-            throw new IllegalArgumentException("Stock cannot become negative!");
+        if (dto.getType() == MovementType.ADJUSTMENT &&
+                (dto.getReason() == null || dto.getReason().isBlank())) {
+            throw new IllegalArgumentException("Reason is required for adjustments!");
         }
 
-        product.setQuantity(updatedQuantity);
+        if (dto.getType() == MovementType.EXIT && dto.getExitReason() == null) {
+            throw new IllegalArgumentException("Exit reason is required for exits!");
+        }
+
+        if (dto.getType() == MovementType.SALE) {
+            throw new IllegalArgumentException("Sale movements are generated automatically!");
+        }
+    }
+
+    private List<StockMovementItem> buildItems(
+            List<StockMovementItemRequestDTO> itemDTOs,
+            StockMovement movement,
+            boolean reverse) {
+
+        List<StockMovementItem> items = new ArrayList<>();
+
+        for (StockMovementItemRequestDTO itemDTO : itemDTOs) {
+            Product product = findProduct(itemDTO.getProductId());
+            int quantity = itemDTO.getQuantity();
+
+            StockMovementItem item = new StockMovementItem();
+            item.setStockMovement(movement);
+            item.setProduct(product);
+            item.setQuantity(quantity);
+
+            switch (movement.getType()) {
+                case ENTRY -> incrementStock(product, quantity);
+                case EXIT -> decrementStock(product, quantity);
+                case ADJUSTMENT -> applyAdjustment(item, product, quantity);
+            }
+
+            items.add(item);
+        }
+
+        return items;
+    }
+
+    private void incrementStock(Product product, int quantity) {
+        product.setQuantity(product.getQuantity() + quantity);
+        productRepository.save(product);
+    }
+
+    private void decrementStock(Product product, int quantity) {
+        int updated = product.getQuantity() - quantity;
+        if (updated < 0) {
+            throw new IllegalArgumentException(
+                    "Insufficient stock for product: " + product.getName()
+            );
+        }
+        product.setQuantity(updated);
+        productRepository.save(product);
+    }
+
+    private void applyAdjustment(StockMovementItem item, Product product, int quantityReal) {
+        int quantityBefore = product.getQuantity();
+        int difference = quantityReal - quantityBefore;
+
+        item.setQuantityBefore(quantityBefore);
+        item.setQuantityDifference(difference);
+
+        product.setQuantity(quantityReal);
         productRepository.save(product);
     }
 
     private void reverseMovement(StockMovement movement) {
-        applyMovement(movement, true);
+        for (StockMovementItem item : movement.getItems()) {
+            Product product = item.getProduct();
+            switch (movement.getType()) {
+                case ENTRY -> decrementStock(product, item.getQuantity());
+                case EXIT -> incrementStock(product, item.getQuantity());
+                case ADJUSTMENT -> {
+                    product.setQuantity(item.getQuantityBefore());
+                    productRepository.save(product);
+                }
+            }
+        }
     }
 
     private StockMovement findMovement(Long id) {
@@ -180,18 +258,21 @@ public class StockMovementServices {
                 .orElseThrow(() -> new ResourceNotFoundException("No supplier found for this ID!"));
     }
 
+    // ─── Mapeamento para DTO ──────────────────────────────────────────────────
+
     private StockMovementResponseDTO toResponseDTO(StockMovement entity) {
         StockMovementResponseDTO dto = new StockMovementResponseDTO();
 
         dto.setId(entity.getId());
         dto.setType(entity.getType());
-        dto.setQuantity(entity.getQuantity());
+        dto.setTypeLabel(entity.getType().getLabel());
         dto.setReason(entity.getReason());
+        dto.setObservation(entity.getObservation());
         dto.setDate(entity.getDate());
 
-        if (entity.getProduct() != null) {
-            dto.setProductId(entity.getProduct().getId());
-            dto.setProductName(entity.getProduct().getName());
+        if (entity.getExitReason() != null) {
+            dto.setExitReason(entity.getExitReason());
+            dto.setExitReasonLabel(entity.getExitReason().getLabel());
         }
 
         if (entity.getAdmin() != null) {
@@ -202,6 +283,30 @@ public class StockMovementServices {
         if (entity.getSupplier() != null) {
             dto.setSupplierId(entity.getSupplier().getId());
             dto.setSupplierTradeName(entity.getSupplier().getTradeName());
+        }
+
+        if (entity.getSale() != null) {
+            dto.setSaleId(entity.getSale().getId());
+        }
+
+        dto.setItems(entity.getItems().stream()
+                .map(this::toItemResponseDTO)
+                .toList());
+
+        return dto;
+    }
+
+    private StockMovementItemResponseDTO toItemResponseDTO(StockMovementItem item) {
+        StockMovementItemResponseDTO dto = new StockMovementItemResponseDTO();
+
+        dto.setId(item.getId());
+        dto.setQuantity(item.getQuantity());
+        dto.setQuantityBefore(item.getQuantityBefore());
+        dto.setQuantityDifference(item.getQuantityDifference());
+
+        if (item.getProduct() != null) {
+            dto.setProductId(item.getProduct().getId());
+            dto.setProductName(item.getProduct().getName());
         }
 
         return dto;
