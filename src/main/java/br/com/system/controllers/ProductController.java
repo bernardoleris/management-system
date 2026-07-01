@@ -95,4 +95,10 @@ public class ProductController {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{id}/toggle-active")
+    public ResponseEntity<Void> toggleActive(@PathVariable Long id) {
+        service.toggleActive(id);
+        return ResponseEntity.noContent().build();
+    }
 }

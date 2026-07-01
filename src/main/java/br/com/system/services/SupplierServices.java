@@ -36,6 +36,16 @@ public class SupplierServices {
                 .toList();
     }
 
+    public List<SupplierResponseDTO> findAllDisabled() {
+        logger.info("Finding all active suppliers!");
+
+        return repository.findAll()
+                .stream()
+                .filter(s -> !s.getActive())
+                .map(s -> ObjectMapper.parseObject(s, SupplierResponseDTO.class))
+                .toList();
+    }
+
     public SupplierResponseDTO findById(Long id) {
         logger.info("Finding one supplier!");
 

@@ -38,7 +38,7 @@ public class Client implements Serializable {
     @Column(name = "birth_date")
     private LocalDate birthDate;
 
-    @OneToOne(optional = false)
-    @JoinColumn(name = "address_id", nullable = false)
+    @OneToOne
+    @JoinColumn(name = "address_id")
     private Address address;
 }

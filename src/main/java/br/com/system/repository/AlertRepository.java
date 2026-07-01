@@ -13,4 +13,6 @@ public interface AlertRepository extends JpaRepository<Alert, Long> {
     List<Alert> findByAdminIdAndActiveTrue(Long adminId);
 
     List<Alert> findByProductIdAndActiveTrue(Long productId);
+
+    boolean existsByProductId(Long productId);
 }

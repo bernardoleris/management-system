@@ -2,15 +2,13 @@ package br.com.system.services;
 
 import br.com.system.data.dto.request.ProductRequestDTO;
 import br.com.system.data.dto.response.ProductResponseDTO;
+import br.com.system.exception.BusinessException;
 import br.com.system.exception.ResourceNotFoundException;
 import br.com.system.model.Brand;
 import br.com.system.model.Category;
 import br.com.system.model.Product;
 import br.com.system.model.Supplier;
-import br.com.system.repository.BrandRepository;
-import br.com.system.repository.CategoryRepository;
-import br.com.system.repository.ProductRepository;
-import br.com.system.repository.SupplierRepository;
+import br.com.system.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +30,15 @@ public class ProductServices {
 
     @Autowired
     private SupplierRepository supplierRepository;
+
+    @Autowired
+    private SaleItemRepository saleItemRepository;
+
+    @Autowired
+    private StockMovementItemRepository stockMovementItemRepository;
+
+    @Autowired
+    private AlertRepository alertRepository;
 
     public List<ProductResponseDTO> findAll() {
         logger.info("Finding products!");
@@ -112,12 +119,33 @@ public class ProductServices {
         return toResponseDTO(productRepository.save(entity));
     }
 
+    public void toggleActive(Long id) {
+        logger.info("Toggling product active status!");
+
+        Product entity = findProduct(id);
+
+        entity.setActive(!entity.getActive());
+        productRepository.save(entity);
+    }
+
     public void delete(Long id) {
         logger.info("Deleting one product!");
 
         Product entity = findProduct(id);
-        entity.setActive(false);
-        productRepository.save(entity);
+
+        if (saleItemRepository.existsByProductId(id)) {
+            throw new BusinessException("Product cannot be deleted because it has sales records!");
+        }
+
+        if (stockMovementItemRepository.existsByProductId(id)) {
+            throw new BusinessException("Product cannot be deleted because it has stock movement records!");
+        }
+
+        if (alertRepository.existsByProductId(id)) {
+            throw new BusinessException("Product cannot be deleted because it has alerts!");
+        }
+
+        productRepository.delete(entity);
     }
 
     private void setProductFields(Product entity, ProductRequestDTO product) {

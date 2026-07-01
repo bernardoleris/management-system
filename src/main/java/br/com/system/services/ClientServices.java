@@ -77,13 +77,18 @@ public class ClientServices {
         UserEntity user = userRepository.findById(client.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("No user found for this ID!"));
 
-        Address address = addressRepository.findById(client.getAddressId())
-                .orElseThrow(() -> new ResourceNotFoundException("No address found for this ID!"));
+        if (client.getAddressId() != null) {
+            Address address = addressRepository.findById(client.getAddressId())
+                    .orElseThrow(() -> new ResourceNotFoundException("No address found for this ID!"));
+
+            entity.setAddress(address);
+        } else {
+            entity.setAddress(null);
+        }
 
         entity.setUser(user);
         entity.setDocumentType(client.getDocumentType());
         entity.setDocumentNumber(client.getDocumentNumber());
         entity.setBirthDate(client.getBirthDate());
-        entity.setAddress(address);
     }
 }

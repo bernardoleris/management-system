@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface SaleItemRepository extends JpaRepository<SaleItem, Long> {
     List<SaleItem> findBySaleId(Long saleId);
+
+    boolean existsByProductId(Long productId);
 }

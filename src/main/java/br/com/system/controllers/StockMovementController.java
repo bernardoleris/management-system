@@ -24,67 +24,33 @@ public class StockMovementController {
         return service.findAll();
     }
 
-    @GetMapping(
-            value = "/{id}",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public StockMovementResponseDTO findById(@PathVariable("id") Long id) {
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public StockMovementResponseDTO findById(@PathVariable Long id) {
         return service.findById(id);
     }
 
-    @GetMapping(
-            value = "/product/{productId}",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public List<StockMovementResponseDTO> findByProduct(@PathVariable Long productId) {
-        return service.findByProduct(productId);
-    }
-
-    @GetMapping(
-            value = "/admin/{adminId}",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
+    @GetMapping(value = "/admin/{adminId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<StockMovementResponseDTO> findByAdmin(@PathVariable Long adminId) {
         return service.findByAdmin(adminId);
     }
 
-    @GetMapping(
-            value = "/supplier/{supplierId}",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
+    @GetMapping(value = "/supplier/{supplierId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<StockMovementResponseDTO> findBySupplier(@PathVariable Long supplierId) {
         return service.findBySupplier(supplierId);
     }
 
-    @GetMapping(
-            value = "/type/{type}",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
+    @GetMapping(value = "/type/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<StockMovementResponseDTO> findByType(@PathVariable MovementType type) {
         return service.findByType(type);
     }
 
-    @PostMapping(
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<StockMovementResponseDTO> create(@RequestBody StockMovementRequestDTO movement) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(movement));
-    }
-
-    @PutMapping(
-            value = "/{id}",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public StockMovementResponseDTO update(
-            @PathVariable("id") Long id,
-            @RequestBody StockMovementRequestDTO movement) {
-        return service.update(id, movement);
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<StockMovementResponseDTO> create(@RequestBody StockMovementRequestDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(dto));
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }

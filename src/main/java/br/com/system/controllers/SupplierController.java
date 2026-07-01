@@ -50,4 +50,9 @@ public class SupplierController {
     public ResponseEntity<List<SupplierResponseDTO>> findAllActive() {
         return ResponseEntity.ok(service.findAllActive());
     }
+
+    @GetMapping("/disabled")
+    public ResponseEntity<List<SupplierResponseDTO>> findAllDisabled() {
+        return ResponseEntity.ok(service.findAllDisabled());
+    }
 }
