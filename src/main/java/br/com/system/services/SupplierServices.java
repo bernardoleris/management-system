@@ -2,6 +2,7 @@ package br.com.system.services;
 
 import br.com.system.data.dto.request.SupplierRequestDTO;
 import br.com.system.data.dto.response.SupplierResponseDTO;
+import br.com.system.exception.DuplicateResourceException;
 import br.com.system.exception.ResourceNotFoundException;
 import br.com.system.mapper.ObjectMapper;
 import br.com.system.model.Supplier;
@@ -18,18 +19,18 @@ public class SupplierServices {
     private final Logger logger = Logger.getLogger(SupplierServices.class.getName());
 
     @Autowired
-    private SupplierRepository repository;
+    private SupplierRepository supplierRepository;
 
     public List<SupplierResponseDTO> findAll() {
         logger.info("Finding all suppliers!");
 
-        return ObjectMapper.parseListObjects(repository.findAll(), SupplierResponseDTO.class);
+        return ObjectMapper.parseListObjects(supplierRepository.findAll(), SupplierResponseDTO.class);
     }
 
     public List<SupplierResponseDTO> findAllActive() {
         logger.info("Finding all active suppliers!");
 
-        return repository.findAll()
+        return supplierRepository.findAll()
                 .stream()
                 .filter(s -> s.getActive())
                 .map(s -> ObjectMapper.parseObject(s, SupplierResponseDTO.class))
@@ -39,7 +40,7 @@ public class SupplierServices {
     public List<SupplierResponseDTO> findAllDisabled() {
         logger.info("Finding all active suppliers!");
 
-        return repository.findAll()
+        return supplierRepository.findAll()
                 .stream()
                 .filter(s -> !s.getActive())
                 .map(s -> ObjectMapper.parseObject(s, SupplierResponseDTO.class))
@@ -57,19 +58,28 @@ public class SupplierServices {
     public SupplierResponseDTO create(SupplierRequestDTO dto) {
         logger.info("Creating one supplier!");
 
+        if (supplierRepository.existsByCnpj(dto.getCnpj())) {
+            throw new DuplicateResourceException("CNPJ already registered!");
+        }
+
         Supplier entity = new Supplier();
         setSupplierFields(entity, dto);
 
-        return ObjectMapper.parseObject(repository.save(entity), SupplierResponseDTO.class);
+        return ObjectMapper.parseObject(supplierRepository.save(entity), SupplierResponseDTO.class);
     }
 
     public SupplierResponseDTO update(Long id, SupplierRequestDTO dto) {
         logger.info("Updating one supplier!");
 
         Supplier entity = findEntityById(id);
+
+        if (supplierRepository.existsByCnpjAndIdNot(dto.getCnpj(), id)) {
+            throw new DuplicateResourceException("CNPJ already registered!");
+        }
+
         setSupplierFields(entity, dto);
 
-        return ObjectMapper.parseObject(repository.save(entity), SupplierResponseDTO.class);
+        return ObjectMapper.parseObject(supplierRepository.save(entity), SupplierResponseDTO.class);
     }
 
     public void toggleActive(Long id) {
@@ -77,13 +87,13 @@ public class SupplierServices {
 
         Supplier entity = findEntityById(id);
         entity.setActive(!entity.getActive());
-        repository.save(entity);
+        supplierRepository.save(entity);
     }
 
     // ─── Métodos internos ────────────────────────────────────────────────────
 
     private Supplier findEntityById(Long id) {
-        return repository.findById(id)
+        return supplierRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No supplier found for this ID!"));
     }
 

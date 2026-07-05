@@ -3,6 +3,7 @@ package br.com.system.services;
 import br.com.system.data.dto.request.ProductRequestDTO;
 import br.com.system.data.dto.response.ProductResponseDTO;
 import br.com.system.exception.BusinessException;
+import br.com.system.exception.DuplicateResourceException;
 import br.com.system.exception.ResourceNotFoundException;
 import br.com.system.model.Brand;
 import br.com.system.model.Category;
@@ -105,6 +106,11 @@ public class ProductServices {
         logger.info("Creating one product!");
 
         Product entity = new Product();
+
+        if (productRepository.existsByBarcode(product.getBarcode())) {
+            throw new DuplicateResourceException("Barcode already registered!");
+        }
+
         setProductFields(entity, product);
 
         return toResponseDTO(productRepository.save(entity));
@@ -114,6 +120,11 @@ public class ProductServices {
         logger.info("Updating one product!");
 
         Product entity = findProduct(id);
+
+        if (productRepository.existsByBarcodeAndIdNot(product.getBarcode(), id)) {
+            throw new DuplicateResourceException("Barcode already registered!");
+        }
+
         setProductFields(entity, product);
 
         return toResponseDTO(productRepository.save(entity));

@@ -2,10 +2,12 @@ package br.com.system.services;
 
 import br.com.system.data.dto.request.ClientRequestDTO;
 import br.com.system.data.dto.response.ClientResponseDTO;
+import br.com.system.exception.DuplicateResourceException;
 import br.com.system.exception.ResourceNotFoundException;
 import br.com.system.mapper.ObjectMapper;
 import br.com.system.model.Address;
 import br.com.system.model.Client;
+import br.com.system.model.Supplier;
 import br.com.system.model.UserEntity;
 import br.com.system.repository.AddressRepository;
 import br.com.system.repository.ClientRepository;
@@ -38,14 +40,17 @@ public class ClientServices {
     public ClientResponseDTO findById(Long id) {
         logger.info("Finding one client!");
 
-        Client entity = clientRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No client found for this ID!"));
+        Client entity = findEntityById(id);
 
         return ObjectMapper.parseObject(entity, ClientResponseDTO.class);
     }
 
     public ClientResponseDTO create(ClientRequestDTO client) {
         logger.info("Creating one client!");
+
+        if (clientRepository.existsByDocumentNumber(client.getDocumentNumber())) {
+            throw new DuplicateResourceException("Document number already registered!");
+        }
 
         Client entity = new Client();
         setClientFields(entity, client);
@@ -56,8 +61,11 @@ public class ClientServices {
     public ClientResponseDTO update(Long id, ClientRequestDTO client) {
         logger.info("Updating one client!");
 
-        Client entity = clientRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No client found for this ID!"));
+        Client entity = findEntityById(id);
+
+        if (clientRepository.existsByDocumentNumberAndIdNot(client.getDocumentNumber(), id)) {
+            throw new DuplicateResourceException("Document number already registered!");
+        }
 
         setClientFields(entity, client);
 
@@ -67,10 +75,14 @@ public class ClientServices {
     public void delete(Long id) {
         logger.info("Deleting one client!");
 
-        Client entity = clientRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No client found for this ID!"));
+        Client entity = findEntityById(id);
 
         clientRepository.delete(entity);
+    }
+
+    private Client findEntityById(Long id) {
+        return clientRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("No client found for this ID!"));
     }
 
     private void setClientFields(Client entity, ClientRequestDTO client) {
