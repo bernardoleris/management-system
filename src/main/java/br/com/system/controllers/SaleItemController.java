@@ -1,5 +1,6 @@
 package br.com.system.controllers;
 
+import br.com.system.controllers.api.SaleItemApi;
 import br.com.system.data.dto.request.SaleItemRequestDTO;
 import br.com.system.data.dto.response.SaleItemResponseDTO;
 import br.com.system.services.SaleItemServices;
@@ -13,12 +14,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/sales/{saleId}/items")
-public class SaleItemController {
+public class SaleItemController implements SaleItemApi {
 
     @Autowired
     private SaleItemServices service;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @Override
     public List<SaleItemResponseDTO> findBySale(@PathVariable Long saleId) {
         return service.findBySale(saleId);
     }
@@ -27,6 +29,7 @@ public class SaleItemController {
             value = "/{itemId}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @Override
     public SaleItemResponseDTO findById(
             @PathVariable Long saleId,
             @PathVariable Long itemId) {
@@ -37,6 +40,7 @@ public class SaleItemController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @Override
     public ResponseEntity<SaleItemResponseDTO> create(
             @PathVariable Long saleId,
             @RequestBody SaleItemRequestDTO item) {
@@ -48,6 +52,7 @@ public class SaleItemController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @Override
     public SaleItemResponseDTO update(
             @PathVariable Long saleId,
             @PathVariable Long itemId,
@@ -56,6 +61,7 @@ public class SaleItemController {
     }
 
     @DeleteMapping(value = "/{itemId}")
+    @Override
     public ResponseEntity<?> delete(
             @PathVariable Long saleId,
             @PathVariable Long itemId) {

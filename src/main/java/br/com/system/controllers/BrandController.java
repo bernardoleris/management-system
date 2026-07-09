@@ -1,5 +1,6 @@
 package br.com.system.controllers;
 
+import br.com.system.controllers.api.BrandApi;
 import br.com.system.data.dto.request.BrandRequestDTO;
 import br.com.system.data.dto.response.BrandResponseDTO;
 import br.com.system.services.BrandServices;
@@ -13,12 +14,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/brands")
-public class BrandController {
+public class BrandController implements BrandApi {
 
     @Autowired
     private BrandServices service;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @Override
     public List<BrandResponseDTO> findAll() {
         return service.findAll();
     }
@@ -27,6 +29,7 @@ public class BrandController {
             value = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @Override
     public BrandResponseDTO findById(@PathVariable("id") Long id) {
         return service.findById(id);
     }
@@ -35,6 +38,7 @@ public class BrandController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @Override
     public ResponseEntity<BrandResponseDTO> create(@RequestBody BrandRequestDTO brand) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(brand));
     }
@@ -44,6 +48,7 @@ public class BrandController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @Override
     public BrandResponseDTO update(
             @PathVariable("id") Long id,
             @RequestBody BrandRequestDTO brand) {
@@ -51,6 +56,7 @@ public class BrandController {
     }
 
     @DeleteMapping(value = "/{id}")
+    @Override
     public ResponseEntity<?> delete(@PathVariable("id") Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();

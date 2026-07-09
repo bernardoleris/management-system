@@ -1,5 +1,6 @@
 package br.com.system.controllers;
 
+import br.com.system.controllers.api.CategoryApi;
 import br.com.system.data.dto.request.CategoryRequestDTO;
 import br.com.system.data.dto.response.CategoryResponseDTO;
 import br.com.system.services.CategoryServices;
@@ -13,12 +14,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/categories")
-public class CategoryController {
+public class CategoryController implements CategoryApi {
 
     @Autowired
     private CategoryServices service;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @Override
     public List<CategoryResponseDTO> findAll() {
         return service.findAll();
     }
@@ -27,6 +29,7 @@ public class CategoryController {
             value = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @Override
     public CategoryResponseDTO findById(@PathVariable("id") Long id) {
         return service.findById(id);
     }
@@ -35,6 +38,7 @@ public class CategoryController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @Override
     public ResponseEntity<CategoryResponseDTO> create(@RequestBody CategoryRequestDTO category) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(category));
     }
@@ -44,6 +48,7 @@ public class CategoryController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @Override
     public CategoryResponseDTO update(
             @PathVariable("id") Long id,
             @RequestBody CategoryRequestDTO category) {
@@ -51,6 +56,7 @@ public class CategoryController {
     }
 
     @DeleteMapping(value = "/{id}")
+    @Override
     public ResponseEntity<?> delete(@PathVariable("id") Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();

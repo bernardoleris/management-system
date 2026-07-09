@@ -1,5 +1,6 @@
 package br.com.system.controllers;
 
+import br.com.system.controllers.api.SaleApi;
 import br.com.system.data.dto.request.SaleRequestDTO;
 import br.com.system.data.dto.response.SaleResponseDTO;
 import br.com.system.enums.SaleStatus;
@@ -14,12 +15,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/sales")
-public class SaleController {
+public class SaleController implements SaleApi {
 
     @Autowired
     private SaleServices service;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @Override
     public List<SaleResponseDTO> findAll() {
         return service.findAll();
     }
@@ -28,6 +30,7 @@ public class SaleController {
             value = "/status/{status}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @Override
     public List<SaleResponseDTO> findByStatus(@PathVariable SaleStatus status) {
         return service.findByStatus(status);
     }
@@ -36,6 +39,7 @@ public class SaleController {
             value = "/admin/{adminId}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @Override
     public List<SaleResponseDTO> findByAdmin(@PathVariable Long adminId) {
         return service.findByAdmin(adminId);
     }
@@ -44,6 +48,7 @@ public class SaleController {
             value = "/client/{clientId}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @Override
     public List<SaleResponseDTO> findByClient(@PathVariable Long clientId) {
         return service.findByClient(clientId);
     }
@@ -52,6 +57,7 @@ public class SaleController {
             value = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @Override
     public SaleResponseDTO findById(@PathVariable("id") Long id) {
         return service.findById(id);
     }
@@ -60,6 +66,7 @@ public class SaleController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @Override
     public ResponseEntity<SaleResponseDTO> create(@RequestBody SaleRequestDTO sale) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(sale));
     }
@@ -69,6 +76,7 @@ public class SaleController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @Override
     public SaleResponseDTO update(
             @PathVariable("id") Long id,
             @RequestBody SaleRequestDTO sale) {
@@ -79,11 +87,13 @@ public class SaleController {
             value = "/{id}/cancel",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @Override
     public SaleResponseDTO cancel(@PathVariable("id") Long id) {
         return service.cancel(id);
     }
 
     @DeleteMapping(value = "/{id}")
+    @Override
     public ResponseEntity<?> delete(@PathVariable("id") Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();

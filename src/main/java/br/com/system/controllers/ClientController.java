@@ -1,5 +1,6 @@
 package br.com.system.controllers;
 
+import br.com.system.controllers.api.ClientApi;
 import br.com.system.data.dto.request.ClientRequestDTO;
 import br.com.system.data.dto.response.ClientResponseDTO;
 import br.com.system.services.ClientServices;
@@ -13,12 +14,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/clients")
-public class ClientController {
+public class ClientController implements ClientApi {
 
     @Autowired
     private ClientServices service;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @Override
     public List<ClientResponseDTO> findAll() {
         return service.findAll();
     }
@@ -27,6 +29,7 @@ public class ClientController {
             value = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @Override
     public ClientResponseDTO findById(@PathVariable("id") Long id) {
         return service.findById(id);
     }
@@ -35,6 +38,7 @@ public class ClientController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @Override
     public ResponseEntity<ClientResponseDTO> create(@RequestBody ClientRequestDTO client) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(client));
     }
@@ -44,6 +48,7 @@ public class ClientController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @Override
     public ClientResponseDTO update(
             @PathVariable("id") Long id,
             @RequestBody ClientRequestDTO client) {
@@ -51,6 +56,7 @@ public class ClientController {
     }
 
     @DeleteMapping(value = "/{id}")
+    @Override
     public ResponseEntity<?> delete(@PathVariable("id") Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
