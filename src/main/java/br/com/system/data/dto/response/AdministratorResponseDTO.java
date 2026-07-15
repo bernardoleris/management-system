@@ -1,6 +1,5 @@
 package br.com.system.data.dto.response;
 
-import br.com.system.enums.AdministratorRole;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +16,6 @@ public class AdministratorResponseDTO implements Serializable {
     private Long id;
     private UserEntityResponseDTO user;
     private String login;
-    private AdministratorRole role;
     private LocalDateTime lastLogin;
 
     public AdministratorResponseDTO() {}

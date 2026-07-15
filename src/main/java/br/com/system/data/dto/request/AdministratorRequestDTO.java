@@ -1,6 +1,5 @@
 package br.com.system.data.dto.request;
 
-import br.com.system.enums.AdministratorRole;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +16,6 @@ public class AdministratorRequestDTO implements Serializable {
     private Long userId;
     private String login;
     private String password;
-    private AdministratorRole role;
     private LocalDateTime lastLogin;
 
     public AdministratorRequestDTO() {}

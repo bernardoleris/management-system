@@ -9,6 +9,7 @@ import br.com.system.model.UserEntity;
 import br.com.system.repository.AdministratorRepository;
 import br.com.system.repository.UserEntityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -23,6 +24,9 @@ public class AdministratorServices {
 
     @Autowired
     private UserEntityRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     public List<AdministratorResponseDTO> findAll() {
         logger.info("Finding administrators!");
@@ -74,8 +78,7 @@ public class AdministratorServices {
 
         entity.setUser(user);
         entity.setLogin(administrator.getLogin());
-        entity.setPassword(administrator.getPassword());
-        entity.setRole(administrator.getRole());
+        entity.setPassword(passwordEncoder.encode(administrator.getPassword()));
         entity.setLastLogin(administrator.getLastLogin());
     }
 }
