@@ -2,6 +2,7 @@ package br.com.system.services;
 
 import br.com.system.data.dto.request.UserEntityRequestDTO;
 import br.com.system.data.dto.response.UserEntityResponseDTO;
+import br.com.system.exception.DuplicateResourceException;
 import br.com.system.exception.ResourceNotFoundException;
 import br.com.system.mapper.ObjectMapper;
 import br.com.system.model.UserEntity;
@@ -37,6 +38,10 @@ public class UserEntityServices {
     public UserEntityResponseDTO create(UserEntityRequestDTO user) {
         logger.info("Creating one user!");
 
+        if (repository.existsByEmail(user.getEmail())) {
+            throw new DuplicateResourceException("Email already registered!");
+        }
+
         UserEntity entity = ObjectMapper.parseObject(user, UserEntity.class);
         UserEntity savedEntity = repository.save(entity);
 
@@ -48,6 +53,10 @@ public class UserEntityServices {
 
         UserEntity entity = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No user found for this ID!"));
+
+        if (repository.existsByEmailAndIdNot(user.getEmail(), id)) {
+            throw new DuplicateResourceException("Email already registered!");
+        }
 
         entity.setFirstName(user.getFirstName());
         entity.setLastName(user.getLastName());

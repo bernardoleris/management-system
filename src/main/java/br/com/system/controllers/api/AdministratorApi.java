@@ -96,5 +96,5 @@ public interface AdministratorApi {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content)
     })
-    ResponseEntity<?> delete(@PathVariable("id") Long id);
+    ResponseEntity<?> toggleActive(@PathVariable("id") Long id);
 }

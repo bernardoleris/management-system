@@ -55,10 +55,10 @@ public class AdministratorController implements AdministratorApi {
         return service.update(id, administrator);
     }
 
-    @DeleteMapping(value = "/{id}")
+    @PatchMapping("/{id}/toggle-active")
     @Override
-    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
-        service.delete(id);
+    public ResponseEntity<Void> toggleActive(@PathVariable Long id) {
+        service.toggleActive(id);
         return ResponseEntity.noContent().build();
     }
 }
