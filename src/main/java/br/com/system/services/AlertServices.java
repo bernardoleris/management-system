@@ -10,6 +10,7 @@ import br.com.system.repository.AdministratorRepository;
 import br.com.system.repository.AlertRepository;
 import br.com.system.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -117,22 +118,22 @@ public class AlertServices {
 
     private void setAlertFields(Alert entity, AlertRequestDTO dto) {
         Product product = findProduct(dto.getProductId());
-        Administrator admin = findAdministrator(dto.getAdminId());
+        Administrator admin = findAdminFromToken();
 
         entity.setProduct(product);
         entity.setAdmin(admin);
         entity.setType(dto.getType());
         entity.setMinimumQuantity(dto.getMinimumQuantity());
         entity.setMessage(dto.getMessage());
+    }
 
-        if (dto.getRead() != null) {
-            entity.setRead(dto.getRead());
-            entity.setReadAt(Boolean.TRUE.equals(dto.getRead()) ? LocalDateTime.now() : null);
-        }
+    private Administrator findAdminFromToken() {
+        String login = SecurityContextHolder.getContext()
+                .getAuthentication()
+                .getName();
 
-        if (dto.getActive() != null) {
-            entity.setActive(dto.getActive());
-        }
+        return administratorRepository.findByLogin(login)
+                .orElseThrow(() -> new ResourceNotFoundException("Administrator not found!"));
     }
 
     private Alert findAlert(Long id) {

@@ -162,7 +162,9 @@ public class ProductServices {
     private void setProductFields(Product entity, ProductRequestDTO product) {
         Category category = findCategory(product.getCategoryId());
         Brand brand = findBrand(product.getBrandId());
-        Supplier supplier = findSupplier(product.getSupplierId());
+        Supplier supplier = product.getSupplierId() != null
+                ? findSupplier(product.getSupplierId())
+                : null;
 
         entity.setName(product.getName());
         entity.setDescription(product.getDescription());
@@ -173,10 +175,6 @@ public class ProductServices {
         entity.setCategory(category);
         entity.setBrand(brand);
         entity.setSupplier(supplier);
-
-        if (product.getActive() != null) {
-            entity.setActive(product.getActive());
-        }
     }
 
     private Product findProduct(Long id) {

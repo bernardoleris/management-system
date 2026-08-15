@@ -1,11 +1,8 @@
 package br.com.system.data.dto.request;
 
-import br.com.system.enums.DocumentType;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Past;
 import jakarta.validation.constraints.Size;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -13,14 +10,15 @@ import lombok.Setter;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.LocalDate;
 
 @Getter
 @Setter
 @EqualsAndHashCode
-public class ClientRequestDTO implements Serializable {
+public class AdministratorCreateRequestDTO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
+
+    // ─── Dados do UserEntity ──────────────────────────────────────────────────
 
     @NotBlank(message = "First name is required")
     @Size(max = 80, message = "First name must have at most 80 characters")
@@ -38,18 +36,18 @@ public class ClientRequestDTO implements Serializable {
     @Size(max = 20, message = "Phone must have at most 20 characters")
     private String phone;
 
-    @NotNull(message = "Document type is required")
-    private DocumentType documentType;
+    // ─── Dados do Administrator ───────────────────────────────────────────────
 
-    @NotBlank(message = "Document number is required")
-    @Size(max = 14, message = "Document number must have at most 14 characters")
-    private String documentNumber;
+    @NotBlank(message = "Login is required")
+    @Size(max = 50, message = "Login must have at most 50 characters")
+    private String login;
 
-    @Past(message = "Birth date must be in the past")
-    private LocalDate birthDate;
+    @NotBlank(message = "Password is required")
+    @Size(min = 6, message = "Password must have at least 6 characters")
+    private String password;
 
-    @Valid
-    private AddressRequestDTO address;
+    @NotNull(message = "Permission is required")
+    private Long permissionId;
 
-    public ClientRequestDTO() {}
+    public AdministratorCreateRequestDTO() {}
 }

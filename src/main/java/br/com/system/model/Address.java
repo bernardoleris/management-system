@@ -25,16 +25,16 @@ public class Address implements Serializable{
     @Column(name = "street", nullable = false, length = 100)
     private String street;
 
-    @Column(name = "number", nullable = false, length = 20)
+    @Column(name = "number", nullable = false, length = 10)
     private String number;
 
-    @Column(name = "complement", length = 100)
+    @Column(name = "complement", length = 50)
     private String complement;
 
-    @Column(name = "neighborhood", nullable = false, length = 80)
+    @Column(name = "neighborhood", nullable = false, length = 100)
     private String neighborhood;
 
-    @Column(name = "city", nullable = false, length = 80)
+    @Column(name = "city", nullable = false, length = 100)
     private String city;
 
     @Column(name = "state", nullable = false, length = 2)

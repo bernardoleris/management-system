@@ -51,11 +51,11 @@ public interface ClientApi {
     })
     ClientResponseDTO update(@PathVariable("id") Long id, @RequestBody ClientRequestDTO client);
 
-    @Operation(summary = "Delete client", description = "Deletes the client.")
+    @Operation(summary = "Toggle client active flag", description = "Toggles the active flag for the client.")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Client deleted successfully", content = @Content),
+            @ApiResponse(responseCode = "204", description = "Client updated successfully", content = @Content),
             @ApiResponse(responseCode = "404", description = "Client not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    ResponseEntity<?> delete(@PathVariable("id") Long id);
+    ResponseEntity<?> toggleActive(@PathVariable("id") Long id);
 }

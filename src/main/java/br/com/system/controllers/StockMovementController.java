@@ -5,6 +5,7 @@ import br.com.system.data.dto.request.StockMovementRequestDTO;
 import br.com.system.data.dto.response.StockMovementResponseDTO;
 import br.com.system.enums.MovementType;
 import br.com.system.services.StockMovementServices;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -52,7 +53,7 @@ public class StockMovementController implements StockMovementApi {
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
-    public ResponseEntity<StockMovementResponseDTO> create(@RequestBody StockMovementRequestDTO dto) {
+    public ResponseEntity<StockMovementResponseDTO> create(@RequestBody @Valid StockMovementRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(dto));
     }
 

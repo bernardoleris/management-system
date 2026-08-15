@@ -4,6 +4,7 @@ import br.com.system.controllers.api.UserEntityApi;
 import br.com.system.data.dto.request.UserEntityRequestDTO;
 import br.com.system.data.dto.response.UserEntityResponseDTO;
 import br.com.system.services.UserEntityServices;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -41,7 +42,7 @@ public class UserEntityController implements UserEntityApi {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @Override
-    public ResponseEntity<UserEntityResponseDTO> create(@RequestBody UserEntityRequestDTO user) {
+    public ResponseEntity<UserEntityResponseDTO> create(@RequestBody @Valid UserEntityRequestDTO user) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(user));
     }
 
@@ -53,7 +54,7 @@ public class UserEntityController implements UserEntityApi {
     @Override
     public UserEntityResponseDTO update(
             @PathVariable("id") Long id,
-            @RequestBody UserEntityRequestDTO user) {
+            @RequestBody @Valid UserEntityRequestDTO user) {
         return service.update(id, user);
     }
 

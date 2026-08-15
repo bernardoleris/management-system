@@ -1,5 +1,6 @@
 package br.com.system.controllers.api;
 
+import br.com.system.data.dto.request.AdministratorCreateRequestDTO;
 import br.com.system.data.dto.request.AdministratorRequestDTO;
 import br.com.system.data.dto.response.AdministratorResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
@@ -62,7 +63,7 @@ public interface AdministratorApi {
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content)
     })
-    ResponseEntity<AdministratorResponseDTO> create(@RequestBody AdministratorRequestDTO administrator);
+    ResponseEntity<AdministratorResponseDTO> create(@RequestBody AdministratorCreateRequestDTO administrator);
 
     @Operation(
             summary = "Update administrator",

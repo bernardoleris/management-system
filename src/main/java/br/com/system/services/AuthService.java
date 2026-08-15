@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.logging.Logger;
 
@@ -39,6 +40,9 @@ public class AuthService {
         if (!passwordEncoder.matches(dto.getPassword(), administrator.getPassword())) {
             throw new BusinessException("Invalid login or password!");
         }
+
+        administrator.setLastLogin(LocalDateTime.now());
+        administratorRepository.save(administrator);
 
         String token = tokenProvider.generateToken(dto.getLogin());
         Date issuedAt = new Date();

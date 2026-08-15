@@ -18,6 +18,8 @@ public class AdministratorRequestDTO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    // ─── Dados do UserEntity ──────────────────────────────────────────────────
+
     @NotBlank(message = "First name is required")
     @Size(max = 80, message = "First name must have at most 80 characters")
     private String firstName;
@@ -34,12 +36,11 @@ public class AdministratorRequestDTO implements Serializable {
     @Size(max = 20, message = "Phone must have at most 20 characters")
     private String phone;
 
+    // ─── Dados do Administrator ───────────────────────────────────────────────
+
     @NotBlank(message = "Login is required")
     @Size(max = 50, message = "Login must have at most 50 characters")
     private String login;
-
-    @NotBlank(message = "Password is required")
-    private String password;
 
     @NotNull(message = "Permission is required")
     private Long permissionId;

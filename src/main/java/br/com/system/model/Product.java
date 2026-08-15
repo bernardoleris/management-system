@@ -58,8 +58,8 @@ public class Product implements Serializable {
     @JoinColumn(name = "brand_id", nullable = false)
     private Brand brand;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "supplier_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "supplier_id")
     private Supplier supplier;
 
     @PrePersist

@@ -1,10 +1,14 @@
 package br.com.system.services;
 
+import br.com.system.data.dto.request.AdministratorCreateRequestDTO;
 import br.com.system.data.dto.request.AdministratorRequestDTO;
+import br.com.system.data.dto.request.ChangePasswordRequestDTO;
 import br.com.system.data.dto.response.AdministratorResponseDTO;
+import br.com.system.data.dto.response.UserEntityResponseDTO;
 import br.com.system.exception.BusinessException;
 import br.com.system.exception.DuplicateResourceException;
 import br.com.system.exception.ResourceNotFoundException;
+import br.com.system.mapper.ObjectMapper;
 import br.com.system.model.Administrator;
 import br.com.system.model.Permission;
 import br.com.system.model.UserEntity;
@@ -16,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -52,7 +57,7 @@ public class AdministratorServices {
     }
 
     @Transactional
-    public AdministratorResponseDTO create(AdministratorRequestDTO dto) {
+    public AdministratorResponseDTO create(AdministratorCreateRequestDTO dto) {
         logger.info("Creating one administrator!");
 
         if (userEntityRepository.existsByEmail(dto.getEmail())) {
@@ -71,7 +76,7 @@ public class AdministratorServices {
         user.setLastName(dto.getLastName());
         user.setEmail(dto.getEmail());
         user.setPhone(dto.getPhone());
-        user.setPermissions(List.of(permission));
+        user.setPermissions(new ArrayList<>(List.of(permission)));
         userEntityRepository.save(user);
 
         Administrator entity = new Administrator();
@@ -105,11 +110,10 @@ public class AdministratorServices {
         user.setLastName(dto.getLastName());
         user.setEmail(dto.getEmail());
         user.setPhone(dto.getPhone());
-        user.setPermissions(List.of(permission));
+        user.setPermissions(new ArrayList<>(List.of(permission)));
         userEntityRepository.save(user);
 
         entity.setLogin(dto.getLogin());
-        entity.setPassword(passwordEncoder.encode(dto.getPassword()));
 
         return toResponseDTO(administratorRepository.save(entity));
     }
@@ -136,12 +140,7 @@ public class AdministratorServices {
         dto.setLastLogin(entity.getLastLogin());
 
         if (entity.getUser() != null) {
-            dto.setUserId(entity.getUser().getId());
-            dto.setFirstName(entity.getUser().getFirstName());
-            dto.setLastName(entity.getUser().getLastName());
-            dto.setEmail(entity.getUser().getEmail());
-            dto.setPhone(entity.getUser().getPhone());
-            dto.setActive(entity.getUser().getActive());
+            dto.setUser(ObjectMapper.parseObject(entity.getUser(), UserEntityResponseDTO.class));
             dto.setPermissions(entity.getUser().getPermissions()
                     .stream()
                     .map(Permission::getAuthority)
@@ -149,5 +148,23 @@ public class AdministratorServices {
         }
 
         return dto;
+    }
+
+    @Transactional
+    public void changePassword(Long id, ChangePasswordRequestDTO dto) {
+        logger.info("Changing administrator password!");
+
+        Administrator entity = findEntityById(id);
+
+        if (!passwordEncoder.matches(dto.getCurrentPassword(), entity.getPassword())) {
+            throw new BusinessException("Current password is incorrect!");
+        }
+
+        if (!dto.getNewPassword().equals(dto.getConfirmPassword())) {
+            throw new BusinessException("Passwords do not match!");
+        }
+
+        entity.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        administratorRepository.save(entity);
     }
 }

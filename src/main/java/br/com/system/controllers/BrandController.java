@@ -4,6 +4,7 @@ import br.com.system.controllers.api.BrandApi;
 import br.com.system.data.dto.request.BrandRequestDTO;
 import br.com.system.data.dto.response.BrandResponseDTO;
 import br.com.system.services.BrandServices;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -39,7 +40,7 @@ public class BrandController implements BrandApi {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @Override
-    public ResponseEntity<BrandResponseDTO> create(@RequestBody BrandRequestDTO brand) {
+    public ResponseEntity<BrandResponseDTO> create(@RequestBody @Valid BrandRequestDTO brand) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(brand));
     }
 
@@ -51,7 +52,7 @@ public class BrandController implements BrandApi {
     @Override
     public BrandResponseDTO update(
             @PathVariable("id") Long id,
-            @RequestBody BrandRequestDTO brand) {
+            @RequestBody @Valid BrandRequestDTO brand) {
         return service.update(id, brand);
     }
 

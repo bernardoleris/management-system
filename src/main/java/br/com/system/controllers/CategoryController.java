@@ -4,6 +4,7 @@ import br.com.system.controllers.api.CategoryApi;
 import br.com.system.data.dto.request.CategoryRequestDTO;
 import br.com.system.data.dto.response.CategoryResponseDTO;
 import br.com.system.services.CategoryServices;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -39,7 +40,7 @@ public class CategoryController implements CategoryApi {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @Override
-    public ResponseEntity<CategoryResponseDTO> create(@RequestBody CategoryRequestDTO category) {
+    public ResponseEntity<CategoryResponseDTO> create(@RequestBody @Valid CategoryRequestDTO category) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(category));
     }
 
@@ -51,7 +52,7 @@ public class CategoryController implements CategoryApi {
     @Override
     public CategoryResponseDTO update(
             @PathVariable("id") Long id,
-            @RequestBody CategoryRequestDTO category) {
+            @RequestBody @Valid CategoryRequestDTO category) {
         return service.update(id, category);
     }
 

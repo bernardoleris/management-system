@@ -5,6 +5,7 @@ import br.com.system.data.dto.request.SaleRequestDTO;
 import br.com.system.data.dto.response.SaleResponseDTO;
 import br.com.system.enums.SaleStatus;
 import br.com.system.services.SaleServices;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -67,7 +68,7 @@ public class SaleController implements SaleApi {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @Override
-    public ResponseEntity<SaleResponseDTO> create(@RequestBody SaleRequestDTO sale) {
+    public ResponseEntity<SaleResponseDTO> create(@RequestBody @Valid SaleRequestDTO sale) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(sale));
     }
 
@@ -79,7 +80,7 @@ public class SaleController implements SaleApi {
     @Override
     public SaleResponseDTO update(
             @PathVariable("id") Long id,
-            @RequestBody SaleRequestDTO sale) {
+            @RequestBody @Valid SaleRequestDTO sale) {
         return service.update(id, sale);
     }
 

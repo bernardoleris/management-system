@@ -4,6 +4,7 @@ import br.com.system.controllers.api.ProductApi;
 import br.com.system.data.dto.request.ProductRequestDTO;
 import br.com.system.data.dto.response.ProductResponseDTO;
 import br.com.system.services.ProductServices;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -84,7 +85,7 @@ public class ProductController implements ProductApi {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @Override
-    public ResponseEntity<ProductResponseDTO> create(@RequestBody ProductRequestDTO product) {
+    public ResponseEntity<ProductResponseDTO> create(@RequestBody @Valid ProductRequestDTO product) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(product));
     }
 
@@ -96,7 +97,7 @@ public class ProductController implements ProductApi {
     @Override
     public ProductResponseDTO update(
             @PathVariable("id") Long id,
-            @RequestBody ProductRequestDTO product) {
+            @RequestBody @Valid ProductRequestDTO product) {
         return service.update(id, product);
     }
 

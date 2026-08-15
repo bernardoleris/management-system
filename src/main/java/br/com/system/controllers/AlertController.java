@@ -4,6 +4,7 @@ import br.com.system.controllers.api.AlertApi;
 import br.com.system.data.dto.request.AlertRequestDTO;
 import br.com.system.data.dto.response.AlertResponseDTO;
 import br.com.system.services.AlertServices;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -75,7 +76,7 @@ public class AlertController implements AlertApi {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @Override
-    public ResponseEntity<AlertResponseDTO> create(@RequestBody AlertRequestDTO alert) {
+    public ResponseEntity<AlertResponseDTO> create(@RequestBody @Valid AlertRequestDTO alert) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(alert));
     }
 
@@ -87,7 +88,7 @@ public class AlertController implements AlertApi {
     @Override
     public AlertResponseDTO update(
             @PathVariable("id") Long id,
-            @RequestBody AlertRequestDTO alert) {
+            @RequestBody @Valid AlertRequestDTO alert) {
         return service.update(id, alert);
     }
 

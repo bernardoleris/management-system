@@ -4,6 +4,7 @@ import br.com.system.controllers.api.AddressApi;
 import br.com.system.data.dto.request.AddressRequestDTO;
 import br.com.system.data.dto.response.AddressResponseDTO;
 import br.com.system.services.AddressServices;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +33,7 @@ public class AddressController implements AddressApi {
     @Override
     public ResponseEntity<AddressResponseDTO> create(
             @PathVariable("id") Long clientId,
-            @RequestBody AddressRequestDTO dto) {
+            @RequestBody @Valid AddressRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(clientId, dto));
     }
 
@@ -47,7 +48,7 @@ public class AddressController implements AddressApi {
     @Override
     public ResponseEntity<AddressResponseDTO> update(
             @PathVariable("id") Long clientId,
-            @RequestBody AddressRequestDTO dto) {
+            @RequestBody @Valid AddressRequestDTO dto) {
         return ResponseEntity.ok(service.update(clientId, dto));
     }
 }

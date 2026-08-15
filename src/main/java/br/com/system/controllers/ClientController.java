@@ -4,6 +4,7 @@ import br.com.system.controllers.api.ClientApi;
 import br.com.system.data.dto.request.ClientRequestDTO;
 import br.com.system.data.dto.response.ClientResponseDTO;
 import br.com.system.services.ClientServices;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -39,7 +40,7 @@ public class ClientController implements ClientApi {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @Override
-    public ResponseEntity<ClientResponseDTO> create(@RequestBody ClientRequestDTO client) {
+    public ResponseEntity<ClientResponseDTO> create(@RequestBody @Valid ClientRequestDTO client) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(client));
     }
 
@@ -51,14 +52,14 @@ public class ClientController implements ClientApi {
     @Override
     public ClientResponseDTO update(
             @PathVariable("id") Long id,
-            @RequestBody ClientRequestDTO client) {
+            @RequestBody @Valid ClientRequestDTO client) {
         return service.update(id, client);
     }
 
-    @DeleteMapping(value = "/{id}")
+    @PatchMapping("/{id}/toggle-active")
     @Override
-    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
-        service.delete(id);
+    public ResponseEntity<Void> toggleActive(@PathVariable Long id) {
+        service.toggleActive(id);
         return ResponseEntity.noContent().build();
     }
 }
