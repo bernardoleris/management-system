@@ -39,7 +39,7 @@ public class AddressController implements AddressApi {
 
     @DeleteMapping
     @Override
-    public ResponseEntity<?> delete(@PathVariable("id") Long clientId) {
+    public ResponseEntity<Void> delete(@PathVariable("id") Long clientId) {
         service.delete(clientId);
         return ResponseEntity.noContent().build();
     }

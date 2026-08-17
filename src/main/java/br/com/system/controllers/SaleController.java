@@ -7,12 +7,13 @@ import br.com.system.enums.SaleStatus;
 import br.com.system.services.SaleServices;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/sales")
@@ -23,8 +24,9 @@ public class SaleController implements SaleApi {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
-    public List<SaleResponseDTO> findAll() {
-        return service.findAll();
+    public Page<SaleResponseDTO> findAll(
+            @PageableDefault(size = 20, sort = "date") Pageable pageable) {
+        return service.findAll(pageable);
     }
 
     @GetMapping(
@@ -32,8 +34,10 @@ public class SaleController implements SaleApi {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @Override
-    public List<SaleResponseDTO> findByStatus(@PathVariable SaleStatus status) {
-        return service.findByStatus(status);
+    public Page<SaleResponseDTO> findByStatus(
+            @PathVariable SaleStatus status,
+            @PageableDefault(size = 20, sort = "date") Pageable pageable) {
+        return service.findByStatus(status, pageable);
     }
 
     @GetMapping(
@@ -41,8 +45,10 @@ public class SaleController implements SaleApi {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @Override
-    public List<SaleResponseDTO> findByAdmin(@PathVariable Long adminId) {
-        return service.findByAdmin(adminId);
+    public Page<SaleResponseDTO> findByAdmin(
+            @PathVariable Long adminId,
+            @PageableDefault(size = 20, sort = "date") Pageable pageable) {
+        return service.findByAdmin(adminId, pageable);
     }
 
     @GetMapping(
@@ -50,8 +56,10 @@ public class SaleController implements SaleApi {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @Override
-    public List<SaleResponseDTO> findByClient(@PathVariable Long clientId) {
-        return service.findByClient(clientId);
+    public Page<SaleResponseDTO> findByClient(
+            @PathVariable Long clientId,
+            @PageableDefault(size = 20, sort = "date") Pageable pageable) {
+        return service.findByClient(clientId, pageable);
     }
 
     @GetMapping(

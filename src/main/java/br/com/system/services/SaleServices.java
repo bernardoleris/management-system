@@ -16,6 +16,8 @@ import br.com.system.repository.ClientRepository;
 import br.com.system.repository.ProductRepository;
 import br.com.system.repository.SaleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -39,40 +41,36 @@ public class SaleServices {
     @Autowired
     private ProductRepository productRepository;
 
-    public List<SaleResponseDTO> findAll() {
+    public Page<SaleResponseDTO> findAll(Pageable pageable) {
         logger.info("Finding sales!");
 
-        return saleRepository.findAll().stream()
-                .map(this::toResponseDTO)
-                .toList();
+        return saleRepository.findAll(pageable)
+                .map(this::toResponseDTO);
     }
 
-    public List<SaleResponseDTO> findByStatus(SaleStatus status) {
+    public Page<SaleResponseDTO> findByStatus(SaleStatus status, Pageable pageable) {
         logger.info("Finding sales by status!");
 
-        return saleRepository.findByStatus(status).stream()
-                .map(this::toResponseDTO)
-                .toList();
+        return saleRepository.findByStatus(status, pageable)
+                .map(this::toResponseDTO);
     }
 
-    public List<SaleResponseDTO> findByAdmin(Long adminId) {
+    public Page<SaleResponseDTO> findByAdmin(Long adminId, Pageable pageable) {
         logger.info("Finding sales by administrator!");
 
         findAdministrator(adminId);
 
-        return saleRepository.findByAdminId(adminId).stream()
-                .map(this::toResponseDTO)
-                .toList();
+        return saleRepository.findByAdminId(adminId, pageable)
+                .map(this::toResponseDTO);
     }
 
-    public List<SaleResponseDTO> findByClient(Long clientId) {
+    public Page<SaleResponseDTO> findByClient(Long clientId, Pageable pageable) {
         logger.info("Finding sales by client!");
 
         findClient(clientId);
 
-        return saleRepository.findByClientId(clientId).stream()
-                .map(this::toResponseDTO)
-                .toList();
+        return saleRepository.findByClientId(clientId, pageable)
+                .map(this::toResponseDTO);
     }
 
     public SaleResponseDTO findById(Long id) {

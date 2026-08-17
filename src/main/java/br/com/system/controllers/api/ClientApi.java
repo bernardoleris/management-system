@@ -3,25 +3,35 @@ package br.com.system.controllers.api;
 import br.com.system.data.dto.request.ClientRequestDTO;
 import br.com.system.data.dto.response.ClientResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.List;
-
 @Tag(name = "Client", description = "Endpoints for client management.")
 public interface ClientApi {
-    @Operation(summary = "List clients", description = "Returns all clients.")
+    @Operation(summary = "List clients", description = "Returns all clients paginated.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Clients found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    List<ClientResponseDTO> findAll();
+    @Parameters({
+            @Parameter(name = "page", description = "Page number (0-based)", example = "0"),
+            @Parameter(name = "size", description = "Items per page", example = "20"),
+            @Parameter(name = "sort", description = "Sort field and direction", example = "id,asc")
+    })
+    Page<ClientResponseDTO> findAll(
+            @Parameter(hidden = true)
+            @PageableDefault(size = 20, sort = "id") Pageable pageable);
 
     @Operation(summary = "Get client by id", description = "Returns the client for the informed id.")
     @ApiResponses({

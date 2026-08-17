@@ -11,6 +11,8 @@ import br.com.system.exception.ResourceNotFoundException;
 import br.com.system.model.*;
 import br.com.system.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,43 +40,39 @@ public class StockMovementServices {
     private SupplierRepository supplierRepository;
 
     @Transactional(readOnly = true)
-    public List<StockMovementResponseDTO> findAll() {
+    public Page<StockMovementResponseDTO> findAll(Pageable pageable) {
         logger.info("Finding stock movements!");
 
-        return stockMovementRepository.findAll().stream()
-                .map(this::toResponseDTO)
-                .toList();
+        return stockMovementRepository.findAll(pageable)
+                .map(this::toResponseDTO);
     }
 
     @Transactional(readOnly = true)
-    public List<StockMovementResponseDTO> findByAdmin(Long adminId) {
+    public Page<StockMovementResponseDTO> findByAdmin(Long adminId, Pageable pageable) {
         logger.info("Finding stock movements by administrator!");
 
         findAdministrator(adminId);
 
-        return stockMovementRepository.findByAdminId(adminId).stream()
-                .map(this::toResponseDTO)
-                .toList();
+        return stockMovementRepository.findByAdminId(adminId, pageable)
+                .map(this::toResponseDTO);
     }
 
     @Transactional(readOnly = true)
-    public List<StockMovementResponseDTO> findBySupplier(Long supplierId) {
+    public Page<StockMovementResponseDTO> findBySupplier(Long supplierId, Pageable pageable) {
         logger.info("Finding stock movements by supplier!");
 
         findSupplier(supplierId);
 
-        return stockMovementRepository.findBySupplierId(supplierId).stream()
-                .map(this::toResponseDTO)
-                .toList();
+        return stockMovementRepository.findBySupplierId(supplierId, pageable)
+                .map(this::toResponseDTO);
     }
 
     @Transactional(readOnly = true)
-    public List<StockMovementResponseDTO> findByType(MovementType type) {
+    public Page<StockMovementResponseDTO> findByType(MovementType type, Pageable pageable) {
         logger.info("Finding stock movements by type!");
 
-        return stockMovementRepository.findByType(type).stream()
-                .map(this::toResponseDTO)
-                .toList();
+        return stockMovementRepository.findByType(type, pageable)
+                .map(this::toResponseDTO);
     }
 
     @Transactional(readOnly = true)

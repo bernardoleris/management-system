@@ -4,55 +4,82 @@ import br.com.system.data.dto.request.SaleRequestDTO;
 import br.com.system.data.dto.response.SaleResponseDTO;
 import br.com.system.enums.SaleStatus;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.List;
-
 @Tag(name = "Sale", description = "Endpoints for sale management.")
 public interface SaleApi {
-    @Operation(summary = "List sales", description = "Returns all sales.")
+    @Operation(summary = "List sales", description = "Returns all sales paginated.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Sales found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    List<SaleResponseDTO> findAll();
+    @Parameters({
+            @Parameter(name = "page", description = "Page number (0-based)", example = "0"),
+            @Parameter(name = "size", description = "Items per page", example = "20"),
+            @Parameter(name = "sort", description = "Sort field and direction", example = "date,desc")
+    })
+    Page<SaleResponseDTO> findAll(
+            @Parameter(hidden = true)
+            @PageableDefault(size = 20, sort = "date") Pageable pageable);
 
-    @Operation(summary = "List sales by status", description = "Returns sales filtered by status.")
+    @Operation(summary = "List sales by status", description = "Returns sales filtered by status paginated.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Sales found",
-                    content = @Content(mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = SaleResponseDTO.class)))),
+            @ApiResponse(responseCode = "200", description = "Sales found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    List<SaleResponseDTO> findByStatus(@PathVariable("status") SaleStatus status);
+    @Parameters({
+            @Parameter(name = "page", description = "Page number (0-based)", example = "0"),
+            @Parameter(name = "size", description = "Items per page", example = "20"),
+            @Parameter(name = "sort", description = "Sort field and direction", example = "date,desc")
+    })
+    Page<SaleResponseDTO> findByStatus(
+            @PathVariable("status") SaleStatus status,
+            @Parameter(hidden = true)
+            @PageableDefault(size = 20, sort = "date") Pageable pageable);
 
-    @Operation(summary = "List sales by administrator", description = "Returns sales linked to the informed administrator.")
+    @Operation(summary = "List sales by administrator", description = "Returns sales linked to the informed administrator paginated.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Sales found",
-                    content = @Content(mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = SaleResponseDTO.class)))),
+            @ApiResponse(responseCode = "200", description = "Sales found", content = @Content),
             @ApiResponse(responseCode = "404", description = "Administrator not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    List<SaleResponseDTO> findByAdmin(@PathVariable("adminId") Long adminId);
+    @Parameters({
+            @Parameter(name = "page", description = "Page number (0-based)", example = "0"),
+            @Parameter(name = "size", description = "Items per page", example = "20"),
+            @Parameter(name = "sort", description = "Sort field and direction", example = "date,desc")
+    })
+    Page<SaleResponseDTO> findByAdmin(
+            @PathVariable("adminId") Long adminId,
+            @Parameter(hidden = true)
+            @PageableDefault(size = 20, sort = "date") Pageable pageable);
 
-    @Operation(summary = "List sales by client", description = "Returns sales linked to the informed client.")
+    @Operation(summary = "List sales by client", description = "Returns sales linked to the informed client paginated.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Sales found",
-                    content = @Content(mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = SaleResponseDTO.class)))),
+            @ApiResponse(responseCode = "200", description = "Sales found", content = @Content),
             @ApiResponse(responseCode = "404", description = "Client not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    List<SaleResponseDTO> findByClient(@PathVariable("clientId") Long clientId);
+    @Parameters({
+            @Parameter(name = "page", description = "Page number (0-based)", example = "0"),
+            @Parameter(name = "size", description = "Items per page", example = "20"),
+            @Parameter(name = "sort", description = "Sort field and direction", example = "date,desc")
+    })
+    Page<SaleResponseDTO> findByClient(
+            @PathVariable("clientId") Long clientId,
+            @Parameter(hidden = true)
+            @PageableDefault(size = 20, sort = "date") Pageable pageable);
 
     @Operation(summary = "Get sale by id", description = "Returns the sale for the informed id.")
     @ApiResponses({

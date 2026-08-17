@@ -3,65 +3,98 @@ package br.com.system.controllers.api;
 import br.com.system.data.dto.request.ProductRequestDTO;
 import br.com.system.data.dto.response.ProductResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.List;
-
 @Tag(name = "Product", description = "Endpoints for product management.")
 public interface ProductApi {
-    @Operation(summary = "List products", description = "Returns all products.")
+
+    @Operation(summary = "List products", description = "Returns all products paginated.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Products found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    List<ProductResponseDTO> findAll();
+    @Parameters({
+            @Parameter(name = "page", description = "Page number (0-based)", example = "0"),
+            @Parameter(name = "size", description = "Items per page", example = "20"),
+            @Parameter(name = "sort", description = "Sort field and direction", example = "name,asc")
+    })
+    Page<ProductResponseDTO> findAll(
+            @Parameter(hidden = true)
+            @PageableDefault(size = 20, sort = "name") Pageable pageable);
 
-    @Operation(summary = "List active products", description = "Returns all active products.")
+    @Operation(summary = "List active products", description = "Returns all active products paginated.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Products found",
-                    content = @Content(mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = ProductResponseDTO.class)))),
+            @ApiResponse(responseCode = "200", description = "Products found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    List<ProductResponseDTO> findActive();
+    @Parameters({
+            @Parameter(name = "page", description = "Page number (0-based)", example = "0"),
+            @Parameter(name = "size", description = "Items per page", example = "20"),
+            @Parameter(name = "sort", description = "Sort field and direction", example = "name,asc")
+    })
+    Page<ProductResponseDTO> findActive(
+            @Parameter(hidden = true)
+            @PageableDefault(size = 20, sort = "name") Pageable pageable);
 
-    @Operation(summary = "List products by category", description = "Returns products for the informed category.")
+    @Operation(summary = "List products by category", description = "Returns products for the informed category paginated.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Products found",
-                    content = @Content(mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = ProductResponseDTO.class)))),
+            @ApiResponse(responseCode = "200", description = "Products found", content = @Content),
             @ApiResponse(responseCode = "404", description = "Category not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    List<ProductResponseDTO> findByCategory(@PathVariable("categoryId") Long categoryId);
+    @Parameters({
+            @Parameter(name = "page", description = "Page number (0-based)", example = "0"),
+            @Parameter(name = "size", description = "Items per page", example = "20"),
+            @Parameter(name = "sort", description = "Sort field and direction", example = "name,asc")
+    })
+    Page<ProductResponseDTO> findByCategory(
+            @PathVariable("categoryId") Long categoryId,
+            @Parameter(hidden = true)
+            @PageableDefault(size = 20, sort = "name") Pageable pageable);
 
-    @Operation(summary = "List products by brand", description = "Returns products for the informed brand.")
+    @Operation(summary = "List products by brand", description = "Returns products for the informed brand paginated.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Products found",
-                    content = @Content(mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = ProductResponseDTO.class)))),
+            @ApiResponse(responseCode = "200", description = "Products found", content = @Content),
             @ApiResponse(responseCode = "404", description = "Brand not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    List<ProductResponseDTO> findByBrand(@PathVariable("brandId") Long brandId);
+    @Parameters({
+            @Parameter(name = "page", description = "Page number (0-based)", example = "0"),
+            @Parameter(name = "size", description = "Items per page", example = "20"),
+            @Parameter(name = "sort", description = "Sort field and direction", example = "name,asc")
+    })
+    Page<ProductResponseDTO> findByBrand(
+            @PathVariable("brandId") Long brandId,
+            @Parameter(hidden = true)
+            @PageableDefault(size = 20, sort = "name") Pageable pageable);
 
-    @Operation(summary = "List products by supplier", description = "Returns products for the informed supplier.")
+    @Operation(summary = "List products by supplier", description = "Returns products for the informed supplier paginated.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Products found",
-                    content = @Content(mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = ProductResponseDTO.class)))),
+            @ApiResponse(responseCode = "200", description = "Products found", content = @Content),
             @ApiResponse(responseCode = "404", description = "Supplier not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    List<ProductResponseDTO> findBySupplier(@PathVariable("supplierId") Long supplierId);
+    @Parameters({
+            @Parameter(name = "page", description = "Page number (0-based)", example = "0"),
+            @Parameter(name = "size", description = "Items per page", example = "20"),
+            @Parameter(name = "sort", description = "Sort field and direction", example = "name,asc")
+    })
+    Page<ProductResponseDTO> findBySupplier(
+            @PathVariable("supplierId") Long supplierId,
+            @Parameter(hidden = true)
+            @PageableDefault(size = 20, sort = "name") Pageable pageable);
 
     @Operation(summary = "Get product by barcode", description = "Returns the product for the informed barcode.")
     @ApiResponses({
@@ -89,6 +122,7 @@ public interface ProductApi {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ProductResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Barcode already registered", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     ResponseEntity<ProductResponseDTO> create(@RequestBody ProductRequestDTO product);
@@ -100,17 +134,19 @@ public interface ProductApi {
                             schema = @Schema(implementation = ProductResponseDTO.class))),
             @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content),
             @ApiResponse(responseCode = "404", description = "Product not found", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Barcode already registered", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     ProductResponseDTO update(@PathVariable("id") Long id, @RequestBody ProductRequestDTO product);
 
-    @Operation(summary = "Delete product", description = "Deletes the product.")
+    @Operation(summary = "Delete product", description = "Deletes the product if it has no linked records.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Product deleted successfully", content = @Content),
+            @ApiResponse(responseCode = "400", description = "Product has linked records", content = @Content),
             @ApiResponse(responseCode = "404", description = "Product not found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    ResponseEntity<?> delete(@PathVariable("id") Long id);
+    ResponseEntity<Void> delete(@PathVariable("id") Long id);
 
     @Operation(summary = "Toggle product active flag", description = "Toggles the active flag for the product.")
     @ApiResponses({

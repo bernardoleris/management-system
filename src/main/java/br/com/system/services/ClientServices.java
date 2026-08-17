@@ -16,10 +16,10 @@ import br.com.system.repository.AddressRepository;
 import br.com.system.repository.ClientRepository;
 import br.com.system.repository.UserEntityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 import java.util.logging.Logger;
 
 @Service
@@ -36,12 +36,11 @@ public class ClientServices {
     private AddressRepository addressRepository;
 
     @Transactional(readOnly = true)
-    public List<ClientResponseDTO> findAll() {
+    public Page<ClientResponseDTO> findAll(Pageable pageable) {
         logger.info("Finding clients!");
 
-        return clientRepository.findAll().stream()
-                .map(this::toResponseDTO)
-                .toList();
+        return clientRepository.findAll(pageable)
+                .map(this::toResponseDTO);
     }
 
     @Transactional(readOnly = true)

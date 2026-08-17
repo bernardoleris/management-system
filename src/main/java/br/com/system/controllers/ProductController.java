@@ -6,12 +6,13 @@ import br.com.system.data.dto.response.ProductResponseDTO;
 import br.com.system.services.ProductServices;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/products")
@@ -22,88 +23,71 @@ public class ProductController implements ProductApi {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
-    public List<ProductResponseDTO> findAll() {
-        return service.findAll();
+    public Page<ProductResponseDTO> findAll(
+            @PageableDefault(size = 20, sort = "name") Pageable pageable) {
+        return service.findAll(pageable);
     }
 
-    @GetMapping(
-            value = "/active",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
+    @GetMapping(value = "/active", produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
-    public List<ProductResponseDTO> findActive() {
-        return service.findActive();
+    public Page<ProductResponseDTO> findActive(
+            @PageableDefault(size = 20, sort = "name") Pageable pageable) {
+        return service.findActive(pageable);
     }
 
-    @GetMapping(
-            value = "/category/{categoryId}",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
+    @GetMapping(value = "/category/{categoryId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
-    public List<ProductResponseDTO> findByCategory(@PathVariable Long categoryId) {
-        return service.findByCategory(categoryId);
+    public Page<ProductResponseDTO> findByCategory(
+            @PathVariable Long categoryId,
+            @PageableDefault(size = 20, sort = "name") Pageable pageable) {
+        return service.findByCategory(categoryId, pageable);
     }
 
-    @GetMapping(
-            value = "/brand/{brandId}",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
+    @GetMapping(value = "/brand/{brandId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
-    public List<ProductResponseDTO> findByBrand(@PathVariable Long brandId) {
-        return service.findByBrand(brandId);
+    public Page<ProductResponseDTO> findByBrand(
+            @PathVariable Long brandId,
+            @PageableDefault(size = 20, sort = "name") Pageable pageable) {
+        return service.findByBrand(brandId, pageable);
     }
 
-    @GetMapping(
-            value = "/supplier/{supplierId}",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
+    @GetMapping(value = "/supplier/{supplierId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
-    public List<ProductResponseDTO> findBySupplier(@PathVariable Long supplierId) {
-        return service.findBySupplier(supplierId);
+    public Page<ProductResponseDTO> findBySupplier(
+            @PathVariable Long supplierId,
+            @PageableDefault(size = 20, sort = "name") Pageable pageable) {
+        return service.findBySupplier(supplierId, pageable);
     }
 
-    @GetMapping(
-            value = "/barcode/{barcode}",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
+    @GetMapping(value = "/barcode/{barcode}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
     public ProductResponseDTO findByBarcode(@PathVariable String barcode) {
         return service.findByBarcode(barcode);
     }
 
-    @GetMapping(
-            value = "/{id}",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
-    public ProductResponseDTO findById(@PathVariable("id") Long id) {
+    public ProductResponseDTO findById(@PathVariable Long id) {
         return service.findById(id);
     }
 
-    @PostMapping(
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
     public ResponseEntity<ProductResponseDTO> create(@RequestBody @Valid ProductRequestDTO product) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.create(product));
     }
 
-    @PutMapping(
-            value = "/{id}",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
     public ProductResponseDTO update(
-            @PathVariable("id") Long id,
+            @PathVariable Long id,
             @RequestBody @Valid ProductRequestDTO product) {
         return service.update(id, product);
     }
 
     @DeleteMapping(value = "/{id}")
     @Override
-    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }

@@ -6,11 +6,12 @@ import br.com.system.data.dto.response.SupplierResponseDTO;
 import br.com.system.services.SupplierServices;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/suppliers")
@@ -48,19 +49,22 @@ public class SupplierController implements SupplierApi {
 
     @GetMapping
     @Override
-    public ResponseEntity<List<SupplierResponseDTO>> findAll() {
-        return ResponseEntity.ok(service.findAll());
+    public Page<SupplierResponseDTO> findAll(
+            @PageableDefault(size = 20, sort = "tradeName") Pageable pageable) {
+        return service.findAll(pageable);
     }
 
     @GetMapping("/active")
     @Override
-    public ResponseEntity<List<SupplierResponseDTO>> findAllActive() {
-        return ResponseEntity.ok(service.findAllActive());
+    public Page<SupplierResponseDTO> findAllActive(
+            @PageableDefault(size = 20, sort = "tradeName") Pageable pageable) {
+        return service.findAllActive(pageable);
     }
 
     @GetMapping("/disabled")
     @Override
-    public ResponseEntity<List<SupplierResponseDTO>> findAllDisabled() {
-        return ResponseEntity.ok(service.findAllDisabled());
+    public Page<SupplierResponseDTO> findAllDisabled(
+            @PageableDefault(size = 20, sort = "tradeName") Pageable pageable) {
+        return service.findAllDisabled(pageable);
     }
 }

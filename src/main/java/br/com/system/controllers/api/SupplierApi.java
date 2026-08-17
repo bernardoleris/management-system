@@ -3,17 +3,19 @@ package br.com.system.controllers.api;
 import br.com.system.data.dto.request.SupplierRequestDTO;
 import br.com.system.data.dto.response.SupplierResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
-
-import java.util.List;
 
 @Tag(name = "Supplier", description = "Endpoints for supplier management.")
 public interface SupplierApi {
@@ -53,30 +55,45 @@ public interface SupplierApi {
     })
     ResponseEntity<SupplierResponseDTO> findById(@PathVariable("id") Long id);
 
-    @Operation(summary = "List suppliers", description = "Returns all suppliers.")
+    @Operation(summary = "List suppliers", description = "Returns all suppliers paginated.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Suppliers found",
-                    content = @Content(mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = SupplierResponseDTO.class)))),
+            @ApiResponse(responseCode = "200", description = "Suppliers found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    ResponseEntity<List<SupplierResponseDTO>> findAll();
+    @Parameters({
+            @Parameter(name = "page", description = "Page number (0-based)", example = "0"),
+            @Parameter(name = "size", description = "Items per page", example = "20"),
+            @Parameter(name = "sort", description = "Sort field and direction", example = "tradeName,asc")
+    })
+    Page<SupplierResponseDTO> findAll(
+            @Parameter(hidden = true)
+            @PageableDefault(size = 20, sort = "tradeName") Pageable pageable);
 
-    @Operation(summary = "List active suppliers", description = "Returns all active suppliers.")
+    @Operation(summary = "List active suppliers", description = "Returns all active suppliers paginated.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Suppliers found",
-                    content = @Content(mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = SupplierResponseDTO.class)))),
+            @ApiResponse(responseCode = "200", description = "Suppliers found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    ResponseEntity<List<SupplierResponseDTO>> findAllActive();
+    @Parameters({
+            @Parameter(name = "page", description = "Page number (0-based)", example = "0"),
+            @Parameter(name = "size", description = "Items per page", example = "20"),
+            @Parameter(name = "sort", description = "Sort field and direction", example = "tradeName,asc")
+    })
+    Page<SupplierResponseDTO> findAllActive(
+            @Parameter(hidden = true)
+            @PageableDefault(size = 20, sort = "tradeName") Pageable pageable);
 
-    @Operation(summary = "List disabled suppliers", description = "Returns all disabled suppliers.")
+    @Operation(summary = "List disabled suppliers", description = "Returns all disabled suppliers paginated.")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Suppliers found",
-                    content = @Content(mediaType = "application/json",
-                            array = @ArraySchema(schema = @Schema(implementation = SupplierResponseDTO.class)))),
+            @ApiResponse(responseCode = "200", description = "Suppliers found", content = @Content),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    ResponseEntity<List<SupplierResponseDTO>> findAllDisabled();
+    @Parameters({
+            @Parameter(name = "page", description = "Page number (0-based)", example = "0"),
+            @Parameter(name = "size", description = "Items per page", example = "20"),
+            @Parameter(name = "sort", description = "Sort field and direction", example = "tradeName,asc")
+    })
+    Page<SupplierResponseDTO> findAllDisabled(
+            @Parameter(hidden = true)
+            @PageableDefault(size = 20, sort = "tradeName") Pageable pageable);
 }

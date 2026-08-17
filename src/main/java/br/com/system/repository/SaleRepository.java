@@ -2,14 +2,14 @@ package br.com.system.repository;
 
 import br.com.system.enums.SaleStatus;
 import br.com.system.model.Sale;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
-
 public interface SaleRepository extends JpaRepository<Sale, Long> {
-    List<Sale> findByStatus(SaleStatus status);
+    Page<Sale> findByStatus(SaleStatus status, Pageable pageable);
 
-    List<Sale> findByAdminId(Long adminId);
+    Page<Sale> findByAdminId(Long adminId, Pageable pageable);
 
-    List<Sale> findByClientId(Long clientId);
+    Page<Sale> findByClientId(Long clientId, Pageable pageable);
 }

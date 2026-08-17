@@ -11,9 +11,11 @@ import br.com.system.model.Product;
 import br.com.system.model.Supplier;
 import br.com.system.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.logging.Logger;
 
 @Service
@@ -41,58 +43,60 @@ public class ProductServices {
     @Autowired
     private AlertRepository alertRepository;
 
-    public List<ProductResponseDTO> findAll() {
+    @Transactional(readOnly = true)
+    public Page<ProductResponseDTO> findAll(Pageable pageable) {
         logger.info("Finding products!");
 
-        return productRepository.findAll().stream()
-                .map(this::toResponseDTO)
-                .toList();
+        return productRepository.findAll(pageable)
+                .map(this::toResponseDTO);
     }
 
-    public List<ProductResponseDTO> findActive() {
+    @Transactional(readOnly = true)
+    public Page<ProductResponseDTO> findActive(Pageable pageable) {
         logger.info("Finding active products!");
 
-        return productRepository.findByActiveTrue().stream()
-                .map(this::toResponseDTO)
-                .toList();
+        return productRepository.findByActiveTrue(pageable)
+                .map(this::toResponseDTO);
     }
 
-    public List<ProductResponseDTO> findByCategory(Long categoryId) {
+    @Transactional(readOnly = true)
+    public Page<ProductResponseDTO> findByCategory(Long categoryId, Pageable pageable) {
         logger.info("Finding products by category!");
 
         findCategory(categoryId);
 
-        return productRepository.findByCategoryIdAndActiveTrue(categoryId).stream()
-                .map(this::toResponseDTO)
-                .toList();
+        return productRepository.findByCategoryIdAndActiveTrue(categoryId, pageable)
+                .map(this::toResponseDTO);
     }
 
-    public List<ProductResponseDTO> findByBrand(Long brandId) {
+    @Transactional(readOnly = true)
+    public Page<ProductResponseDTO> findByBrand(Long brandId, Pageable pageable) {
         logger.info("Finding products by brand!");
 
         findBrand(brandId);
 
-        return productRepository.findByBrandIdAndActiveTrue(brandId).stream()
-                .map(this::toResponseDTO)
-                .toList();
+        return productRepository.findByBrandIdAndActiveTrue(brandId, pageable)
+                .map(this::toResponseDTO);
     }
 
-    public List<ProductResponseDTO> findBySupplier(Long supplierId) {
+    @Transactional(readOnly = true)
+    public Page<ProductResponseDTO> findBySupplier(Long supplierId, Pageable pageable) {
         logger.info("Finding products by supplier!");
 
         findSupplier(supplierId);
 
-        return productRepository.findBySupplierIdAndActiveTrue(supplierId).stream()
-                .map(this::toResponseDTO)
-                .toList();
+        return productRepository.findBySupplierIdAndActiveTrue(supplierId, pageable)
+                .map(this::toResponseDTO);
     }
 
+    @Transactional(readOnly = true)
     public ProductResponseDTO findById(Long id) {
         logger.info("Finding one product!");
 
         return toResponseDTO(findProduct(id));
     }
 
+    @Transactional(readOnly = true)
     public ProductResponseDTO findByBarcode(String barcode) {
         logger.info("Finding one product by barcode!");
 
@@ -102,26 +106,28 @@ public class ProductServices {
         return toResponseDTO(entity);
     }
 
+    @Transactional
     public ProductResponseDTO create(ProductRequestDTO product) {
         logger.info("Creating one product!");
 
-        Product entity = new Product();
-
-        if (productRepository.existsByBarcode(product.getBarcode())) {
+        if (product.getBarcode() != null && productRepository.existsByBarcode(product.getBarcode())) {
             throw new DuplicateResourceException("Barcode already registered!");
         }
 
+        Product entity = new Product();
         setProductFields(entity, product);
 
         return toResponseDTO(productRepository.save(entity));
     }
 
+    @Transactional
     public ProductResponseDTO update(Long id, ProductRequestDTO product) {
         logger.info("Updating one product!");
 
         Product entity = findProduct(id);
 
-        if (productRepository.existsByBarcodeAndIdNot(product.getBarcode(), id)) {
+        if (product.getBarcode() != null &&
+                productRepository.existsByBarcodeAndIdNot(product.getBarcode(), id)) {
             throw new DuplicateResourceException("Barcode already registered!");
         }
 
@@ -130,15 +136,16 @@ public class ProductServices {
         return toResponseDTO(productRepository.save(entity));
     }
 
+    @Transactional
     public void toggleActive(Long id) {
         logger.info("Toggling product active status!");
 
         Product entity = findProduct(id);
-
         entity.setActive(!entity.getActive());
         productRepository.save(entity);
     }
 
+    @Transactional
     public void delete(Long id) {
         logger.info("Deleting one product!");
 
@@ -158,6 +165,8 @@ public class ProductServices {
 
         productRepository.delete(entity);
     }
+
+    // ─── Métodos internos ─────────────────────────────────────────────────────
 
     private void setProductFields(Product entity, ProductRequestDTO product) {
         Category category = findCategory(product.getCategoryId());

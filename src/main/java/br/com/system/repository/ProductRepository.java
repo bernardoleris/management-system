@@ -1,21 +1,22 @@
 package br.com.system.repository;
 
 import br.com.system.model.Product;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
-    List<Product> findByActiveTrue();
+    Page<Product> findByActiveTrue(Pageable pageable);
+
+    Page<Product> findByCategoryIdAndActiveTrue(Long categoryId, Pageable pageable);
+
+    Page<Product> findByBrandIdAndActiveTrue(Long brandId, Pageable pageable);
+
+    Page<Product> findBySupplierIdAndActiveTrue(Long supplierId, Pageable pageable);
 
     Optional<Product> findByBarcode(String barcode);
-
-    List<Product> findByCategoryIdAndActiveTrue(Long categoryId);
-
-    List<Product> findByBrandIdAndActiveTrue(Long brandId);
-
-    List<Product> findBySupplierIdAndActiveTrue(Long supplierId);
 
     boolean existsByBarcode(String barcode);
 

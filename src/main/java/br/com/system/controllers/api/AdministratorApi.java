@@ -74,28 +74,17 @@ public interface AdministratorApi {
                     content = @Content(
                             mediaType = "application/json",
                             schema = @Schema(implementation = AdministratorResponseDTO.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid request",
-                    content = @Content),
-            @ApiResponse(responseCode = "404", description = "Administrator not found",
-                    content = @Content),
-            @ApiResponse(responseCode = "500", description = "Internal server error",
-                    content = @Content)
+            @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content),
+            @ApiResponse(responseCode = "404", description = "Administrator not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    AdministratorResponseDTO update(
-            @PathVariable("id") Long id,
-            @RequestBody AdministratorRequestDTO administrator);
+    AdministratorResponseDTO update(@PathVariable("id") Long id, @RequestBody AdministratorRequestDTO administrator);
 
-    @Operation(
-            summary = "Delete administrator",
-            description = "Deletes the informed administrator."
-    )
+    @Operation(summary = "Toggle administrator active flag", description = "Toggles the active flag for the administrator.")
     @ApiResponses({
-            @ApiResponse(responseCode = "204", description = "Administrator deleted successfully",
-                    content = @Content),
-            @ApiResponse(responseCode = "404", description = "Administrator not found",
-                    content = @Content),
-            @ApiResponse(responseCode = "500", description = "Internal server error",
-                    content = @Content)
+            @ApiResponse(responseCode = "204", description = "Administrator updated successfully", content = @Content),
+            @ApiResponse(responseCode = "404", description = "administrator not found", content = @Content),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
     ResponseEntity<?> toggleActive(@PathVariable("id") Long id);
 }

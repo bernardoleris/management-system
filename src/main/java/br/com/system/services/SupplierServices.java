@@ -8,9 +8,9 @@ import br.com.system.mapper.ObjectMapper;
 import br.com.system.model.Supplier;
 import br.com.system.repository.SupplierRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 import java.util.logging.Logger;
 
 @Service
@@ -21,30 +21,25 @@ public class SupplierServices {
     @Autowired
     private SupplierRepository supplierRepository;
 
-    public List<SupplierResponseDTO> findAll() {
+    public Page<SupplierResponseDTO> findAll(Pageable pageable) {
         logger.info("Finding all suppliers!");
 
-        return ObjectMapper.parseListObjects(supplierRepository.findAll(), SupplierResponseDTO.class);
+        return supplierRepository.findAll(pageable)
+                .map(supplier -> ObjectMapper.parseObject(supplier, SupplierResponseDTO.class));
     }
 
-    public List<SupplierResponseDTO> findAllActive() {
+    public Page<SupplierResponseDTO> findAllActive(Pageable pageable) {
         logger.info("Finding all active suppliers!");
 
-        return supplierRepository.findAll()
-                .stream()
-                .filter(s -> s.getActive())
-                .map(s -> ObjectMapper.parseObject(s, SupplierResponseDTO.class))
-                .toList();
+        return supplierRepository.findByActiveTrue(pageable)
+                .map(supplier -> ObjectMapper.parseObject(supplier, SupplierResponseDTO.class));
     }
 
-    public List<SupplierResponseDTO> findAllDisabled() {
-        logger.info("Finding all active suppliers!");
+    public Page<SupplierResponseDTO> findAllDisabled(Pageable pageable) {
+        logger.info("Finding all disabled suppliers!");
 
-        return supplierRepository.findAll()
-                .stream()
-                .filter(s -> !s.getActive())
-                .map(s -> ObjectMapper.parseObject(s, SupplierResponseDTO.class))
-                .toList();
+        return supplierRepository.findByActiveFalse(pageable)
+                .map(supplier -> ObjectMapper.parseObject(supplier, SupplierResponseDTO.class));
     }
 
     public SupplierResponseDTO findById(Long id) {

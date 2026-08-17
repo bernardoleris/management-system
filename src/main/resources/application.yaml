@@ -14,6 +14,12 @@ spring:
       ddl-auto: update
     show-sql: false
 
+  data:
+    web:
+      pageable:
+        one-indexed-parameters: false
+        default-page-size: 20
+
 logging:
   level:
     root: INFO

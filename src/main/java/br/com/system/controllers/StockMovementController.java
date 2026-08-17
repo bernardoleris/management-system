@@ -7,12 +7,13 @@ import br.com.system.enums.MovementType;
 import br.com.system.services.StockMovementServices;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/stock-movements")
@@ -23,8 +24,9 @@ public class StockMovementController implements StockMovementApi {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
-    public List<StockMovementResponseDTO> findAll() {
-        return service.findAll();
+    public Page<StockMovementResponseDTO> findAll(
+            @PageableDefault(size = 20, sort = "date") Pageable pageable) {
+        return service.findAll(pageable);
     }
 
     @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -35,20 +37,26 @@ public class StockMovementController implements StockMovementApi {
 
     @GetMapping(value = "/admin/{adminId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
-    public List<StockMovementResponseDTO> findByAdmin(@PathVariable Long adminId) {
-        return service.findByAdmin(adminId);
+    public Page<StockMovementResponseDTO> findByAdmin(
+            @PathVariable Long adminId,
+            @PageableDefault(size = 20, sort = "date") Pageable pageable) {
+        return service.findByAdmin(adminId, pageable);
     }
 
     @GetMapping(value = "/supplier/{supplierId}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
-    public List<StockMovementResponseDTO> findBySupplier(@PathVariable Long supplierId) {
-        return service.findBySupplier(supplierId);
+    public Page<StockMovementResponseDTO> findBySupplier(
+            @PathVariable Long supplierId,
+            @PageableDefault(size = 20, sort = "date") Pageable pageable) {
+        return service.findBySupplier(supplierId, pageable);
     }
 
     @GetMapping(value = "/type/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     @Override
-    public List<StockMovementResponseDTO> findByType(@PathVariable MovementType type) {
-        return service.findByType(type);
+    public Page<StockMovementResponseDTO> findByType(
+            @PathVariable MovementType type,
+            @PageableDefault(size = 20, sort = "date") Pageable pageable) {
+        return service.findByType(type, pageable);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
