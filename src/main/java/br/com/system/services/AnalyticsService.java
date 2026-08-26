@@ -4,6 +4,7 @@ import br.com.system.data.dto.response.analytics.ChartResponseDTO;
 import br.com.system.data.dto.response.analytics.ProductWithoutMovementResponseDTO;
 import br.com.system.data.dto.response.analytics.TopProductsResponseDTO;
 import br.com.system.enums.AnalyticsPeriod;
+import br.com.system.enums.Payment;
 import br.com.system.model.Product;
 import br.com.system.repository.ProductRepository;
 import br.com.system.repository.SaleItemRepository;
@@ -89,7 +90,7 @@ public class AnalyticsService {
         List<Object[]> results = saleRepository.countByPaymentMethod(range[0], range[1]);
 
         List<String> labels = results.stream()
-                .map(r -> r[0].toString())
+                .map(r -> Payment.valueOf(r[0].toString()).getLabel())
                 .toList();
 
         List<Number> data = results.stream()

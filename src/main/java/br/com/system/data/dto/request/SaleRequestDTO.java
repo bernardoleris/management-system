@@ -34,7 +34,6 @@ public class SaleRequestDTO implements Serializable {
     @NotNull(message = "Administrator is required")
     private Long adminId;
 
-    @NotNull(message = "Client is required")
     private Long clientId;
 
     @NotEmpty(message = "At least one item is required")

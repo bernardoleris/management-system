@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 @Service
+@Transactional
 public class SaleServices {
     private final Logger logger = Logger.getLogger(SaleServices.class.getName());
 
@@ -41,6 +43,7 @@ public class SaleServices {
     @Autowired
     private ProductRepository productRepository;
 
+    @Transactional(readOnly = true)
     public Page<SaleResponseDTO> findAll(Pageable pageable) {
         logger.info("Finding sales!");
 
@@ -48,6 +51,7 @@ public class SaleServices {
                 .map(this::toResponseDTO);
     }
 
+    @Transactional(readOnly = true)
     public Page<SaleResponseDTO> findByStatus(SaleStatus status, Pageable pageable) {
         logger.info("Finding sales by status!");
 
@@ -55,6 +59,7 @@ public class SaleServices {
                 .map(this::toResponseDTO);
     }
 
+    @Transactional(readOnly = true)
     public Page<SaleResponseDTO> findByAdmin(Long adminId, Pageable pageable) {
         logger.info("Finding sales by administrator!");
 
@@ -64,6 +69,7 @@ public class SaleServices {
                 .map(this::toResponseDTO);
     }
 
+    @Transactional(readOnly = true)
     public Page<SaleResponseDTO> findByClient(Long clientId, Pageable pageable) {
         logger.info("Finding sales by client!");
 
@@ -73,6 +79,7 @@ public class SaleServices {
                 .map(this::toResponseDTO);
     }
 
+    @Transactional(readOnly = true)
     public SaleResponseDTO findById(Long id) {
         logger.info("Finding one sale!");
 
@@ -116,9 +123,11 @@ public class SaleServices {
         saleRepository.delete(entity);
     }
 
+    // ─── Métodos internos ─────────────────────────────────────────────────────
+
     private void setSaleFields(Sale entity, SaleRequestDTO sale) {
         Administrator admin = findAdministrator(sale.getAdminId());
-        Client client = findClient(sale.getClientId());
+        Client client = sale.getClientId() != null ? findClient(sale.getClientId()) : null;
 
         entity.setAdmin(admin);
         entity.setClient(client);
@@ -166,9 +175,7 @@ public class SaleServices {
     }
 
     private void decreaseStockIfCompleted(Sale sale) {
-        if (sale.getStatus() != SaleStatus.COMPLETED) {
-            return;
-        }
+        if (sale.getStatus() != SaleStatus.COMPLETED) return;
 
         for (SaleItem item : sale.getItems()) {
             Product product = item.getProduct();
@@ -178,9 +185,7 @@ public class SaleServices {
     }
 
     private void restoreStockIfCompleted(Sale sale) {
-        if (sale.getStatus() != SaleStatus.COMPLETED) {
-            return;
-        }
+        if (sale.getStatus() != SaleStatus.COMPLETED) return;
 
         for (SaleItem item : sale.getItems()) {
             Product product = item.getProduct();
