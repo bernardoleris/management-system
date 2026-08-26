@@ -21,5 +21,6 @@ public class LoginResponseDTO implements Serializable {
     private Boolean authenticated;
     private Date issuedAt;
     private Date expiration;
-    private String token;
+    private String accessToken;
+    private String refreshToken;
 }

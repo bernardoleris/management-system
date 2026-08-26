@@ -35,4 +35,5 @@ springdoc:
 security:
   jwt:
     secret: 3f8k2m9x7p4n1q6r5t0w8v2j5h3b7d9c4e6g1i8l0o2u5y7a9z
-    expiration: 86400000
+    expiration: 3600000        # 1 hora em milissegundos
+    refresh-expiration: 604800000  # 7 dias em milissegundos
