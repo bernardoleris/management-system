@@ -4,9 +4,9 @@ spring:
 
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/stock_db?useTimezone=true&serverTimezone=UTC
-    username: root
-    password: 1234
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
 
   jpa:
     open-in-view: false
@@ -34,6 +34,6 @@ springdoc:
 
 security:
   jwt:
-    secret: 3f8k2m9x7p4n1q6r5t0w8v2j5h3b7d9c4e6g1i8l0o2u5y7a9z
-    expiration: 3600000        # 1 hora em milissegundos
-    refresh-expiration: 604800000  # 7 dias em milissegundos
+    secret: ${JWT_SECRET}
+    expiration: ${JWT_EXPIRATION}
+    refresh-expiration: ${JWT_REFRESH_EXPIRATION}
