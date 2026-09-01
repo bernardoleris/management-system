@@ -18,6 +18,8 @@ import br.com.system.repository.SaleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -126,7 +128,7 @@ public class SaleServices {
     // ─── Métodos internos ─────────────────────────────────────────────────────
 
     private void setSaleFields(Sale entity, SaleRequestDTO sale) {
-        Administrator admin = findAdministrator(sale.getAdminId());
+        Administrator admin = findAdminFromToken();
         Client client = sale.getClientId() != null ? findClient(sale.getClientId()) : null;
 
         entity.setAdmin(admin);
@@ -200,6 +202,14 @@ public class SaleServices {
 
     private BigDecimal valueOrZero(BigDecimal value) {
         return value == null ? BigDecimal.ZERO : value;
+    }
+
+    private Administrator findAdminFromToken() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String login = authentication.getName();
+
+        return administratorRepository.findByLogin(login)
+                .orElseThrow(() -> new ResourceNotFoundException("Administrator not found!"));
     }
 
     private Sale findSale(Long id) {

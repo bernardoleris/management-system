@@ -11,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.List;
@@ -19,9 +20,11 @@ import java.util.List;
 @Setter
 @EqualsAndHashCode
 public class SaleRequestDTO implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private SaleStatus status;
+
     @NotNull(message = "Payment method is required")
     private Payment paymentMethod;
 
@@ -30,9 +33,6 @@ public class SaleRequestDTO implements Serializable {
 
     @Size(max = 200, message = "Notes must have at most 200 characters")
     private String notes;
-
-    @NotNull(message = "Administrator is required")
-    private Long adminId;
 
     private Long clientId;
 

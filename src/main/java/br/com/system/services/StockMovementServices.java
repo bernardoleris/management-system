@@ -13,6 +13,8 @@ import br.com.system.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -88,7 +90,7 @@ public class StockMovementServices {
 
         validateMovementRules(dto);
 
-        Administrator admin = findAdministrator(dto.getAdminId());
+        Administrator admin = findAdminFromToken();
         Supplier supplier = dto.getSupplierId() == null ? null : findSupplier(dto.getSupplierId());
 
         StockMovement entity = new StockMovement();
@@ -145,6 +147,8 @@ public class StockMovementServices {
         entity.setItems(items);
         stockMovementRepository.save(entity);
     }
+
+    // ─── Métodos internos ─────────────────────────────────────────────────────
 
     private void validateMovementRules(StockMovementRequestDTO dto) {
         if (dto.getItems() == null || dto.getItems().isEmpty()) {
@@ -232,6 +236,14 @@ public class StockMovementServices {
                 }
             }
         }
+    }
+
+    private Administrator findAdminFromToken() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String login = authentication.getName();
+
+        return administratorRepository.findByLogin(login)
+                .orElseThrow(() -> new ResourceNotFoundException("Administrator not found!"));
     }
 
     private StockMovement findMovement(Long id) {

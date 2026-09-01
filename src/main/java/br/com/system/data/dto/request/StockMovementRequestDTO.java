@@ -21,9 +21,6 @@ public class StockMovementRequestDTO implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    @NotNull(message = "Administrator is required")
-    private Long adminId;
-
     private Long supplierId;
 
     @NotNull(message = "Movement type is required")
