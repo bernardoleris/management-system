@@ -89,22 +89,3 @@ docker compose up --build
 ```
 
 4. Access the API documentation: http://localhost:8080/swagger-ui.html
-
-
----
-
-## 🚧 Project Status
-
-| Feature | Status |
-|---|---|
-| Core REST API | ✅ Done |
-| Authentication (JWT + Refresh Token) | ✅ Done |
-| Role-based access control | ✅ Done |
-| Input validation | ✅ Done |
-| Exception handling | ✅ Done |
-| Pagination | ✅ Done |
-| API Documentation (Swagger) | ✅ Done |
-| Analytics | ✅ Done |
-| Docker | ✅ Done |
-| Unit and integration tests | ⬜ Pending |
-| Flyway migrations | ⬜ Pending |
