@@ -1,6 +1,7 @@
 package br.com.system.support;
 
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -33,5 +34,22 @@ public abstract class AbstractIntegrationTest {
     @BeforeEach
     void setUpRestAssured() {
         RestAssured.port = port;
+    }
+
+    protected String ownerAccessToken() {
+        return io.restassured.RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body("""
+                {
+                    "login": "admin",
+                    "password": "password"
+                }
+                """)
+                .when()
+                .post("/auth/login")
+                .then()
+                .statusCode(200)
+                .extract()
+                .path("accessToken");
     }
 }
