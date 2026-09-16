@@ -1,0 +1,1 @@
+ALTER TABLE sale MODIFY client_id BIGINT NULL;

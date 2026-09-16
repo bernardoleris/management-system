@@ -51,7 +51,7 @@ class SaleControllerTest extends AbstractIntegrationTest {
 
     @Test
     void shouldCreateCompletedSaleAndDecreaseProductQuantity() {
-        createSale("""
+        Long saleId = createSale("""
                 {
                     "status": "COMPLETED",
                     "paymentMethod": "CASH",
@@ -70,9 +70,22 @@ class SaleControllerTest extends AbstractIntegrationTest {
                 .body("paymentMethod", equalTo("CASH"))
                 .body("totalValue", equalTo(60.0F))
                 .body("items[0].unitPrice", equalTo(20.0F))
-                .body("items[0].subtotal", equalTo(60.0F));
+                .body("items[0].subtotal", equalTo(60.0F))
+                .extract()
+                .jsonPath()
+                .getLong("id");
 
         assertProductQuantity(7);
+
+        given()
+                .auth().oauth2(ownerAccessToken())
+                .when()
+                .get("/stock-movements/type/SALE")
+                .then()
+                .statusCode(200)
+                .body("content.size()", equalTo(1))
+                .body("content[0].saleId", equalTo(saleId.intValue()))
+                .body("content[0].items[0].quantity", equalTo(3));
     }
 
     @Test
@@ -146,6 +159,62 @@ class SaleControllerTest extends AbstractIntegrationTest {
                 .statusCode(404);
 
         assertProductQuantity(10);
+    }
+
+    @Test
+    void shouldReturn422AndKeepStockWhenCompletedSaleHasInsufficientStock() {
+        createSale("""
+                {
+                    "status": "COMPLETED",
+                    "paymentMethod": "PIX",
+                    "items": [
+                        {
+                            "productId": 1,
+                            "quantity": 11
+                        }
+                    ]
+                }
+                """)
+                .statusCode(422);
+
+        assertProductQuantity(10);
+    }
+
+    @Test
+    void shouldCreateSaleWithoutClient() {
+        createSale("""
+                {
+                    "status": "PENDING",
+                    "paymentMethod": "PIX",
+                    "items": [
+                        {
+                            "productId": 1,
+                            "quantity": 1
+                        }
+                    ]
+                }
+                """)
+                .statusCode(201)
+                .body("clientId", org.hamcrest.Matchers.nullValue())
+                .body("totalValue", equalTo(20.0F));
+    }
+
+    @Test
+    void shouldReturn400WhenDiscountExceedsItemsTotal() {
+        createSale("""
+                {
+                    "status": "PENDING",
+                    "paymentMethod": "PIX",
+                    "discount": 21.00,
+                    "items": [
+                        {
+                            "productId": 1,
+                            "quantity": 1
+                        }
+                    ]
+                }
+                """)
+                .statusCode(400);
     }
 
     private Long createCompletedSale(int quantity) {

@@ -12,12 +12,14 @@ import br.com.system.repository.SaleItemRepository;
 import br.com.system.repository.SaleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.logging.Logger;
 
 @Service
+@Transactional
 public class SaleItemServices {
     private final Logger logger = Logger.getLogger(SaleItemServices.class.getName());
 
@@ -29,6 +31,12 @@ public class SaleItemServices {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private InventoryService inventoryService;
+
+    @Autowired
+    private StockMovementServices stockMovementServices;
 
     public List<SaleItemResponseDTO> findBySale(Long saleId) {
         logger.info("Finding sale items!");
@@ -56,6 +64,7 @@ public class SaleItemServices {
         decreaseStockIfCompleted(sale, item);
         recalculateTotal(sale);
         saleRepository.save(sale);
+        synchronizeSaleMovementIfCompleted(sale);
 
         return toResponseDTO(item);
     }
@@ -71,6 +80,7 @@ public class SaleItemServices {
         decreaseStockIfCompleted(sale, item);
         recalculateTotal(sale);
         saleRepository.save(sale);
+        synchronizeSaleMovementIfCompleted(sale);
 
         return toResponseDTO(item);
     }
@@ -85,6 +95,7 @@ public class SaleItemServices {
         sale.getItems().remove(item);
         recalculateTotal(sale);
         saleRepository.save(sale);
+        synchronizeSaleMovementIfCompleted(sale);
     }
 
     private SaleItem buildSaleItem(Sale sale, SaleItemRequestDTO dto) {
@@ -100,6 +111,13 @@ public class SaleItemServices {
         BigDecimal unitPrice = dto.getUnitPrice() == null ? product.getSalePrice() : dto.getUnitPrice();
         BigDecimal discount = valueOrZero(dto.getDiscount());
         Integer quantity = dto.getQuantity() == null ? 0 : dto.getQuantity();
+        BigDecimal grossValue = unitPrice.multiply(BigDecimal.valueOf(quantity));
+
+        if (discount.compareTo(grossValue) > 0) {
+            throw new br.com.system.exception.BusinessException(
+                    "Item discount cannot exceed its gross value!"
+            );
+        }
 
         item.setProduct(product);
         item.setQuantity(quantity);
@@ -113,7 +131,14 @@ public class SaleItemServices {
                 .map(SaleItem::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        sale.setTotalValue(itemsTotal.subtract(valueOrZero(sale.getDiscount())));
+        BigDecimal discount = valueOrZero(sale.getDiscount());
+        if (discount.compareTo(itemsTotal) > 0) {
+            throw new br.com.system.exception.BusinessException(
+                    "Sale discount cannot exceed its items total!"
+            );
+        }
+
+        sale.setTotalValue(itemsTotal.subtract(discount));
     }
 
     private void decreaseStockIfCompleted(Sale sale, SaleItem item) {
@@ -121,9 +146,7 @@ public class SaleItemServices {
             return;
         }
 
-        Product product = item.getProduct();
-        product.setQuantity(product.getQuantity() - item.getQuantity());
-        productRepository.save(product);
+        inventoryService.decrease(item.getProduct(), item.getQuantity());
     }
 
     private void restoreStockIfCompleted(Sale sale, SaleItem item) {
@@ -131,9 +154,13 @@ public class SaleItemServices {
             return;
         }
 
-        Product product = item.getProduct();
-        product.setQuantity(product.getQuantity() + item.getQuantity());
-        productRepository.save(product);
+        inventoryService.increase(item.getProduct(), item.getQuantity());
+    }
+
+    private void synchronizeSaleMovementIfCompleted(Sale sale) {
+        if (sale.getStatus() == SaleStatus.COMPLETED) {
+            stockMovementServices.synchronizeFromSale(sale);
+        }
     }
 
     private BigDecimal calculateSubtotal(Integer quantity, BigDecimal unitPrice, BigDecimal discount) {

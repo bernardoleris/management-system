@@ -6,7 +6,6 @@ import br.com.system.data.dto.response.StockMovementItemResponseDTO;
 import br.com.system.data.dto.response.StockMovementResponseDTO;
 import br.com.system.enums.MovementType;
 import br.com.system.exception.BusinessException;
-import br.com.system.exception.InsufficientStockException;
 import br.com.system.exception.ResourceNotFoundException;
 import br.com.system.model.*;
 import br.com.system.repository.*;
@@ -30,9 +29,6 @@ public class StockMovementServices {
     private StockMovementRepository stockMovementRepository;
 
     @Autowired
-    private StockMovementItemRepository stockMovementItemRepository;
-
-    @Autowired
     private ProductRepository productRepository;
 
     @Autowired
@@ -40,6 +36,9 @@ public class StockMovementServices {
 
     @Autowired
     private SupplierRepository supplierRepository;
+
+    @Autowired
+    private InventoryService inventoryService;
 
     @Transactional(readOnly = true)
     public Page<StockMovementResponseDTO> findAll(Pageable pageable) {
@@ -125,27 +124,74 @@ public class StockMovementServices {
     public void createFromSale(Sale sale) {
         logger.info("Creating stock movement from sale!");
 
+        StockMovement entity = buildSaleMovement(sale);
+        for (StockMovementItem item : entity.getItems()) {
+            inventoryService.decrease(item.getProduct(), item.getQuantity());
+        }
+
+        stockMovementRepository.save(entity);
+    }
+
+    @Transactional
+    public void applyOrCreateFromSale(Sale sale) {
+        stockMovementRepository.findBySaleId(sale.getId())
+                .ifPresentOrElse(movement -> {
+                    movement.getItems().clear();
+                    movement.getItems().addAll(buildSaleItems(sale, movement));
+                    for (StockMovementItem item : movement.getItems()) {
+                        inventoryService.decrease(item.getProduct(), item.getQuantity());
+                    }
+                    stockMovementRepository.save(movement);
+                }, () -> createFromSale(sale));
+    }
+
+    @Transactional
+    public void synchronizeFromSale(Sale sale) {
+        stockMovementRepository.findBySaleId(sale.getId())
+                .ifPresentOrElse(movement -> {
+                    movement.getItems().clear();
+                    movement.getItems().addAll(buildSaleItems(sale, movement));
+                    stockMovementRepository.save(movement);
+                }, () -> stockMovementRepository.save(buildSaleMovement(sale)));
+    }
+
+    private StockMovement buildSaleMovement(Sale sale) {
         StockMovement entity = new StockMovement();
         entity.setType(MovementType.SALE);
         entity.setSale(sale);
         entity.setAdmin(sale.getAdmin());
+        entity.setItems(buildSaleItems(sale, entity));
 
+        return entity;
+    }
+
+    private List<StockMovementItem> buildSaleItems(Sale sale, StockMovement movement) {
         List<StockMovementItem> items = new ArrayList<>();
         for (SaleItem saleItem : sale.getItems()) {
-            Product product = saleItem.getProduct();
-            int quantity = saleItem.getQuantity();
-
             StockMovementItem item = new StockMovementItem();
-            item.setStockMovement(entity);
-            item.setProduct(product);
-            item.setQuantity(quantity);
-
-            decrementStock(product, quantity);
+            item.setStockMovement(movement);
+            item.setProduct(saleItem.getProduct());
+            item.setQuantity(saleItem.getQuantity());
             items.add(item);
         }
 
-        entity.setItems(items);
-        stockMovementRepository.save(entity);
+        return items;
+    }
+
+    @Transactional
+    public boolean reverseFromSale(Sale sale) {
+        return stockMovementRepository.findBySaleId(sale.getId())
+                .map(movement -> {
+                    reverseMovement(movement);
+                    return true;
+                })
+                .orElse(false);
+    }
+
+    @Transactional
+    public void removeFromSale(Sale sale) {
+        stockMovementRepository.findBySaleId(sale.getId())
+                .ifPresent(stockMovementRepository::delete);
     }
 
     // ─── Métodos internos ─────────────────────────────────────────────────────
@@ -186,8 +232,8 @@ public class StockMovementServices {
             item.setQuantity(quantity);
 
             switch (movement.getType()) {
-                case ENTRY -> incrementStock(product, quantity);
-                case EXIT -> decrementStock(product, quantity);
+                case ENTRY -> inventoryService.increase(product, quantity);
+                case EXIT -> inventoryService.decrease(product, quantity);
                 case ADJUSTMENT -> applyAdjustment(item, product, quantity);
             }
 
@@ -197,22 +243,6 @@ public class StockMovementServices {
         return items;
     }
 
-    private void incrementStock(Product product, int quantity) {
-        product.setQuantity(product.getQuantity() + quantity);
-        productRepository.save(product);
-    }
-
-    private void decrementStock(Product product, int quantity) {
-        int updated = product.getQuantity() - quantity;
-        if (updated < 0) {
-            throw new InsufficientStockException(
-                    "Insufficient stock for product: " + product.getName()
-            );
-        }
-        product.setQuantity(updated);
-        productRepository.save(product);
-    }
-
     private void applyAdjustment(StockMovementItem item, Product product, int quantityReal) {
         int quantityBefore = product.getQuantity();
         int difference = quantityReal - quantityBefore;
@@ -220,19 +250,17 @@ public class StockMovementServices {
         item.setQuantityBefore(quantityBefore);
         item.setQuantityDifference(difference);
 
-        product.setQuantity(quantityReal);
-        productRepository.save(product);
+        inventoryService.setQuantity(product, quantityReal);
     }
 
     private void reverseMovement(StockMovement movement) {
         for (StockMovementItem item : movement.getItems()) {
             Product product = item.getProduct();
             switch (movement.getType()) {
-                case ENTRY -> decrementStock(product, item.getQuantity());
-                case EXIT -> incrementStock(product, item.getQuantity());
+                case ENTRY -> inventoryService.decrease(product, item.getQuantity());
+                case EXIT, SALE -> inventoryService.increase(product, item.getQuantity());
                 case ADJUSTMENT -> {
-                    product.setQuantity(item.getQuantityBefore());
-                    productRepository.save(product);
+                    inventoryService.setQuantity(product, item.getQuantityBefore());
                 }
             }
         }
