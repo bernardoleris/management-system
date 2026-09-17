@@ -37,14 +37,18 @@ public abstract class AbstractIntegrationTest {
     }
 
     protected String ownerAccessToken() {
+        return accessToken("admin", "password");
+    }
+
+    protected String accessToken(String login, String password) {
         return io.restassured.RestAssured.given()
                 .contentType(ContentType.JSON)
                 .body("""
                 {
-                    "login": "admin",
-                    "password": "password"
+                    "login": "%s",
+                    "password": "%s"
                 }
-                """)
+                """.formatted(login, password))
                 .when()
                 .post("/auth/login")
                 .then()

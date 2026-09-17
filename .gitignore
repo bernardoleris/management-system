@@ -19,6 +19,7 @@ replay_pid*
 .env.*
 application-local.properties
 application-local.yml
+PROJECT_CONTEXT.local.md
 
 # Pacotes gerados
 *.war
