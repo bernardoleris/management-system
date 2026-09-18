@@ -2,6 +2,7 @@ package br.com.system.services;
 
 import br.com.system.data.dto.request.BrandRequestDTO;
 import br.com.system.data.dto.response.BrandResponseDTO;
+import br.com.system.exception.DuplicateResourceException;
 import br.com.system.exception.ResourceNotFoundException;
 import br.com.system.mapper.ObjectMapper;
 import br.com.system.model.Brand;
@@ -37,7 +38,13 @@ public class BrandServices {
     public BrandResponseDTO create(BrandRequestDTO brand) {
         logger.info("Creating one brand!");
 
+        String name = normalizeName(brand.getName());
+        if (brandRepository.existsByNameIgnoreCase(name)) {
+            throw new DuplicateResourceException("Brand name already registered!");
+        }
+
         Brand entity = ObjectMapper.parseObject(brand, Brand.class);
+        entity.setName(name);
 
         return ObjectMapper.parseObject(brandRepository.save(entity), BrandResponseDTO.class);
     }
@@ -48,7 +55,12 @@ public class BrandServices {
         Brand entity = brandRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No brand found for this ID!"));
 
-        entity.setName(brand.getName());
+        String name = normalizeName(brand.getName());
+        if (brandRepository.existsByNameIgnoreCaseAndIdNot(name, id)) {
+            throw new DuplicateResourceException("Brand name already registered!");
+        }
+
+        entity.setName(name);
 
         return ObjectMapper.parseObject(brandRepository.save(entity), BrandResponseDTO.class);
     }
@@ -60,5 +72,9 @@ public class BrandServices {
                 .orElseThrow(() -> new ResourceNotFoundException("No brand found for this ID!"));
 
         brandRepository.delete(entity);
+    }
+
+    private String normalizeName(String name) {
+        return name.strip();
     }
 }

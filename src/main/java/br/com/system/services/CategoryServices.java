@@ -2,6 +2,7 @@ package br.com.system.services;
 
 import br.com.system.data.dto.request.CategoryRequestDTO;
 import br.com.system.data.dto.response.CategoryResponseDTO;
+import br.com.system.exception.DuplicateResourceException;
 import br.com.system.exception.ResourceNotFoundException;
 import br.com.system.mapper.ObjectMapper;
 import br.com.system.model.Category;
@@ -37,7 +38,13 @@ public class CategoryServices {
     public CategoryResponseDTO create(CategoryRequestDTO category) {
         logger.info("Creating one category!");
 
+        String name = normalizeName(category.getName());
+        if (categoryRepository.existsByNameIgnoreCase(name)) {
+            throw new DuplicateResourceException("Category name already registered!");
+        }
+
         Category entity = ObjectMapper.parseObject(category, Category.class);
+        entity.setName(name);
 
         return ObjectMapper.parseObject(categoryRepository.save(entity), CategoryResponseDTO.class);
     }
@@ -48,7 +55,12 @@ public class CategoryServices {
         Category entity = categoryRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No category found for this ID!"));
 
-        entity.setName(category.getName());
+        String name = normalizeName(category.getName());
+        if (categoryRepository.existsByNameIgnoreCaseAndIdNot(name, id)) {
+            throw new DuplicateResourceException("Category name already registered!");
+        }
+
+        entity.setName(name);
 
         return ObjectMapper.parseObject(categoryRepository.save(entity), CategoryResponseDTO.class);
     }
@@ -60,5 +72,9 @@ public class CategoryServices {
                 .orElseThrow(() -> new ResourceNotFoundException("No category found for this ID!"));
 
         categoryRepository.delete(entity);
+    }
+
+    private String normalizeName(String name) {
+        return name.strip();
     }
 }

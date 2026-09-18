@@ -170,23 +170,6 @@ class AdministratorControllerTest extends AbstractIntegrationTest {
                 .body("authenticated", equalTo(true));
     }
 
-    private String ownerAccessToken() {
-        return given()
-                .contentType(ContentType.JSON)
-                .body("""
-                {
-                    "login": "admin",
-                    "password": "password"
-                }
-                """)
-                .when()
-                .post("/auth/login")
-                .then()
-                .statusCode(200)
-                .extract()
-                .path("accessToken");
-    }
-
     private Long createAdministrator(String login, String email) {
         return createAdministrator(login, email, "secret123");
     }

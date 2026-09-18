@@ -45,6 +45,9 @@ public class SaleServices {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private StockMovementServices stockMovementServices;
+
     @Transactional(readOnly = true)
     public Page<SaleResponseDTO> findAll(Pageable pageable) {
         logger.info("Finding sales!");
@@ -93,18 +96,27 @@ public class SaleServices {
 
         Sale entity = new Sale();
         setSaleFields(entity, sale);
+        Sale savedSale = saleRepository.save(entity);
+        createStockMovementIfCompleted(savedSale);
 
-        return toResponseDTO(saleRepository.save(entity));
+        return toResponseDTO(savedSale);
     }
 
     public SaleResponseDTO update(Long id, SaleRequestDTO sale) {
         logger.info("Updating one sale!");
 
         Sale entity = findSale(id);
+        boolean wasCompleted = entity.getStatus() == SaleStatus.COMPLETED;
         restoreStockIfCompleted(entity);
         setSaleFields(entity, sale);
+        Sale savedSale = saleRepository.save(entity);
+        if (savedSale.getStatus() == SaleStatus.COMPLETED) {
+            createStockMovementIfCompleted(savedSale);
+        } else if (wasCompleted) {
+            stockMovementServices.removeFromSale(savedSale);
+        }
 
-        return toResponseDTO(saleRepository.save(entity));
+        return toResponseDTO(savedSale);
     }
 
     public SaleResponseDTO cancel(Long id) {
@@ -112,6 +124,7 @@ public class SaleServices {
 
         Sale entity = findSale(id);
         restoreStockIfCompleted(entity);
+        stockMovementServices.removeFromSale(entity);
         entity.setStatus(SaleStatus.CANCELED);
 
         return toResponseDTO(saleRepository.save(entity));
@@ -122,6 +135,7 @@ public class SaleServices {
 
         Sale entity = findSale(id);
         restoreStockIfCompleted(entity);
+        stockMovementServices.removeFromSale(entity);
         saleRepository.delete(entity);
     }
 
@@ -148,7 +162,6 @@ public class SaleServices {
         }
 
         recalculateTotal(entity);
-        decreaseStockIfCompleted(entity);
     }
 
     private SaleItem buildSaleItem(Sale sale, SaleItemRequestDTO itemDTO) {
@@ -156,6 +169,13 @@ public class SaleServices {
         BigDecimal unitPrice = itemDTO.getUnitPrice() == null ? product.getSalePrice() : itemDTO.getUnitPrice();
         BigDecimal discount = valueOrZero(itemDTO.getDiscount());
         Integer quantity = itemDTO.getQuantity() == null ? 0 : itemDTO.getQuantity();
+
+        BigDecimal grossValue = unitPrice.multiply(BigDecimal.valueOf(quantity));
+        if (discount.compareTo(grossValue) > 0) {
+            throw new br.com.system.exception.BusinessException(
+                    "Item discount cannot exceed its gross value!"
+            );
+        }
 
         SaleItem item = new SaleItem();
         item.setSale(sale);
@@ -173,26 +193,31 @@ public class SaleServices {
                 .map(SaleItem::getSubtotal)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        sale.setTotalValue(itemsTotal.subtract(valueOrZero(sale.getDiscount())));
+        BigDecimal discount = valueOrZero(sale.getDiscount());
+        if (discount.compareTo(itemsTotal) > 0) {
+            throw new br.com.system.exception.BusinessException(
+                    "Sale discount cannot exceed its items total!"
+            );
+        }
+
+        sale.setTotalValue(itemsTotal.subtract(discount));
     }
 
-    private void decreaseStockIfCompleted(Sale sale) {
-        if (sale.getStatus() != SaleStatus.COMPLETED) return;
-
-        for (SaleItem item : sale.getItems()) {
-            Product product = item.getProduct();
-            product.setQuantity(product.getQuantity() - item.getQuantity());
-            productRepository.save(product);
+    private void createStockMovementIfCompleted(Sale sale) {
+        if (sale.getStatus() == SaleStatus.COMPLETED) {
+            stockMovementServices.applyOrCreateFromSale(sale);
         }
     }
 
     private void restoreStockIfCompleted(Sale sale) {
         if (sale.getStatus() != SaleStatus.COMPLETED) return;
 
-        for (SaleItem item : sale.getItems()) {
-            Product product = item.getProduct();
-            product.setQuantity(product.getQuantity() + item.getQuantity());
-            productRepository.save(product);
+        if (!stockMovementServices.reverseFromSale(sale)) {
+            for (SaleItem item : sale.getItems()) {
+                Product product = item.getProduct();
+                product.setQuantity(product.getQuantity() + item.getQuantity());
+                productRepository.save(product);
+            }
         }
     }
 

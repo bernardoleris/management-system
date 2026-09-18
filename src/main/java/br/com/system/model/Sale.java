@@ -56,8 +56,8 @@ public class Sale implements Serializable {
     @JoinColumn(name = "admin_id", nullable = false)
     private Administrator admin;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "client_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "client_id")
     private Client client;
 
     @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL, orphanRemoval = true)
