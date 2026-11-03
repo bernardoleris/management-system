@@ -16,10 +16,11 @@ public interface SaleItemRepository extends JpaRepository<SaleItem, Long> {
 
     // produtos mais vendidos
     @Query("SELECT si.product.id, si.product.name, SUM(si.quantity) as total " +
-            "FROM SaleItem si WHERE si.sale.date BETWEEN :start AND :end " +
+            "FROM SaleItem si WHERE si.sale.company.id = :companyId AND si.sale.date BETWEEN :start AND :end " +
             "AND si.sale.status = 'COMPLETED' " +
             "GROUP BY si.product.id, si.product.name ORDER BY total DESC")
     List<Object[]> findTopProducts(
+            @Param("companyId") Long companyId,
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end,
             Pageable pageable);

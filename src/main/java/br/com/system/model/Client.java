@@ -32,7 +32,7 @@ public class Client implements Serializable {
     @Column(name = "document_type", nullable = false, length = 4)
     private DocumentType documentType;
 
-    @Column(name = "document_number", nullable = false, unique = true, length = 14)
+    @Column(name = "document_number", nullable = false, length = 14)
     private String documentNumber;
 
     @Column(name = "birth_date")
@@ -41,4 +41,8 @@ public class Client implements Serializable {
     @OneToOne
     @JoinColumn(name = "address_id")
     private Address address;
+
+    @ManyToOne
+    @JoinColumn(name = "company_id", nullable = false)
+    private Company company;
 }

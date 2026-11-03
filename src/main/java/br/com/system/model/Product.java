@@ -31,7 +31,7 @@ public class Product implements Serializable {
     @Column(name = "description", length = 255)
     private String description;
 
-    @Column(name = "barcode", unique = true, length = 50)
+    @Column(name = "barcode", length = 50)
     private String barcode;
 
     @Column(name = "purchase_price", nullable = false, precision = 10, scale = 2)
@@ -49,6 +49,10 @@ public class Product implements Serializable {
 
     @Column(name = "active", nullable = false)
     private Boolean active = true;
+
+    @ManyToOne
+    @JoinColumn(name = "company_id", nullable = false)
+    private Company company;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "category_id", nullable = false)

@@ -2,7 +2,10 @@ package br.com.system.controllers;
 
 import br.com.system.data.dto.request.LoginRequestDTO;
 import br.com.system.data.dto.request.RefreshTokenRequestDTO;
+import br.com.system.data.dto.request.SwitchCompanyRequestDTO;
+import br.com.system.data.dto.response.AvailableCompanyResponseDTO;
 import br.com.system.data.dto.response.LoginResponseDTO;
+import br.com.system.data.dto.response.SwitchCompanyResponseDTO;
 import br.com.system.services.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -13,10 +16,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @Tag(name = "Authentication", description = "Endpoints for authentication.")
 @RestController
@@ -49,7 +55,7 @@ public class AuthController {
     })
     @PostMapping("/refresh-token")
     public ResponseEntity<LoginResponseDTO> refreshToken(@RequestBody @Valid RefreshTokenRequestDTO dto) {
-        return ResponseEntity.ok(service.refreshToken(dto.getRefreshToken()));
+        return ResponseEntity.ok(service.refreshToken(dto.getRefreshToken(), dto.getCompanyId()));
     }
 
     @Operation(summary = "Logout", description = "Revokes the refresh token and logs out the administrator.")
@@ -62,5 +68,16 @@ public class AuthController {
     public ResponseEntity<Void> logout(@RequestBody @Valid RefreshTokenRequestDTO dto) {
         service.logout(dto.getRefreshToken());
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/companies")
+    public List<AvailableCompanyResponseDTO> availableCompanies() {
+        return service.availableCompanies();
+    }
+
+    @PostMapping("/switch-company")
+    public ResponseEntity<SwitchCompanyResponseDTO> switchCompany(
+            @RequestBody @Valid SwitchCompanyRequestDTO dto) {
+        return ResponseEntity.ok(service.switchCompany(dto.getCompanyId()));
     }
 }

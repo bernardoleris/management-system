@@ -10,6 +10,7 @@ import br.com.system.model.SaleItem;
 import br.com.system.repository.ProductRepository;
 import br.com.system.repository.SaleItemRepository;
 import br.com.system.repository.SaleRepository;
+import br.com.system.security.CurrentCompany;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +38,9 @@ public class SaleItemServices {
 
     @Autowired
     private StockMovementServices stockMovementServices;
+
+    @Autowired
+    private CurrentCompany currentCompany;
 
     public List<SaleItemResponseDTO> findBySale(Long saleId) {
         logger.info("Finding sale items!");
@@ -172,11 +176,12 @@ public class SaleItemServices {
     }
 
     private Sale findSale(Long saleId) {
-        return saleRepository.findById(saleId)
+        return saleRepository.findByIdAndCompanyId(saleId, currentCompany.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No sale found for this ID!"));
     }
 
     private SaleItem findSaleItem(Long saleId, Long itemId) {
+        findSale(saleId);
         SaleItem item = saleItemRepository.findById(itemId)
                 .orElseThrow(() -> new ResourceNotFoundException("No sale item found for this ID!"));
 
@@ -188,7 +193,7 @@ public class SaleItemServices {
     }
 
     private Product findProduct(Long productId) {
-        return productRepository.findById(productId)
+        return productRepository.findByIdAndCompanyId(productId, currentCompany.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No product found for this ID!"));
     }
 

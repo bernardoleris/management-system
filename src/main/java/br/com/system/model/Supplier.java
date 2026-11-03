@@ -25,7 +25,7 @@ public class Supplier implements Serializable {
     @Column(name = "trade_name", nullable = false, length = 100)
     private String tradeName;
 
-    @Column(name = "cnpj", nullable = false, unique = true, length = 14)
+    @Column(name = "cnpj", nullable = false, length = 14)
     private String cnpj;
 
     @Column(name = "phone", nullable = false, length = 20)
@@ -36,6 +36,10 @@ public class Supplier implements Serializable {
 
     @Column(name = "active", nullable = false)
     private Boolean active = true;
+
+    @ManyToOne
+    @JoinColumn(name = "company_id", nullable = false)
+    private Company company;
 
     @PrePersist
     public void prePersist() {

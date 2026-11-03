@@ -1,10 +1,18 @@
 package br.com.system.repository;
 
 import br.com.system.model.Client;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ClientRepository extends JpaRepository<Client, Long> {
-    boolean existsByDocumentNumber(String documentNumber);
+import java.util.Optional;
 
-    boolean existsByDocumentNumberAndIdNot(String documentNumber, Long id);
+public interface ClientRepository extends JpaRepository<Client, Long> {
+    Page<Client> findByCompanyId(Long companyId, Pageable pageable);
+
+    Optional<Client> findByIdAndCompanyId(Long id, Long companyId);
+
+    boolean existsByCompanyIdAndDocumentNumber(Long companyId, String documentNumber);
+
+    boolean existsByCompanyIdAndDocumentNumberAndIdNot(Long companyId, String documentNumber, Long id);
 }

@@ -49,6 +49,10 @@ public class Sale implements Serializable {
     @Column(name = "total_value", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalValue = BigDecimal.ZERO;
 
+    @ManyToOne
+    @JoinColumn(name = "company_id", nullable = false)
+    private Company company;
+
     @Column(name = "notes", length = 200)
     private String notes;
 

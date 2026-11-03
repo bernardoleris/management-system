@@ -1,110 +1,89 @@
-# 🗂️ Stock Management System
+# Bernardo Leris System
 
-> A web-based inventory management system designed for small retail businesses.
+API REST para gestão de estoque e operações de pequenos comércios. Ela oferece autenticação, cadastros, vendas, movimentações de estoque, alertas e indicadores.
 
----
+## Recursos
 
-## 📌 About
+- Autenticação com JWT e refresh token;
+- controle de acesso por papel (`ROLE_OWNER`, `ROLE_ADMIN` e `ROLE_OPERATOR`);
+- produtos, categorias, marcas, fornecedores, clientes e endereços;
+- vendas com itens, descontos, status e formas de pagamento;
+- movimentações de estoque e prevenção de saldo negativo;
+- alertas de estoque e analytics de vendas;
+- documentação OpenAPI e migrations versionadas com Flyway.
 
-The **Stock Management System** is a REST API built with **Spring Boot**, aimed at helping small store owners take control of their business operations. The goal is to provide a simple, reliable, and professional tool to manage products, sales, customers, and suppliers — all in one place.
+## Tecnologia
 
-The system was designed with real-world small business needs in mind: intuitive workflows, clear stock alerts, sales tracking, and analytics to help owners make better decisions.
+Java 21, Spring Boot 4, Spring Security, Spring Data JPA, Flyway, MySQL 8, Maven, Docker e Docker Compose.
 
----
+## Executar com Docker
 
-## 🎯 Goals
+Crie um arquivo `.env` na raiz com as variáveis abaixo. Não versione esse arquivo.
 
-- Give store owners real-time visibility over their inventory
-- Track sales and associate them with customers
-- Alert when a product is running low on stock
-- Provide business analytics (best-selling products, busiest days, customer insights)
-- Support multiple access levels for owners and employees
-
----
-
-## 🧩 Core Modules
-
-| Module | Description |
-|---|---|
-| **Products** | Register and manage products with pricing, stock quantity, category, and brand |
-| **Categories & Brands** | Organize products for better management |
-| **Suppliers** | Track product suppliers and link them to stock entries |
-| **Clients** | Register customers and track their purchase history |
-| **Sales** | Record sales with multiple items, payment methods, and optional discounts |
-| **Stock Movements** | Full history of stock entries, exits, adjustments, and sales |
-| **Alerts** | Custom low-stock alerts configured per product |
-| **Analytics** | Insights on sales performance, customer behavior, and stock health |
-
----
-
-## 🔐 Access Levels
-
-| Role | Who | Access |
-|---|---|---|
-| `ROLE_OWNER` | System owner | Full access across the entire platform |
-| `ROLE_ADMIN` | Store owner | Full access to their own store's data |
-| `ROLE_OPERATOR` | Store employee | Basic operations: sales, stock queries, alerts |
-
----
-
-## 🛠️ Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Language | Java 21 |
-| Framework | Spring Boot |
-| Security | Spring Security + JWT + Refresh Token |
-| Database | MySQL |
-| ORM | Spring Data JPA / Hibernate |
-| Documentation | SpringDoc OpenAPI (Swagger UI) |
-| Build Tool | Maven |
-| Containerization | Docker + Docker Compose |
-
-
----
-
-## 🚀 Running with Docker
-
-Make sure you have **Docker** and **Docker Compose** installed.
-
-1. Clone the repository
-```bash
-git clone https://github.com/your-username/stock-management-system.git
-cd stock-management-system
-```
-
-2. Create a `.env` file in the root of the project
 ```env
-DB_URL=jdbc:mysql://db:3306/stock_db?useTimezone=true&serverTimezone=UTC
-DB_USERNAME=root
-DB_PASSWORD=your_password
-JWT_SECRET=your_secret_key
+DB_PASSWORD=uma_senha_segura
+JWT_SECRET=uma_chave_secreta_longa
 JWT_EXPIRATION=3600000
 JWT_REFRESH_EXPIRATION=604800000
 ```
 
-3. Run the application
+Suba os serviços:
+
 ```bash
 docker compose up --build
 ```
 
-4. Access the API documentation: http://localhost:8080/swagger-ui.html
+- API: `http://localhost:8080`
+- Swagger UI: `http://localhost:8080/swagger-ui.html`
+- MySQL: `localhost:3307` (banco `stock_db`)
 
+## Testes
 
----
+```bash
+mvn test
+```
 
-## 🚧 Project Status
+Os testes de integração usam Testcontainers e exigem Docker em execução.
 
-| Feature | Status |
-|---|---|
-| Core REST API | ✅ Done |
-| Authentication (JWT + Refresh Token) | ✅ Done |
-| Role-based access control | ✅ Done |
-| Input validation | ✅ Done |
-| Exception handling | ✅ Done |
-| Pagination | ✅ Done |
-| API Documentation (Swagger) | ✅ Done |
-| Analytics | ✅ Done |
-| Docker | ✅ Done |
-| Unit and integration tests | ⬜ Pending |
-| Flyway migrations | ⬜ Pending |
+## Estado de multiempresa
+
+O banco e a autenticação já possuem empresas e vínculos de acesso, e o JWT carrega a empresa ativa. As permissões também são derivadas do vínculo ativo, permitindo papéis diferentes para a mesma pessoa em empresas distintas. O escopo por empresa já está aplicado aos módulos operacionais e aos indicadores, e os `company_id` são obrigatórios no banco. Ainda faltam testes de integração completos e a revisão dos endpoints administrativos; portanto, o isolamento entre empresas ainda não deve ser considerado concluído.
+
+O dono da empresa gerencia a equipe em `/company/members`: cria login e senha, define o papel, altera o papel e desativa acessos. O sistema preserva pelo menos um dono ativo por empresa.
+
+## Empresas e equipe
+
+Após autenticar, use o access token para:
+
+- `GET /auth/companies`: listar as empresas disponíveis e o papel em cada uma;
+- `POST /auth/switch-company`: trocar a empresa ativa e receber um novo access token;
+- `GET /company/members`: listar membros da empresa ativa;
+- `POST /company/members`: criar uma nova conta e associá-la à empresa ativa;
+- `POST /company/members/existing`: associar uma conta existente à empresa ativa;
+- `PUT /company/members/{membershipId}/role`: alterar o papel de um membro;
+- `DELETE /company/members/{membershipId}`: desativar o vínculo do membro.
+
+Exemplo de troca de empresa:
+
+```json
+{
+  "companyId": 2
+}
+```
+
+Ao renovar o token, envie `companyId` junto do refresh token para manter a empresa desejada.
+
+## Estrutura principal
+
+```text
+src/main/java/br/com/system
+├── controllers     # endpoints HTTP
+├── services        # regras de negócio
+├── repository      # acesso a dados
+├── model           # entidades JPA
+├── security        # JWT e autorização
+└── config          # configuração da aplicação e OpenAPI
+
+src/main/resources/db/migration
+└── V1 ... V4       # schema e evolução do banco com Flyway
+```

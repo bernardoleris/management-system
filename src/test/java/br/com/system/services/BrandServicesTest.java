@@ -3,6 +3,7 @@ package br.com.system.services;
 import br.com.system.data.dto.request.BrandRequestDTO;
 import br.com.system.exception.DuplicateResourceException;
 import br.com.system.repository.BrandRepository;
+import br.com.system.security.CurrentCompany;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,6 +22,9 @@ class BrandServicesTest {
     @Mock
     private BrandRepository brandRepository;
 
+    @Mock
+    private CurrentCompany currentCompany;
+
     @InjectMocks
     private BrandServices brandServices;
 
@@ -28,13 +32,14 @@ class BrandServicesTest {
     void shouldRejectBrandNameThatAlreadyExistsIgnoringCaseAndOuterSpaces() {
         BrandRequestDTO request = new BrandRequestDTO();
         request.setName("  acme  ");
-        when(brandRepository.existsByNameIgnoreCase("acme")).thenReturn(true);
+        when(currentCompany.getId()).thenReturn(1L);
+        when(brandRepository.existsByCompanyIdAndNameIgnoreCase(1L, "acme")).thenReturn(true);
 
         assertThatThrownBy(() -> brandServices.create(request))
                 .isInstanceOf(DuplicateResourceException.class)
                 .hasMessage("Brand name already registered!");
 
-        verify(brandRepository).existsByNameIgnoreCase("acme");
+        verify(brandRepository).existsByCompanyIdAndNameIgnoreCase(1L, "acme");
         verify(brandRepository, never()).save(any());
     }
 }

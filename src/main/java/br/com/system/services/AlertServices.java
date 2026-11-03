@@ -8,7 +8,9 @@ import br.com.system.model.Alert;
 import br.com.system.model.Product;
 import br.com.system.repository.AdministratorRepository;
 import br.com.system.repository.AlertRepository;
+import br.com.system.repository.CompanyRepository;
 import br.com.system.repository.ProductRepository;
+import br.com.system.security.CurrentCompany;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -30,10 +32,16 @@ public class AlertServices {
     @Autowired
     private AdministratorRepository administratorRepository;
 
+    @Autowired
+    private CompanyRepository companyRepository;
+
+    @Autowired
+    private CurrentCompany currentCompany;
+
     public List<AlertResponseDTO> findAll() {
         logger.info("Finding alerts!");
 
-        return alertRepository.findAll().stream()
+        return alertRepository.findByCompanyId(currentCompany.getId()).stream()
                 .map(this::toResponseDTO)
                 .toList();
     }
@@ -41,7 +49,7 @@ public class AlertServices {
     public List<AlertResponseDTO> findActive() {
         logger.info("Finding active alerts!");
 
-        return alertRepository.findByActiveTrue().stream()
+        return alertRepository.findByCompanyIdAndActiveTrue(currentCompany.getId()).stream()
                 .map(this::toResponseDTO)
                 .toList();
     }
@@ -49,7 +57,7 @@ public class AlertServices {
     public List<AlertResponseDTO> findUnread() {
         logger.info("Finding unread alerts!");
 
-        return alertRepository.findByReadFalseAndActiveTrue().stream()
+        return alertRepository.findByCompanyIdAndReadFalseAndActiveTrue(currentCompany.getId()).stream()
                 .map(this::toResponseDTO)
                 .toList();
     }
@@ -59,7 +67,7 @@ public class AlertServices {
 
         findAdministrator(adminId);
 
-        return alertRepository.findByAdminIdAndActiveTrue(adminId).stream()
+        return alertRepository.findByCompanyIdAndAdminIdAndActiveTrue(currentCompany.getId(), adminId).stream()
                 .map(this::toResponseDTO)
                 .toList();
     }
@@ -69,7 +77,7 @@ public class AlertServices {
 
         findProduct(productId);
 
-        return alertRepository.findByProductIdAndActiveTrue(productId).stream()
+        return alertRepository.findByCompanyIdAndProductIdAndActiveTrue(currentCompany.getId(), productId).stream()
                 .map(this::toResponseDTO)
                 .toList();
     }
@@ -85,6 +93,7 @@ public class AlertServices {
 
         Alert entity = new Alert();
         setAlertFields(entity, dto);
+        entity.setCompany(companyRepository.getReferenceById(currentCompany.getId()));
 
         return toResponseDTO(alertRepository.save(entity));
     }
@@ -137,12 +146,12 @@ public class AlertServices {
     }
 
     private Alert findAlert(Long id) {
-        return alertRepository.findById(id)
+        return alertRepository.findByIdAndCompanyId(id, currentCompany.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No alert found for this ID!"));
     }
 
     private Product findProduct(Long productId) {
-        return productRepository.findById(productId)
+        return productRepository.findByIdAndCompanyId(productId, currentCompany.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No product found for this ID!"));
     }
 

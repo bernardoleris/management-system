@@ -5,6 +5,7 @@ import br.com.system.data.dto.request.StockMovementItemRequestDTO;
 import br.com.system.data.dto.request.StockMovementRequestDTO;
 import br.com.system.exception.BusinessException;
 import br.com.system.model.Administrator;
+import br.com.system.model.Company;
 import br.com.system.model.Product;
 import br.com.system.model.Sale;
 import br.com.system.model.SaleItem;
@@ -46,6 +47,7 @@ class StockMovementServicesTest {
         Sale sale = new Sale();
         sale.setId(10L);
         sale.setAdmin(administrator);
+        sale.setCompany(company(1L));
 
         SaleItem saleItem = new SaleItem();
         saleItem.setProduct(product);
@@ -83,7 +85,8 @@ class StockMovementServicesTest {
 
         Sale sale = new Sale();
         sale.setId(10L);
-        when(stockMovementRepository.findBySaleId(10L)).thenReturn(Optional.of(movement));
+        sale.setCompany(company(1L));
+        when(stockMovementRepository.findBySaleIdAndCompanyId(10L, 1L)).thenReturn(Optional.of(movement));
 
         boolean wasReversed = stockMovementServices.reverseFromSale(sale);
 
@@ -96,6 +99,7 @@ class StockMovementServicesTest {
         Product product = new Product();
         Sale sale = new Sale();
         sale.setId(10L);
+        sale.setCompany(company(1L));
 
         SaleItem saleItem = new SaleItem();
         saleItem.setProduct(product);
@@ -104,7 +108,7 @@ class StockMovementServicesTest {
 
         StockMovement existingMovement = new StockMovement();
         existingMovement.setType(MovementType.SALE);
-        when(stockMovementRepository.findBySaleId(10L)).thenReturn(Optional.of(existingMovement));
+        when(stockMovementRepository.findBySaleIdAndCompanyId(10L, 1L)).thenReturn(Optional.of(existingMovement));
 
         stockMovementServices.applyOrCreateFromSale(sale);
 
@@ -160,5 +164,11 @@ class StockMovementServicesTest {
         request.setType(type);
         request.setItems(List.of(item));
         return request;
+    }
+
+    private Company company(Long id) {
+        Company company = new Company();
+        company.setId(id);
+        return company;
     }
 }

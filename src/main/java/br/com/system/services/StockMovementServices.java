@@ -9,6 +9,7 @@ import br.com.system.exception.BusinessException;
 import br.com.system.exception.ResourceNotFoundException;
 import br.com.system.model.*;
 import br.com.system.repository.*;
+import br.com.system.security.CurrentCompany;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -29,6 +30,12 @@ public class StockMovementServices {
     private StockMovementRepository stockMovementRepository;
 
     @Autowired
+    private CompanyRepository companyRepository;
+
+    @Autowired
+    private CurrentCompany currentCompany;
+
+    @Autowired
     private ProductRepository productRepository;
 
     @Autowired
@@ -44,7 +51,7 @@ public class StockMovementServices {
     public Page<StockMovementResponseDTO> findAll(Pageable pageable) {
         logger.info("Finding stock movements!");
 
-        return stockMovementRepository.findAll(pageable)
+        return stockMovementRepository.findByCompanyId(currentCompany.getId(), pageable)
                 .map(this::toResponseDTO);
     }
 
@@ -54,7 +61,7 @@ public class StockMovementServices {
 
         findAdministrator(adminId);
 
-        return stockMovementRepository.findByAdminId(adminId, pageable)
+        return stockMovementRepository.findByCompanyIdAndAdminId(currentCompany.getId(), adminId, pageable)
                 .map(this::toResponseDTO);
     }
 
@@ -64,7 +71,7 @@ public class StockMovementServices {
 
         findSupplier(supplierId);
 
-        return stockMovementRepository.findBySupplierId(supplierId, pageable)
+        return stockMovementRepository.findByCompanyIdAndSupplierId(currentCompany.getId(), supplierId, pageable)
                 .map(this::toResponseDTO);
     }
 
@@ -72,7 +79,7 @@ public class StockMovementServices {
     public Page<StockMovementResponseDTO> findByType(MovementType type, Pageable pageable) {
         logger.info("Finding stock movements by type!");
 
-        return stockMovementRepository.findByType(type, pageable)
+        return stockMovementRepository.findByCompanyIdAndType(currentCompany.getId(), type, pageable)
                 .map(this::toResponseDTO);
     }
 
@@ -99,6 +106,7 @@ public class StockMovementServices {
         entity.setExitReason(dto.getExitReason());
         entity.setAdmin(admin);
         entity.setSupplier(supplier);
+        entity.setCompany(companyRepository.getReferenceById(currentCompany.getId()));
 
         List<StockMovementItem> items = buildItems(dto.getItems(), entity, false);
         entity.setItems(items);
@@ -134,7 +142,7 @@ public class StockMovementServices {
 
     @Transactional
     public void applyOrCreateFromSale(Sale sale) {
-        stockMovementRepository.findBySaleId(sale.getId())
+        stockMovementRepository.findBySaleIdAndCompanyId(sale.getId(), sale.getCompany().getId())
                 .ifPresentOrElse(movement -> {
                     movement.getItems().clear();
                     movement.getItems().addAll(buildSaleItems(sale, movement));
@@ -147,7 +155,7 @@ public class StockMovementServices {
 
     @Transactional
     public void synchronizeFromSale(Sale sale) {
-        stockMovementRepository.findBySaleId(sale.getId())
+        stockMovementRepository.findBySaleIdAndCompanyId(sale.getId(), sale.getCompany().getId())
                 .ifPresentOrElse(movement -> {
                     movement.getItems().clear();
                     movement.getItems().addAll(buildSaleItems(sale, movement));
@@ -160,6 +168,7 @@ public class StockMovementServices {
         entity.setType(MovementType.SALE);
         entity.setSale(sale);
         entity.setAdmin(sale.getAdmin());
+        entity.setCompany(sale.getCompany());
         entity.setItems(buildSaleItems(sale, entity));
 
         return entity;
@@ -180,7 +189,7 @@ public class StockMovementServices {
 
     @Transactional
     public boolean reverseFromSale(Sale sale) {
-        return stockMovementRepository.findBySaleId(sale.getId())
+        return stockMovementRepository.findBySaleIdAndCompanyId(sale.getId(), sale.getCompany().getId())
                 .map(movement -> {
                     reverseMovement(movement);
                     return true;
@@ -190,7 +199,7 @@ public class StockMovementServices {
 
     @Transactional
     public void removeFromSale(Sale sale) {
-        stockMovementRepository.findBySaleId(sale.getId())
+        stockMovementRepository.findBySaleIdAndCompanyId(sale.getId(), sale.getCompany().getId())
                 .ifPresent(stockMovementRepository::delete);
     }
 
@@ -275,12 +284,12 @@ public class StockMovementServices {
     }
 
     private StockMovement findMovement(Long id) {
-        return stockMovementRepository.findById(id)
+        return stockMovementRepository.findByIdAndCompanyId(id, currentCompany.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No stock movement found for this ID!"));
     }
 
     private Product findProduct(Long productId) {
-        return productRepository.findById(productId)
+        return productRepository.findByIdAndCompanyId(productId, currentCompany.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No product found for this ID!"));
     }
 
@@ -290,7 +299,7 @@ public class StockMovementServices {
     }
 
     private Supplier findSupplier(Long supplierId) {
-        return supplierRepository.findById(supplierId)
+        return supplierRepository.findByIdAndCompanyId(supplierId, currentCompany.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No supplier found for this ID!"));
     }
 
