@@ -18,6 +18,7 @@ import br.com.system.repository.SaleRepository;
 import br.com.system.repository.CompanyRepository;
 import br.com.system.repository.CompanyMembershipRepository;
 import br.com.system.security.CurrentCompany;
+import br.com.system.security.TenantPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -244,9 +245,12 @@ public class SaleServices {
 
     private Administrator findAdminFromToken() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String login = authentication.getName();
+        if (authentication != null && authentication.getPrincipal() instanceof TenantPrincipal principal) {
+            return administratorRepository.findByUserId(principal.getUserId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Administrator not found!"));
+        }
 
-        return administratorRepository.findByLogin(login)
+        return administratorRepository.findByLogin(authentication.getName())
                 .orElseThrow(() -> new ResourceNotFoundException("Administrator not found!"));
     }
 

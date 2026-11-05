@@ -8,8 +8,11 @@ import br.com.system.exception.BusinessException;
 import br.com.system.model.Administrator;
 import br.com.system.model.Product;
 import br.com.system.repository.AdministratorRepository;
+import br.com.system.repository.ClientRepository;
+import br.com.system.repository.CompanyRepository;
 import br.com.system.repository.ProductRepository;
 import br.com.system.repository.SaleRepository;
+import br.com.system.security.CurrentCompany;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -43,6 +46,15 @@ class SaleServicesTest {
     private ProductRepository productRepository;
 
     @Mock
+    private ClientRepository clientRepository;
+
+    @Mock
+    private CompanyRepository companyRepository;
+
+    @Mock
+    private CurrentCompany currentCompany;
+
+    @Mock
     private StockMovementServices stockMovementServices;
 
     @InjectMocks
@@ -51,6 +63,11 @@ class SaleServicesTest {
     @AfterEach
     void clearSecurityContext() {
         SecurityContextHolder.clearContext();
+    }
+
+    @org.junit.jupiter.api.BeforeEach
+    void setUpCompanyContext() {
+        when(currentCompany.getId()).thenReturn(1L);
     }
 
     @Test
@@ -62,7 +79,7 @@ class SaleServicesTest {
         SecurityContextHolder.getContext()
                 .setAuthentication(new TestingAuthenticationToken("admin", null));
         when(administratorRepository.findByLogin("admin")).thenReturn(Optional.of(administrator));
-        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(productRepository.findByIdAndCompanyId(1L, 1L)).thenReturn(Optional.of(product));
 
         SaleItemRequestDTO item = new SaleItemRequestDTO();
         item.setProductId(1L);
@@ -89,7 +106,7 @@ class SaleServicesTest {
         SecurityContextHolder.getContext()
                 .setAuthentication(new TestingAuthenticationToken("admin", null));
         when(administratorRepository.findByLogin("admin")).thenReturn(Optional.of(administrator));
-        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(productRepository.findByIdAndCompanyId(1L, 1L)).thenReturn(Optional.of(product));
 
         SaleItemRequestDTO item = new SaleItemRequestDTO();
         item.setProductId(1L);
@@ -111,7 +128,7 @@ class SaleServicesTest {
     void shouldApplyStockMovementWhenCreatingCompletedSale() {
         prepareAuthenticatedAdministrator();
         Product product = productWithPrice();
-        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(productRepository.findByIdAndCompanyId(1L, 1L)).thenReturn(Optional.of(product));
         when(saleRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         SaleRequestDTO request = saleRequest(SaleStatus.COMPLETED, 2);
@@ -128,7 +145,7 @@ class SaleServicesTest {
     @Test
     void shouldNotApplyStockMovementWhenCreatingPendingSale() {
         prepareAuthenticatedAdministrator();
-        when(productRepository.findById(1L)).thenReturn(Optional.of(productWithPrice()));
+        when(productRepository.findByIdAndCompanyId(1L, 1L)).thenReturn(Optional.of(productWithPrice()));
         when(saleRepository.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
         saleServices.create(saleRequest(SaleStatus.PENDING, 2));
@@ -141,7 +158,7 @@ class SaleServicesTest {
         br.com.system.model.Sale sale = new br.com.system.model.Sale();
         sale.setId(10L);
         sale.setStatus(SaleStatus.COMPLETED);
-        when(saleRepository.findById(10L)).thenReturn(Optional.of(sale));
+        when(saleRepository.findByIdAndCompanyId(10L, 1L)).thenReturn(Optional.of(sale));
         when(saleRepository.save(sale)).thenReturn(sale);
 
         saleServices.cancel(10L);
@@ -157,7 +174,7 @@ class SaleServicesTest {
         br.com.system.model.Sale sale = new br.com.system.model.Sale();
         sale.setId(10L);
         sale.setStatus(SaleStatus.COMPLETED);
-        when(saleRepository.findById(10L)).thenReturn(Optional.of(sale));
+        when(saleRepository.findByIdAndCompanyId(10L, 1L)).thenReturn(Optional.of(sale));
 
         saleServices.delete(10L);
 

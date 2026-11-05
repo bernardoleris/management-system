@@ -6,6 +6,7 @@ import br.com.system.model.Product;
 import br.com.system.model.Sale;
 import br.com.system.repository.ProductRepository;
 import br.com.system.repository.SaleRepository;
+import br.com.system.security.CurrentCompany;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -25,6 +26,7 @@ class SaleItemServicesTest {
     @Mock private ProductRepository productRepository;
     @Mock private InventoryService inventoryService;
     @Mock private StockMovementServices stockMovementServices;
+    @Mock private CurrentCompany currentCompany;
     @InjectMocks private SaleItemServices saleItemServices;
 
     @Test
@@ -34,8 +36,9 @@ class SaleItemServicesTest {
         sale.setStatus(SaleStatus.COMPLETED);
         Product product = new Product();
         product.setSalePrice(new BigDecimal("20.00"));
-        when(saleRepository.findById(10L)).thenReturn(Optional.of(sale));
-        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(currentCompany.getId()).thenReturn(1L);
+        when(saleRepository.findByIdAndCompanyId(10L, 1L)).thenReturn(Optional.of(sale));
+        when(productRepository.findByIdAndCompanyId(1L, 1L)).thenReturn(Optional.of(product));
 
         SaleItemRequestDTO request = new SaleItemRequestDTO();
         request.setProductId(1L);

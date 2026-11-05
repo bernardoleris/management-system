@@ -70,7 +70,7 @@ class ClientControllerTest extends AbstractIntegrationTest {
                 .then()
                 .statusCode(200)
                 .body("content.size()", equalTo(1))
-                .body("totalElements", equalTo(1));
+                .body("page.totalElements", equalTo(1));
 
         given()
                 .auth().oauth2(ownerAccessToken())

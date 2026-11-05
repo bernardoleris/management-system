@@ -65,6 +65,9 @@ public class ClientServices {
         validateDocumentNumber(dto);
 
         Long companyId = currentCompany.getId();
+        if (clientRepository.existsByCompanyIdAndUserEmail(companyId, dto.getEmail())) {
+            throw new DuplicateResourceException("Email already registered!");
+        }
         if (clientRepository.existsByCompanyIdAndDocumentNumber(companyId, dto.getDocumentNumber())) {
             throw new DuplicateResourceException("Document number already registered!");
         }
@@ -107,8 +110,13 @@ public class ClientServices {
 
         validateDocumentNumber(dto);
 
+        Long companyId = currentCompany.getId();
+        if (clientRepository.existsByCompanyIdAndUserEmailAndIdNot(companyId, dto.getEmail(), id)) {
+            throw new DuplicateResourceException("Email already registered!");
+        }
+
         if (clientRepository.existsByCompanyIdAndDocumentNumberAndIdNot(
-                currentCompany.getId(), dto.getDocumentNumber(), id)) {
+                companyId, dto.getDocumentNumber(), id)) {
             throw new DuplicateResourceException("Document number already registered!");
         }
 

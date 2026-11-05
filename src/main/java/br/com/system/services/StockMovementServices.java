@@ -10,6 +10,7 @@ import br.com.system.exception.ResourceNotFoundException;
 import br.com.system.model.*;
 import br.com.system.repository.*;
 import br.com.system.security.CurrentCompany;
+import br.com.system.security.TenantPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -280,9 +281,12 @@ public class StockMovementServices {
 
     private Administrator findAdminFromToken() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String login = authentication.getName();
+        if (authentication != null && authentication.getPrincipal() instanceof TenantPrincipal principal) {
+            return administratorRepository.findByUserId(principal.getUserId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Administrator not found!"));
+        }
 
-        return administratorRepository.findByLogin(login)
+        return administratorRepository.findByLogin(authentication.getName())
                 .orElseThrow(() -> new ResourceNotFoundException("Administrator not found!"));
     }
 

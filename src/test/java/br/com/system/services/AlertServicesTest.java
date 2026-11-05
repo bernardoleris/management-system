@@ -2,6 +2,7 @@ package br.com.system.services;
 
 import br.com.system.model.Alert;
 import br.com.system.repository.AlertRepository;
+import br.com.system.security.CurrentCompany;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,6 +22,9 @@ class AlertServicesTest {
     @Mock
     private AlertRepository alertRepository;
 
+    @Mock
+    private CurrentCompany currentCompany;
+
     @InjectMocks
     private AlertServices alertServices;
 
@@ -30,7 +34,8 @@ class AlertServicesTest {
         alert.setId(1L);
         alert.setRead(false);
         alert.setActive(true);
-        when(alertRepository.findById(1L)).thenReturn(Optional.of(alert));
+        when(currentCompany.getId()).thenReturn(1L);
+        when(alertRepository.findByIdAndCompanyId(1L, 1L)).thenReturn(Optional.of(alert));
         when(alertRepository.save(alert)).thenReturn(alert);
 
         LocalDateTime beforeMarkingAsRead = LocalDateTime.now();

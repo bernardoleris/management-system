@@ -12,6 +12,8 @@ import br.com.system.repository.CompanyRepository;
 import br.com.system.repository.CompanyMembershipRepository;
 import br.com.system.repository.ProductRepository;
 import br.com.system.security.CurrentCompany;
+import br.com.system.security.TenantPrincipal;
+import org.springframework.security.core.Authentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -141,11 +143,13 @@ public class AlertServices {
     }
 
     private Administrator findAdminFromToken() {
-        String login = SecurityContextHolder.getContext()
-                .getAuthentication()
-                .getName();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof TenantPrincipal principal) {
+            return administratorRepository.findByUserId(principal.getUserId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Administrator not found!"));
+        }
 
-        return administratorRepository.findByLogin(login)
+        return administratorRepository.findByLogin(authentication.getName())
                 .orElseThrow(() -> new ResourceNotFoundException("Administrator not found!"));
     }
 

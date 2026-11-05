@@ -15,4 +15,8 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
     boolean existsByCompanyIdAndDocumentNumber(Long companyId, String documentNumber);
 
     boolean existsByCompanyIdAndDocumentNumberAndIdNot(Long companyId, String documentNumber, Long id);
+
+    boolean existsByCompanyIdAndUserEmail(Long companyId, String email);
+
+    boolean existsByCompanyIdAndUserEmailAndIdNot(Long companyId, String email, Long id);
 }
