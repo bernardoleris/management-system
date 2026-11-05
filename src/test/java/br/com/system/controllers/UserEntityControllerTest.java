@@ -1,75 +1,44 @@
 package br.com.system.controllers;
 
 import br.com.system.support.AbstractIntegrationTest;
-import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
+import org.springframework.test.context.jdbc.Sql;
 
 import static io.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.contains;
 
 class UserEntityControllerTest extends AbstractIntegrationTest {
 
     @Test
-    void shouldCreateUser() {
-        createUser(userBody("New", "User", "new.user@test.com"))
-                .statusCode(201)
-                .body("id", notNullValue())
-                .body("firstName", equalTo("New"))
-                .body("lastName", equalTo("User"))
-                .body("email", equalTo("new.user@test.com"))
-                .body("active", equalTo(true));
-    }
+    @Sql(scripts = "classpath:sql/seed-second-company.sql",
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void shouldOnlyExposeUsersLinkedToTheActiveCompany() {
+        String defaultCompanyToken = ownerAccessToken();
+        String companyBToken = accessToken("owner-empresa-b", "password");
 
-    @Test
-    void shouldUpdateUser() {
-        given().auth().oauth2(ownerAccessToken()).contentType(ContentType.JSON)
-                .body(userBody("Updated", "Owner", "updated.owner@test.com"))
-                .when().put("/users/{id}", 1)
+        given().auth().oauth2(defaultCompanyToken)
+                .when().get("/users")
                 .then().statusCode(200)
-                .body("id", equalTo(1))
-                .body("firstName", equalTo("Updated"))
-                .body("email", equalTo("updated.owner@test.com"));
-    }
+                .body("id", contains(1, 2));
 
-    @Test
-    void shouldReturn409WhenEmailIsDuplicated() {
-        createUser(userBody("Duplicate", "User", "admin@test.com"))
-                .statusCode(409)
-                .body("message", equalTo("Email already registered!"));
-    }
+        given().auth().oauth2(companyBToken)
+                .when().get("/users")
+                .then().statusCode(200)
+                .body("id", contains(10, 11));
 
-    @Test
-    void shouldListFindAndDeleteUserWithoutRelationships() {
-        Long userId = createUser(userBody("Disposable", "User", "disposable.user@test.com"))
-                .statusCode(201).extract().jsonPath().getLong("id");
-
-        given().auth().oauth2(ownerAccessToken()).when().get("/users")
-                .then().statusCode(200).body("id", notNullValue());
-
-        given().auth().oauth2(ownerAccessToken()).when().get("/users/{id}", userId)
-                .then().statusCode(200).body("email", equalTo("disposable.user@test.com"));
-
-        given().auth().oauth2(ownerAccessToken()).when().delete("/users/{id}", userId)
-                .then().statusCode(204);
-
-        given().auth().oauth2(ownerAccessToken()).when().get("/users/{id}", userId)
+        given().auth().oauth2(defaultCompanyToken)
+                .when().get("/users/{id}", 10)
                 .then().statusCode(404);
-    }
 
-    @Test
-    void shouldReturn400WhenUserDataIsInvalid() {
-        createUser("""
-                { "firstName": "", "lastName": "", "email": "invalid" }
-                """)
-                .statusCode(400)
-                .body("message", equalTo("Validation failed"));
+        given().auth().oauth2(companyBToken)
+                .when().get("/users/{id}", 1)
+                .then().statusCode(404);
     }
 
     @Test
     void shouldReturn404WhenUserDoesNotExist() {
         given().auth().oauth2(ownerAccessToken()).when().get("/users/{id}", 999)
-                .then().statusCode(404).body("message", equalTo("No user found for this ID!"));
+                .then().statusCode(404);
     }
 
     @Test
@@ -77,19 +46,18 @@ class UserEntityControllerTest extends AbstractIntegrationTest {
         given().when().get("/users").then().statusCode(401);
     }
 
-    private io.restassured.response.ValidatableResponse createUser(String body) {
-        return given().auth().oauth2(ownerAccessToken()).contentType(ContentType.JSON).body(body)
-                .when().post("/users").then().log().ifValidationFails();
-    }
+    @Test
+    void shouldRejectLegacyUserMutations() {
+        given().auth().oauth2(ownerAccessToken())
+                .when().post("/users")
+                .then().statusCode(405);
 
-    private String userBody(String firstName, String lastName, String email) {
-        return """
-                {
-                    "firstName": "%s",
-                    "lastName": "%s",
-                    "email": "%s",
-                    "phone": "11999999999"
-                }
-                """.formatted(firstName, lastName, email);
+        given().auth().oauth2(ownerAccessToken())
+                .when().put("/users/{id}", 1)
+                .then().statusCode(405);
+
+        given().auth().oauth2(ownerAccessToken())
+                .when().delete("/users/{id}", 1)
+                .then().statusCode(405);
     }
 }
