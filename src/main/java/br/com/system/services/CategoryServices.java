@@ -6,7 +6,9 @@ import br.com.system.exception.DuplicateResourceException;
 import br.com.system.exception.ResourceNotFoundException;
 import br.com.system.mapper.ObjectMapper;
 import br.com.system.model.Category;
+import br.com.system.repository.CompanyRepository;
 import br.com.system.repository.CategoryRepository;
+import br.com.system.security.CurrentCompany;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,31 +22,39 @@ public class CategoryServices {
     @Autowired
     private CategoryRepository categoryRepository;
 
+    @Autowired
+    private CompanyRepository companyRepository;
+
+    @Autowired
+    private CurrentCompany currentCompany;
+
     public List<CategoryResponseDTO> findAll() {
         logger.info("Finding categories!");
 
-        return ObjectMapper.parseListObjects(categoryRepository.findAll(), CategoryResponseDTO.class);
+        return ObjectMapper.parseListObjects(
+                categoryRepository.findAllByCompanyId(currentCompany.getId()),
+                CategoryResponseDTO.class
+        );
     }
 
     public CategoryResponseDTO findById(Long id) {
         logger.info("Finding one category!");
 
-        Category entity = categoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No category found for this ID!"));
-
-        return ObjectMapper.parseObject(entity, CategoryResponseDTO.class);
+        return ObjectMapper.parseObject(findEntityById(id), CategoryResponseDTO.class);
     }
 
     public CategoryResponseDTO create(CategoryRequestDTO category) {
         logger.info("Creating one category!");
 
         String name = normalizeName(category.getName());
-        if (categoryRepository.existsByNameIgnoreCase(name)) {
+        Long companyId = currentCompany.getId();
+        if (categoryRepository.existsByCompanyIdAndNameIgnoreCase(companyId, name)) {
             throw new DuplicateResourceException("Category name already registered!");
         }
 
         Category entity = ObjectMapper.parseObject(category, Category.class);
         entity.setName(name);
+        entity.setCompany(companyRepository.getReferenceById(companyId));
 
         return ObjectMapper.parseObject(categoryRepository.save(entity), CategoryResponseDTO.class);
     }
@@ -52,11 +62,10 @@ public class CategoryServices {
     public CategoryResponseDTO update(Long id, CategoryRequestDTO category) {
         logger.info("Updating one category!");
 
-        Category entity = categoryRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("No category found for this ID!"));
+        Category entity = findEntityById(id);
 
         String name = normalizeName(category.getName());
-        if (categoryRepository.existsByNameIgnoreCaseAndIdNot(name, id)) {
+        if (categoryRepository.existsByCompanyIdAndNameIgnoreCaseAndIdNot(currentCompany.getId(), name, id)) {
             throw new DuplicateResourceException("Category name already registered!");
         }
 
@@ -68,7 +77,7 @@ public class CategoryServices {
     public void delete(Long id) {
         logger.info("Deleting one category!");
 
-        Category entity = categoryRepository.findById(id)
+        Category entity = categoryRepository.findByIdAndCompanyId(id, currentCompany.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No category found for this ID!"));
 
         categoryRepository.delete(entity);
@@ -76,5 +85,10 @@ public class CategoryServices {
 
     private String normalizeName(String name) {
         return name.strip();
+    }
+
+    private Category findEntityById(Long id) {
+        return categoryRepository.findByIdAndCompanyId(id, currentCompany.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("No category found for this ID!"));
     }
 }

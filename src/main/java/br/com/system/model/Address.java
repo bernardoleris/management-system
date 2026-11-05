@@ -42,4 +42,8 @@ public class Address implements Serializable{
 
     @Column(name = "zip_code", nullable = false, length = 8)
     private String zipCode;
+
+    @ManyToOne
+    @JoinColumn(name = "company_id", nullable = false)
+    private Company company;
 }

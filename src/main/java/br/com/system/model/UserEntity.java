@@ -6,13 +6,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.Collection;
 import java.util.List;
 
 @Getter
@@ -21,7 +18,7 @@ import java.util.List;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Entity
 @Table(name = "tb_user")
-public class UserEntity implements Serializable, UserDetails {
+public class UserEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -36,7 +33,7 @@ public class UserEntity implements Serializable, UserDetails {
     @Column(name = "last_name", nullable = false, length = 80)
     private String lastName;
 
-    @Column(name = "email", nullable = false, unique = true, length = 50)
+    @Column(name = "email", nullable = false, length = 50)
     private String email;
 
     @Column(name = "phone", length = 20)
@@ -60,50 +57,7 @@ public class UserEntity implements Serializable, UserDetails {
     @Column(name = "credentials_non_expired", nullable = false)
     private Boolean credentialsNonExpired = true;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "user_permission",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "permission_id")
-    )
-    private List<Permission> permissions;
-
     // ─── Métodos do UserDetails ───────────────────────────────────────────────
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return this.permissions;
-    }
-
-    @Override
-    public String getPassword() {
-        return null; // senha fica no Administrator
-    }
-
-    @Override
-    public String getUsername() {
-        return this.email;
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return this.accountNonExpired;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return this.accountNonLocked;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return this.credentialsNonExpired;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return this.active;
-    }
 
     // ─── PrePersist ───────────────────────────────────────────────────────────
 

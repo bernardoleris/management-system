@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import br.com.system.enums.CompanyRole;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
@@ -46,8 +47,8 @@ public class AdministratorCreateRequestDTO implements Serializable {
     @Size(min = 6, message = "Password must have at least 6 characters")
     private String password;
 
-    @NotNull(message = "Permission is required")
-    private Long permissionId;
+    @NotNull(message = "Company role is required")
+    private CompanyRole role;
 
     public AdministratorCreateRequestDTO() {}
 }

@@ -14,7 +14,9 @@ import br.com.system.model.Client;
 import br.com.system.model.UserEntity;
 import br.com.system.repository.AddressRepository;
 import br.com.system.repository.ClientRepository;
+import br.com.system.repository.CompanyRepository;
 import br.com.system.repository.UserEntityRepository;
+import br.com.system.security.CurrentCompany;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,11 +37,17 @@ public class ClientServices {
     @Autowired
     private AddressRepository addressRepository;
 
+    @Autowired
+    private CompanyRepository companyRepository;
+
+    @Autowired
+    private CurrentCompany currentCompany;
+
     @Transactional(readOnly = true)
     public Page<ClientResponseDTO> findAll(Pageable pageable) {
         logger.info("Finding clients!");
 
-        return clientRepository.findAll(pageable)
+        return clientRepository.findByCompanyId(currentCompany.getId(), pageable)
                 .map(this::toResponseDTO);
     }
 
@@ -56,11 +64,11 @@ public class ClientServices {
 
         validateDocumentNumber(dto);
 
-        if (userRepository.existsByEmail(dto.getEmail())) {
+        Long companyId = currentCompany.getId();
+        if (clientRepository.existsByCompanyIdAndUserEmail(companyId, dto.getEmail())) {
             throw new DuplicateResourceException("Email already registered!");
         }
-
-        if (clientRepository.existsByDocumentNumber(dto.getDocumentNumber())) {
+        if (clientRepository.existsByCompanyIdAndDocumentNumber(companyId, dto.getDocumentNumber())) {
             throw new DuplicateResourceException("Document number already registered!");
         }
 
@@ -77,6 +85,7 @@ public class ClientServices {
         if (dto.getAddress() != null) {
             address = new Address();
             setAddressFields(address, dto);
+            address.setCompany(companyRepository.getReferenceById(companyId));
             addressRepository.save(address);
         }
 
@@ -87,6 +96,7 @@ public class ClientServices {
         entity.setDocumentNumber(dto.getDocumentNumber());
         entity.setBirthDate(dto.getBirthDate());
         entity.setAddress(address);
+        entity.setCompany(companyRepository.getReferenceById(companyId));
 
         return toResponseDTO(clientRepository.save(entity));
     }
@@ -100,11 +110,13 @@ public class ClientServices {
 
         validateDocumentNumber(dto);
 
-        if (userRepository.existsByEmailAndIdNot(dto.getEmail(), user.getId())) {
+        Long companyId = currentCompany.getId();
+        if (clientRepository.existsByCompanyIdAndUserEmailAndIdNot(companyId, dto.getEmail(), id)) {
             throw new DuplicateResourceException("Email already registered!");
         }
 
-        if (clientRepository.existsByDocumentNumberAndIdNot(dto.getDocumentNumber(), id)) {
+        if (clientRepository.existsByCompanyIdAndDocumentNumberAndIdNot(
+                companyId, dto.getDocumentNumber(), id)) {
             throw new DuplicateResourceException("Document number already registered!");
         }
 
@@ -156,7 +168,7 @@ public class ClientServices {
     }
 
     private Client findEntityById(Long id) {
-        return clientRepository.findById(id)
+        return clientRepository.findByIdAndCompanyId(id, currentCompany.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No client found for this ID!"));
     }
 

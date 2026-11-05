@@ -20,11 +20,14 @@ public class JwtTokenProvider {
 
     // ─── Gera o token ─────────────────────────────────────────────────────────
 
-    public String generateToken(String login) {
+    public String generateToken(String login, Long userId, Long companyId, Long membershipId) {
         Algorithm algorithm = Algorithm.HMAC256(secret);
 
         return JWT.create()
                 .withSubject(login)
+                .withClaim("user_id", userId)
+                .withClaim("company_id", companyId)
+                .withClaim("membership_id", membershipId)
                 .withIssuedAt(new Date())
                 .withExpiresAt(new Date(System.currentTimeMillis() + expiration))
                 .sign(algorithm);
@@ -48,5 +51,23 @@ public class JwtTokenProvider {
         Algorithm algorithm = Algorithm.HMAC256(secret);
         DecodedJWT decodedJWT = JWT.require(algorithm).build().verify(token);
         return decodedJWT.getSubject();
+    }
+
+    public Long getUserIdFromToken(String token) {
+        return getClaimAsLong(token, "user_id");
+    }
+
+    public Long getCompanyIdFromToken(String token) {
+        return getClaimAsLong(token, "company_id");
+    }
+
+    public Long getMembershipIdFromToken(String token) {
+        return getClaimAsLong(token, "membership_id");
+    }
+
+    private Long getClaimAsLong(String token, String claimName) {
+        Algorithm algorithm = Algorithm.HMAC256(secret);
+        DecodedJWT decodedJWT = JWT.require(algorithm).build().verify(token);
+        return decodedJWT.getClaim(claimName).asLong();
     }
 }

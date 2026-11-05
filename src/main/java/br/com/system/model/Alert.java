@@ -56,6 +56,10 @@ public class Alert implements Serializable {
     @Column(name = "active", nullable = false)
     private Boolean active = true;
 
+    @ManyToOne
+    @JoinColumn(name = "company_id", nullable = false)
+    private Company company;
+
     @PrePersist
     public void prePersist() {
         if (this.read == null) {

@@ -36,6 +36,10 @@ public class StockMovement implements Serializable {
     @Column(name = "date", nullable = false)
     private LocalDateTime date;
 
+    @ManyToOne
+    @JoinColumn(name = "company_id", nullable = false)
+    private Company company;
+
     @Column(name = "reason")
     private String reason;
 

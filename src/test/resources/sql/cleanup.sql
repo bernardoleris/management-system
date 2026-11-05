@@ -1,0 +1,16 @@
+DELETE FROM refresh_token;
+DELETE FROM company_membership;
+DELETE FROM alert;
+DELETE FROM stock_movement_items;
+DELETE FROM stock_movements;
+DELETE FROM sale_item;
+DELETE FROM sale;
+DELETE FROM product;
+DELETE FROM client;
+DELETE FROM administrator;
+DELETE FROM tb_user;
+DELETE FROM supplier;
+DELETE FROM category;
+DELETE FROM brand;
+DELETE FROM address;
+DELETE FROM company WHERE slug <> 'default';

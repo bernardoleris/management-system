@@ -21,12 +21,6 @@ VALUES (
     NOW()
 );
 
-INSERT INTO permission (id, description)
-VALUES (1, 'ROLE_OWNER');
-
-INSERT INTO user_permission (user_id, permission_id)
-VALUES (1, 1);
-
 INSERT INTO administrator (id, user_id, login, password, last_login)
 VALUES (
     1,
@@ -36,14 +30,20 @@ VALUES (
     NULL
 );
 
-INSERT INTO category (id, name)
-VALUES (1, 'Test Category');
+INSERT INTO company_membership (company_id, user_id, role, active, created_at, updated_at)
+SELECT id, 1, 'COMPANY_OWNER', true, NOW(), NOW()
+FROM company
+WHERE slug = 'default';
 
-INSERT INTO brand (id, name)
-VALUES (1, 'Test Brand');
+INSERT INTO category (id, name, company_id)
+SELECT 1, 'Test Category', id FROM company WHERE slug = 'default';
 
-INSERT INTO supplier (id, trade_name, cnpj, phone, email, active)
-VALUES (1, 'Test Supplier', '12345678000199', '11999999999', 'supplier@test.com', true);
+INSERT INTO brand (id, name, company_id)
+SELECT 1, 'Test Brand', id FROM company WHERE slug = 'default';
+
+INSERT INTO supplier (id, trade_name, cnpj, phone, email, active, company_id)
+SELECT 1, 'Test Supplier', '12345678000199', '11999999999', 'supplier@test.com', true, id
+FROM company WHERE slug = 'default';
 
 INSERT INTO product (
     id,
@@ -55,6 +55,7 @@ INSERT INTO product (
     quantity,
     created_at,
     active,
+    company_id,
     category_id,
     brand_id,
     supplier_id
@@ -69,6 +70,7 @@ VALUES (
     10,
     NOW(),
     true,
+    (SELECT id FROM company WHERE slug = 'default'),
     1,
     1,
     1
@@ -99,5 +101,6 @@ VALUES (
     NOW()
 );
 
-INSERT INTO client (id, user_id, document_type, document_number, birth_date, address_id)
-VALUES (1, 2, 'CPF', '12345678901', '1990-01-01', NULL);
+INSERT INTO client (id, user_id, document_type, document_number, birth_date, address_id, company_id)
+VALUES (1, 2, 'CPF', '12345678901', '1990-01-01', NULL,
+        (SELECT id FROM company WHERE slug = 'default'));

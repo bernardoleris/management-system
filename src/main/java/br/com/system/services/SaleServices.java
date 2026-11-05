@@ -15,6 +15,10 @@ import br.com.system.repository.AdministratorRepository;
 import br.com.system.repository.ClientRepository;
 import br.com.system.repository.ProductRepository;
 import br.com.system.repository.SaleRepository;
+import br.com.system.repository.CompanyRepository;
+import br.com.system.repository.CompanyMembershipRepository;
+import br.com.system.security.CurrentCompany;
+import br.com.system.security.TenantPrincipal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -37,7 +41,16 @@ public class SaleServices {
     private SaleRepository saleRepository;
 
     @Autowired
+    private CompanyRepository companyRepository;
+
+    @Autowired
+    private CurrentCompany currentCompany;
+
+    @Autowired
     private AdministratorRepository administratorRepository;
+
+    @Autowired
+    private CompanyMembershipRepository membershipRepository;
 
     @Autowired
     private ClientRepository clientRepository;
@@ -52,7 +65,7 @@ public class SaleServices {
     public Page<SaleResponseDTO> findAll(Pageable pageable) {
         logger.info("Finding sales!");
 
-        return saleRepository.findAll(pageable)
+        return saleRepository.findByCompanyId(currentCompany.getId(), pageable)
                 .map(this::toResponseDTO);
     }
 
@@ -60,7 +73,7 @@ public class SaleServices {
     public Page<SaleResponseDTO> findByStatus(SaleStatus status, Pageable pageable) {
         logger.info("Finding sales by status!");
 
-        return saleRepository.findByStatus(status, pageable)
+        return saleRepository.findByCompanyIdAndStatus(currentCompany.getId(), status, pageable)
                 .map(this::toResponseDTO);
     }
 
@@ -70,7 +83,7 @@ public class SaleServices {
 
         findAdministrator(adminId);
 
-        return saleRepository.findByAdminId(adminId, pageable)
+        return saleRepository.findByCompanyIdAndAdminId(currentCompany.getId(), adminId, pageable)
                 .map(this::toResponseDTO);
     }
 
@@ -80,7 +93,7 @@ public class SaleServices {
 
         findClient(clientId);
 
-        return saleRepository.findByClientId(clientId, pageable)
+        return saleRepository.findByCompanyIdAndClientId(currentCompany.getId(), clientId, pageable)
                 .map(this::toResponseDTO);
     }
 
@@ -95,6 +108,7 @@ public class SaleServices {
         logger.info("Creating one sale!");
 
         Sale entity = new Sale();
+        entity.setCompany(companyRepository.getReferenceById(currentCompany.getId()));
         setSaleFields(entity, sale);
         Sale savedSale = saleRepository.save(entity);
         createStockMovementIfCompleted(savedSale);
@@ -231,29 +245,37 @@ public class SaleServices {
 
     private Administrator findAdminFromToken() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String login = authentication.getName();
+        if (authentication != null && authentication.getPrincipal() instanceof TenantPrincipal principal) {
+            return administratorRepository.findByUserId(principal.getUserId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Administrator not found!"));
+        }
 
-        return administratorRepository.findByLogin(login)
+        return administratorRepository.findByLogin(authentication.getName())
                 .orElseThrow(() -> new ResourceNotFoundException("Administrator not found!"));
     }
 
     private Sale findSale(Long id) {
-        return saleRepository.findById(id)
+        return saleRepository.findByIdAndCompanyId(id, currentCompany.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No sale found for this ID!"));
     }
 
     private Administrator findAdministrator(Long adminId) {
-        return administratorRepository.findById(adminId)
+        Administrator administrator = administratorRepository.findById(adminId)
                 .orElseThrow(() -> new ResourceNotFoundException("No administrator found for this ID!"));
+        if (!membershipRepository.existsByCompanyIdAndUserIdAndActiveTrue(
+                currentCompany.getId(), administrator.getUser().getId())) {
+            throw new ResourceNotFoundException("No administrator found for this ID!");
+        }
+        return administrator;
     }
 
     private Client findClient(Long clientId) {
-        return clientRepository.findById(clientId)
+        return clientRepository.findByIdAndCompanyId(clientId, currentCompany.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No client found for this ID!"));
     }
 
     private Product findProduct(Long productId) {
-        return productRepository.findById(productId)
+        return productRepository.findByIdAndCompanyId(productId, currentCompany.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No product found for this ID!"));
     }
 

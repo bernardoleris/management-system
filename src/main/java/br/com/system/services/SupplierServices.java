@@ -5,8 +5,10 @@ import br.com.system.data.dto.response.SupplierResponseDTO;
 import br.com.system.exception.DuplicateResourceException;
 import br.com.system.exception.ResourceNotFoundException;
 import br.com.system.mapper.ObjectMapper;
+import br.com.system.repository.CompanyRepository;
 import br.com.system.model.Supplier;
 import br.com.system.repository.SupplierRepository;
+import br.com.system.security.CurrentCompany;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,24 +23,30 @@ public class SupplierServices {
     @Autowired
     private SupplierRepository supplierRepository;
 
+    @Autowired
+    private CompanyRepository companyRepository;
+
+    @Autowired
+    private CurrentCompany currentCompany;
+
     public Page<SupplierResponseDTO> findAll(Pageable pageable) {
         logger.info("Finding all suppliers!");
 
-        return supplierRepository.findAll(pageable)
+        return supplierRepository.findByCompanyId(currentCompany.getId(), pageable)
                 .map(supplier -> ObjectMapper.parseObject(supplier, SupplierResponseDTO.class));
     }
 
     public Page<SupplierResponseDTO> findAllActive(Pageable pageable) {
         logger.info("Finding all active suppliers!");
 
-        return supplierRepository.findByActiveTrue(pageable)
+        return supplierRepository.findByCompanyIdAndActiveTrue(currentCompany.getId(), pageable)
                 .map(supplier -> ObjectMapper.parseObject(supplier, SupplierResponseDTO.class));
     }
 
     public Page<SupplierResponseDTO> findAllDisabled(Pageable pageable) {
         logger.info("Finding all disabled suppliers!");
 
-        return supplierRepository.findByActiveFalse(pageable)
+        return supplierRepository.findByCompanyIdAndActiveFalse(currentCompany.getId(), pageable)
                 .map(supplier -> ObjectMapper.parseObject(supplier, SupplierResponseDTO.class));
     }
 
@@ -53,12 +61,14 @@ public class SupplierServices {
     public SupplierResponseDTO create(SupplierRequestDTO dto) {
         logger.info("Creating one supplier!");
 
-        if (supplierRepository.existsByCnpj(dto.getCnpj())) {
+        Long companyId = currentCompany.getId();
+        if (supplierRepository.existsByCompanyIdAndCnpj(companyId, dto.getCnpj())) {
             throw new DuplicateResourceException("CNPJ already registered!");
         }
 
         Supplier entity = new Supplier();
         setSupplierFields(entity, dto);
+        entity.setCompany(companyRepository.getReferenceById(companyId));
 
         return ObjectMapper.parseObject(supplierRepository.save(entity), SupplierResponseDTO.class);
     }
@@ -68,7 +78,7 @@ public class SupplierServices {
 
         Supplier entity = findEntityById(id);
 
-        if (supplierRepository.existsByCnpjAndIdNot(dto.getCnpj(), id)) {
+        if (supplierRepository.existsByCompanyIdAndCnpjAndIdNot(currentCompany.getId(), dto.getCnpj(), id)) {
             throw new DuplicateResourceException("CNPJ already registered!");
         }
 
@@ -88,7 +98,7 @@ public class SupplierServices {
     // ─── Métodos internos ────────────────────────────────────────────────────
 
     private Supplier findEntityById(Long id) {
-        return supplierRepository.findById(id)
+        return supplierRepository.findByIdAndCompanyId(id, currentCompany.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No supplier found for this ID!"));
     }
 

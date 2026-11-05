@@ -10,6 +10,7 @@ import br.com.system.model.Category;
 import br.com.system.model.Product;
 import br.com.system.model.Supplier;
 import br.com.system.repository.*;
+import br.com.system.security.CurrentCompany;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,12 @@ public class ProductServices {
 
     @Autowired
     private ProductRepository productRepository;
+
+    @Autowired
+    private CompanyRepository companyRepository;
+
+    @Autowired
+    private CurrentCompany currentCompany;
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -47,7 +54,7 @@ public class ProductServices {
     public Page<ProductResponseDTO> findAll(Pageable pageable) {
         logger.info("Finding products!");
 
-        return productRepository.findAll(pageable)
+        return productRepository.findByCompanyId(currentCompany.getId(), pageable)
                 .map(this::toResponseDTO);
     }
 
@@ -55,7 +62,7 @@ public class ProductServices {
     public Page<ProductResponseDTO> findActive(Pageable pageable) {
         logger.info("Finding active products!");
 
-        return productRepository.findByActiveTrue(pageable)
+        return productRepository.findByCompanyIdAndActiveTrue(currentCompany.getId(), pageable)
                 .map(this::toResponseDTO);
     }
 
@@ -65,7 +72,7 @@ public class ProductServices {
 
         findCategory(categoryId);
 
-        return productRepository.findByCategoryIdAndActiveTrue(categoryId, pageable)
+        return productRepository.findByCompanyIdAndCategoryIdAndActiveTrue(currentCompany.getId(), categoryId, pageable)
                 .map(this::toResponseDTO);
     }
 
@@ -75,7 +82,7 @@ public class ProductServices {
 
         findBrand(brandId);
 
-        return productRepository.findByBrandIdAndActiveTrue(brandId, pageable)
+        return productRepository.findByCompanyIdAndBrandIdAndActiveTrue(currentCompany.getId(), brandId, pageable)
                 .map(this::toResponseDTO);
     }
 
@@ -85,7 +92,7 @@ public class ProductServices {
 
         findSupplier(supplierId);
 
-        return productRepository.findBySupplierIdAndActiveTrue(supplierId, pageable)
+        return productRepository.findByCompanyIdAndSupplierIdAndActiveTrue(currentCompany.getId(), supplierId, pageable)
                 .map(this::toResponseDTO);
     }
 
@@ -100,7 +107,7 @@ public class ProductServices {
     public ProductResponseDTO findByBarcode(String barcode) {
         logger.info("Finding one product by barcode!");
 
-        Product entity = productRepository.findByBarcode(barcode)
+        Product entity = productRepository.findByCompanyIdAndBarcode(currentCompany.getId(), barcode)
                 .orElseThrow(() -> new ResourceNotFoundException("No product found for this barcode!"));
 
         return toResponseDTO(entity);
@@ -110,12 +117,14 @@ public class ProductServices {
     public ProductResponseDTO create(ProductRequestDTO product) {
         logger.info("Creating one product!");
 
-        if (product.getBarcode() != null && productRepository.existsByBarcode(product.getBarcode())) {
+        Long companyId = currentCompany.getId();
+        if (product.getBarcode() != null && productRepository.existsByCompanyIdAndBarcode(companyId, product.getBarcode())) {
             throw new DuplicateResourceException("Barcode already registered!");
         }
 
         Product entity = new Product();
         setProductFields(entity, product);
+        entity.setCompany(companyRepository.getReferenceById(companyId));
 
         return toResponseDTO(productRepository.save(entity));
     }
@@ -127,7 +136,7 @@ public class ProductServices {
         Product entity = findProduct(id);
 
         if (product.getBarcode() != null &&
-                productRepository.existsByBarcodeAndIdNot(product.getBarcode(), id)) {
+                productRepository.existsByCompanyIdAndBarcodeAndIdNot(currentCompany.getId(), product.getBarcode(), id)) {
             throw new DuplicateResourceException("Barcode already registered!");
         }
 
@@ -159,7 +168,7 @@ public class ProductServices {
             throw new BusinessException("Product cannot be deleted because it has stock movement records!");
         }
 
-        if (alertRepository.existsByProductId(id)) {
+        if (alertRepository.existsByCompanyIdAndProductId(currentCompany.getId(), id)) {
             throw new BusinessException("Product cannot be deleted because it has alerts!");
         }
 
@@ -187,22 +196,22 @@ public class ProductServices {
     }
 
     private Product findProduct(Long id) {
-        return productRepository.findById(id)
+        return productRepository.findByIdAndCompanyId(id, currentCompany.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No product found for this ID!"));
     }
 
     private Category findCategory(Long categoryId) {
-        return categoryRepository.findById(categoryId)
+        return categoryRepository.findByIdAndCompanyId(categoryId, currentCompany.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No category found for this ID!"));
     }
 
     private Brand findBrand(Long brandId) {
-        return brandRepository.findById(brandId)
+        return brandRepository.findByIdAndCompanyId(brandId, currentCompany.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No brand found for this ID!"));
     }
 
     private Supplier findSupplier(Long supplierId) {
-        return supplierRepository.findById(supplierId)
+        return supplierRepository.findByIdAndCompanyId(supplierId, currentCompany.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No supplier found for this ID!"));
     }
 

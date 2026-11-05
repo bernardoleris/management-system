@@ -17,4 +17,6 @@ public class RefreshTokenRequestDTO implements Serializable {
 
     @NotBlank(message = "Refresh token is required")
     private String refreshToken;
+
+    private Long companyId;
 }

@@ -1,14 +1,10 @@
 package br.com.system.controllers;
 
 import br.com.system.controllers.api.UserEntityApi;
-import br.com.system.data.dto.request.UserEntityRequestDTO;
 import br.com.system.data.dto.response.UserEntityResponseDTO;
 import br.com.system.services.UserEntityServices;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,31 +33,4 @@ public class UserEntityController implements UserEntityApi {
         return service.findById(id);
     }
 
-    @PostMapping(
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    @Override
-    public ResponseEntity<UserEntityResponseDTO> create(@RequestBody @Valid UserEntityRequestDTO user) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.create(user));
-    }
-
-    @PutMapping(
-            value = "/{id}",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    @Override
-    public UserEntityResponseDTO update(
-            @PathVariable("id") Long id,
-            @RequestBody @Valid UserEntityRequestDTO user) {
-        return service.update(id, user);
-    }
-
-    @DeleteMapping(value = "/{id}")
-    @Override
-    public ResponseEntity<?> delete(@PathVariable("id") Long id) {
-        service.delete(id);
-        return ResponseEntity.noContent().build();
-    }
 }

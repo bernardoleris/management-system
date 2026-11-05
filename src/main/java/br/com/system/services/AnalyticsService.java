@@ -9,6 +9,7 @@ import br.com.system.model.Product;
 import br.com.system.repository.ProductRepository;
 import br.com.system.repository.SaleItemRepository;
 import br.com.system.repository.SaleRepository;
+import br.com.system.security.CurrentCompany;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,9 @@ public class AnalyticsService {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private CurrentCompany currentCompany;
+
     // ─── Vendas por mês ───────────────────────────────────────────────────────
 
     @Transactional(readOnly = true)
@@ -43,7 +47,7 @@ public class AnalyticsService {
 
         LocalDateTime[] range = resolveRange(period, start, end);
 
-        List<Object[]> results = saleRepository.countSalesByMonth(range[0], range[1]);
+        List<Object[]> results = saleRepository.countSalesByMonth(currentCompany.getId(), range[0], range[1]);
 
         List<String> labels = results.stream()
                 .map(r -> Month.of(((Number) r[0]).intValue())
@@ -65,7 +69,7 @@ public class AnalyticsService {
 
         LocalDateTime[] range = resolveRange(period, start, end);
 
-        List<Object[]> results = saleRepository.revenueByMonth(range[0], range[1]);
+        List<Object[]> results = saleRepository.revenueByMonth(currentCompany.getId(), range[0], range[1]);
 
         List<String> labels = results.stream()
                 .map(r -> Month.of(((Number) r[0]).intValue())
@@ -87,7 +91,7 @@ public class AnalyticsService {
 
         LocalDateTime[] range = resolveRange(period, start, end);
 
-        List<Object[]> results = saleRepository.countByPaymentMethod(range[0], range[1]);
+        List<Object[]> results = saleRepository.countByPaymentMethod(currentCompany.getId(), range[0], range[1]);
 
         List<String> labels = results.stream()
                 .map(r -> Payment.valueOf(r[0].toString()).getLabel())
@@ -109,7 +113,7 @@ public class AnalyticsService {
 
         LocalDateTime[] range = resolveRange(period, start, end);
 
-        return saleItemRepository.findTopProducts(range[0], range[1], PageRequest.of(0, limit))
+        return saleItemRepository.findTopProducts(currentCompany.getId(), range[0], range[1], PageRequest.of(0, limit))
                 .stream()
                 .map(r -> new TopProductsResponseDTO(
                         ((Number) r[0]).longValue(),
@@ -128,7 +132,7 @@ public class AnalyticsService {
 
         LocalDateTime[] range = resolveRange(period, start, end);
 
-        return productRepository.findProductsWithoutMovement(range[0], range[1])
+        return productRepository.findProductsWithoutMovement(currentCompany.getId(), range[0], range[1])
                 .stream()
                 .map(this::toProductWithoutMovementDTO)
                 .toList();

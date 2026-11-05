@@ -8,6 +8,8 @@ import br.com.system.model.Address;
 import br.com.system.model.Client;
 import br.com.system.repository.AddressRepository;
 import br.com.system.repository.ClientRepository;
+import br.com.system.repository.CompanyRepository;
+import br.com.system.security.CurrentCompany;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +25,12 @@ public class AddressServices {
     @Autowired
     private ClientRepository clientRepository;
 
+    @Autowired
+    private CompanyRepository companyRepository;
+
+    @Autowired
+    private CurrentCompany currentCompany;
+
     public AddressResponseDTO findByClient(Long clientId) {
         logger.info("Finding address by client!");
 
@@ -35,6 +43,7 @@ public class AddressServices {
 
         Client client = findClient(clientId);
         Address address = ObjectMapper.parseObject(dto, Address.class);
+        address.setCompany(companyRepository.getReferenceById(currentCompany.getId()));
         Address savedAddress = addressRepository.save(address);
 
         client.setAddress(savedAddress);
@@ -47,11 +56,7 @@ public class AddressServices {
         logger.info("Updating address by client!");
 
         Client client = findClient(clientId);
-        Address address = client.getAddress();
-
-        if (address == null) {
-            throw new ResourceNotFoundException("No address found for this client!");
-        }
+        Address address = findAddress(client);
 
         address.setStreet(dto.getStreet());
         address.setNumber(dto.getNumber());
@@ -68,11 +73,7 @@ public class AddressServices {
         logger.info("Deleting address by client!");
 
         Client client = findClient(clientId);
-        Address address = client.getAddress();
-
-        if (address == null) {
-            throw new ResourceNotFoundException("No address found for this client!");
-        }
+        Address address = findAddress(client);
 
         client.setAddress(null);
         clientRepository.save(client);
@@ -80,7 +81,16 @@ public class AddressServices {
     }
 
     private Client findClient(Long clientId) {
-        return clientRepository.findById(clientId)
+        return clientRepository.findByIdAndCompanyId(clientId, currentCompany.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No client found for this ID!"));
+    }
+
+    private Address findAddress(Client client) {
+        if (client.getAddress() == null) {
+            throw new ResourceNotFoundException("No address found for this client!");
+        }
+
+        return addressRepository.findByIdAndCompanyId(client.getAddress().getId(), currentCompany.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("No address found for this client!"));
     }
 }

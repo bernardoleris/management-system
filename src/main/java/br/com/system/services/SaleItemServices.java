@@ -10,6 +10,7 @@ import br.com.system.model.SaleItem;
 import br.com.system.repository.ProductRepository;
 import br.com.system.repository.SaleItemRepository;
 import br.com.system.repository.SaleRepository;
+import br.com.system.security.CurrentCompany;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,12 +39,15 @@ public class SaleItemServices {
     @Autowired
     private StockMovementServices stockMovementServices;
 
+    @Autowired
+    private CurrentCompany currentCompany;
+
     public List<SaleItemResponseDTO> findBySale(Long saleId) {
         logger.info("Finding sale items!");
 
         findSale(saleId);
 
-        return saleItemRepository.findBySaleId(saleId).stream()
+        return saleItemRepository.findBySaleIdAndSaleCompanyId(saleId, currentCompany.getId()).stream()
                 .map(this::toResponseDTO)
                 .toList();
     }
@@ -172,23 +176,20 @@ public class SaleItemServices {
     }
 
     private Sale findSale(Long saleId) {
-        return saleRepository.findById(saleId)
+        return saleRepository.findByIdAndCompanyId(saleId, currentCompany.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No sale found for this ID!"));
     }
 
     private SaleItem findSaleItem(Long saleId, Long itemId) {
-        SaleItem item = saleItemRepository.findById(itemId)
+        findSale(saleId);
+        SaleItem item = saleItemRepository.findByIdAndSaleIdAndSaleCompanyId(
+                        itemId, saleId, currentCompany.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No sale item found for this ID!"));
-
-        if (!item.getSale().getId().equals(saleId)) {
-            throw new ResourceNotFoundException("No sale item found for this sale!");
-        }
-
         return item;
     }
 
     private Product findProduct(Long productId) {
-        return productRepository.findById(productId)
+        return productRepository.findByIdAndCompanyId(productId, currentCompany.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No product found for this ID!"));
     }
 

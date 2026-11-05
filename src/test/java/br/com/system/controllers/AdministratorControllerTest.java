@@ -3,8 +3,6 @@ package br.com.system.controllers;
 import br.com.system.support.AbstractIntegrationTest;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.annotation.DirtiesContext;
-import org.springframework.test.context.jdbc.Sql;
 
 import java.util.UUID;
 
@@ -14,11 +12,6 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.notNullValue;
 
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@Sql(
-        scripts = "classpath:sql/seed-base.sql",
-        executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
-)
 class AdministratorControllerTest extends AbstractIntegrationTest {
 
     @Test
@@ -46,7 +39,7 @@ class AdministratorControllerTest extends AbstractIntegrationTest {
                 .body("id", equalTo(id.intValue()))
                 .body("login", equalTo("admin"))
                 .body("user.email", equalTo("admin@test.com"))
-                .body("permissions", hasItem("ROLE_OWNER"));
+                .body("role", equalTo("COMPANY_OWNER"));
     }
 
     @Test
@@ -66,7 +59,7 @@ class AdministratorControllerTest extends AbstractIntegrationTest {
                     "phone": "11999999999",
                     "login": "%s",
                     "password": "secret123",
-                    "permissionId": 1
+                    "role": "COMPANY_OWNER"
                 }
                 """.formatted(email, login))
                 .when()
@@ -77,7 +70,7 @@ class AdministratorControllerTest extends AbstractIntegrationTest {
                 .body("login", equalTo(login))
                 .body("user.firstName", equalTo("Maria"))
                 .body("user.email", equalTo(email))
-                .body("permissions", hasItem("ROLE_OWNER"));
+                .body("role", equalTo("COMPANY_OWNER"));
     }
 
     @Test
@@ -94,7 +87,7 @@ class AdministratorControllerTest extends AbstractIntegrationTest {
                     "email": "ana.souza@test.com",
                     "phone": "11988887777",
                     "login": "admin_updated",
-                    "permissionId": 1
+                    "role": "COMPANY_OWNER"
                 }
                 """)
                 .when()
@@ -105,12 +98,14 @@ class AdministratorControllerTest extends AbstractIntegrationTest {
                 .body("login", equalTo("admin_updated"))
                 .body("user.firstName", equalTo("Ana"))
                 .body("user.email", equalTo("ana.souza@test.com"))
-                .body("permissions", hasItem("ROLE_OWNER"));
+                .body("role", equalTo("COMPANY_OWNER"));
     }
 
     @Test
-    void shouldToggleAdministratorActiveStatus() {
-        Long id = createAdministrator("toggle_" + uniqueSuffix(), "toggle." + uniqueSuffix() + "@test.com");
+    void shouldRevokeCompanyAccessWhenAdministratorIsDeactivated() {
+        String login = "toggle_" + uniqueSuffix();
+        Long id = createAdministrator(login, "toggle." + uniqueSuffix() + "@test.com");
+        String administratorToken = accessToken(login, "secret123");
 
         given()
                 .auth().oauth2(ownerAccessToken())
@@ -120,12 +115,11 @@ class AdministratorControllerTest extends AbstractIntegrationTest {
                 .statusCode(204);
 
         given()
-                .auth().oauth2(ownerAccessToken())
+                .auth().oauth2(administratorToken)
                 .when()
-                .get("/administrators/{id}", id)
+                .get("/categories")
                 .then()
-                .statusCode(200)
-                .body("user.active", equalTo(false));
+                .statusCode(401);
     }
 
     @Test
@@ -186,7 +180,7 @@ class AdministratorControllerTest extends AbstractIntegrationTest {
                     "phone": "11999990000",
                     "login": "%s",
                     "password": "%s",
-                    "permissionId": 1
+                    "role": "COMPANY_OWNER"
                 }
                 """.formatted(email, login, password))
                 .when()

@@ -21,6 +21,7 @@ application-local.properties
 application-local.yml
 PROJECT_CONTEXT.local.md
 MULTI_COMPANY_MODEL.local.md
+docs/local/
 
 # Pacotes gerados
 *.war

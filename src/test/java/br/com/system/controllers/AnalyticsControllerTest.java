@@ -3,21 +3,16 @@ package br.com.system.controllers;
 import br.com.system.support.AbstractIntegrationTest;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 
 import java.time.LocalDate;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.notNullValue;
 
-@DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD)
-@Sql(
-        scripts = "classpath:sql/seed-base.sql",
-        executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
-)
 class AnalyticsControllerTest extends AbstractIntegrationTest {
 
     @Test
@@ -141,6 +136,69 @@ class AnalyticsControllerTest extends AbstractIntegrationTest {
                 .statusCode(401);
     }
 
+    @Test
+    @Sql(scripts = "classpath:sql/seed-second-company.sql",
+            executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    void shouldOnlyAggregateDataFromTheActiveCompany() {
+        String defaultCompanyToken = ownerAccessToken();
+        String companyBToken = accessToken("owner-empresa-b", "password");
+
+        createCompletedSale(defaultCompanyToken, 1, "CASH", 2);
+        createCompletedSale(companyBToken, 2, "PIX", 3);
+
+        createProduct(defaultCompanyToken, "Default Company Unsold Product", "7890000000003", 1);
+        createProduct(companyBToken, "Company B Unsold Product", "7890000000004", 2);
+
+        given()
+                .auth().oauth2(companyBToken)
+                .queryParam("period", "CURRENT_MONTH")
+                .when()
+                .get("/analytics/sales-by-month")
+                .then()
+                .statusCode(200)
+                .body("data", contains(1));
+
+        given()
+                .auth().oauth2(companyBToken)
+                .queryParam("period", "CURRENT_MONTH")
+                .when()
+                .get("/analytics/revenue-by-month")
+                .then()
+                .statusCode(200)
+                .body("data", contains(60.0F));
+
+        given()
+                .auth().oauth2(companyBToken)
+                .queryParam("period", "CURRENT_MONTH")
+                .when()
+                .get("/analytics/payment-methods")
+                .then()
+                .statusCode(200)
+                .body("labels", contains("Pix"))
+                .body("data", contains(1));
+
+        given()
+                .auth().oauth2(companyBToken)
+                .queryParam("period", "CURRENT_MONTH")
+                .when()
+                .get("/analytics/top-products")
+                .then()
+                .statusCode(200)
+                .body("size()", equalTo(1))
+                .body("[0].productId", equalTo(2))
+                .body("[0].productName", equalTo("Product From Company B"))
+                .body("[0].totalSold", equalTo(3));
+
+        given()
+                .auth().oauth2(companyBToken)
+                .queryParam("period", "CURRENT_MONTH")
+                .when()
+                .get("/analytics/products-without-movement")
+                .then()
+                .statusCode(200)
+                .body("productName", contains("Company B Unsold Product"));
+    }
+
     private io.restassured.response.ValidatableResponse createSale(
             String status, String paymentMethod, int quantity) {
         return given()
@@ -184,5 +242,49 @@ class AnalyticsControllerTest extends AbstractIntegrationTest {
                 .post("/products")
                 .then()
                 .log().ifValidationFails();
+    }
+
+    private void createCompletedSale(String token, long productId, String paymentMethod, int quantity) {
+        given()
+                .auth().oauth2(token)
+                .contentType(ContentType.JSON)
+                .body("""
+                        {
+                            "status": "COMPLETED",
+                            "paymentMethod": "%s",
+                            "items": [
+                                {
+                                    "productId": %d,
+                                    "quantity": %d
+                                }
+                            ]
+                        }
+                        """.formatted(paymentMethod, productId, quantity))
+                .when()
+                .post("/sales")
+                .then()
+                .statusCode(201);
+    }
+
+    private void createProduct(String token, String name, String barcode, long relationshipId) {
+        given()
+                .auth().oauth2(token)
+                .contentType(ContentType.JSON)
+                .body("""
+                        {
+                            "name": "%s",
+                            "barcode": "%s",
+                            "purchasePrice": 10.00,
+                            "salePrice": 20.00,
+                            "quantity": 5,
+                            "categoryId": %d,
+                            "brandId": %d,
+                            "supplierId": %d
+                        }
+                        """.formatted(name, barcode, relationshipId, relationshipId, relationshipId))
+                .when()
+                .post("/products")
+                .then()
+                .statusCode(201);
     }
 }

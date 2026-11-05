@@ -4,15 +4,20 @@ import br.com.system.model.Alert;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface AlertRepository extends JpaRepository<Alert, Long> {
-    List<Alert> findByActiveTrue();
+    List<Alert> findByCompanyId(Long companyId);
 
-    List<Alert> findByReadFalseAndActiveTrue();
+    List<Alert> findByCompanyIdAndActiveTrue(Long companyId);
 
-    List<Alert> findByAdminIdAndActiveTrue(Long adminId);
+    List<Alert> findByCompanyIdAndReadFalseAndActiveTrue(Long companyId);
 
-    List<Alert> findByProductIdAndActiveTrue(Long productId);
+    List<Alert> findByCompanyIdAndAdminIdAndActiveTrue(Long companyId, Long adminId);
 
-    boolean existsByProductId(Long productId);
+    List<Alert> findByCompanyIdAndProductIdAndActiveTrue(Long companyId, Long productId);
+
+    Optional<Alert> findByIdAndCompanyId(Long id, Long companyId);
+
+    boolean existsByCompanyIdAndProductId(Long companyId, Long productId);
 }
