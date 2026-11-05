@@ -118,7 +118,7 @@ public class AuthService {
                 .findByCompanyIdAndUserIdAndActiveTrue(companyId, principal.getUserId())
                 .filter(value -> Boolean.TRUE.equals(value.getCompany().getActive()))
                 .orElseThrow(() -> new BusinessException("No active access to this company!"));
-        Administrator administrator = administratorRepository.findByLogin(principal.getUsername())
+        Administrator administrator = administratorRepository.findByUserId(principal.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("Administrator not found!"));
 
         Date issuedAt = new Date();
