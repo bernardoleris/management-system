@@ -7,13 +7,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
+import org.springframework.test.context.jdbc.SqlMergeMode;
 import org.springframework.test.context.jdbc.Sql;
 import org.testcontainers.containers.MySQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Testcontainers
+@SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
 @Sql(
         scripts = "classpath:sql/seed-base.sql",
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
@@ -24,11 +23,14 @@ import org.testcontainers.junit.jupiter.Testcontainers;
 )
 public abstract class AbstractIntegrationTest {
 
-    @Container
     protected static final MySQLContainer<?> mysql = new MySQLContainer<>("mysql:8.0")
             .withDatabaseName("stock_test_db")
             .withUsername("root")
             .withPassword("test");
+
+    static {
+        mysql.start();
+    }
 
     @LocalServerPort
     protected int port;
