@@ -102,8 +102,10 @@ class AdministratorControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void shouldToggleAdministratorActiveStatus() {
-        Long id = createAdministrator("toggle_" + uniqueSuffix(), "toggle." + uniqueSuffix() + "@test.com");
+    void shouldRevokeCompanyAccessWhenAdministratorIsDeactivated() {
+        String login = "toggle_" + uniqueSuffix();
+        Long id = createAdministrator(login, "toggle." + uniqueSuffix() + "@test.com");
+        String administratorToken = accessToken(login, "secret123");
 
         given()
                 .auth().oauth2(ownerAccessToken())
@@ -113,12 +115,11 @@ class AdministratorControllerTest extends AbstractIntegrationTest {
                 .statusCode(204);
 
         given()
-                .auth().oauth2(ownerAccessToken())
+                .auth().oauth2(administratorToken)
                 .when()
-                .get("/administrators/{id}", id)
+                .get("/categories")
                 .then()
-                .statusCode(200)
-                .body("user.active", equalTo(false));
+                .statusCode(401);
     }
 
     @Test
