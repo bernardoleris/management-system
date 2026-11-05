@@ -62,6 +62,14 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             }
 
             UserDetails userDetails = userDetailsService.loadUserByUsername(login);
+            if (!userDetails.isEnabled()
+                    || !userDetails.isAccountNonExpired()
+                    || !userDetails.isAccountNonLocked()
+                    || !userDetails.isCredentialsNonExpired()) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             TenantPrincipal principal = new TenantPrincipal(
                     userDetails,
                     userId,

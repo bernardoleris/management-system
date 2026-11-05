@@ -7,7 +7,7 @@ import org.springframework.test.context.jdbc.Sql;
 import static io.restassured.RestAssured.given;
 
 @Sql(
-        scripts = "classpath:sql/seed-permissions.sql",
+        scripts = "classpath:sql/seed-company-roles.sql",
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD
 )
 class SecurityAuthorizationTest extends AbstractIntegrationTest {
@@ -50,5 +50,6 @@ class SecurityAuthorizationTest extends AbstractIntegrationTest {
 
         given().auth().oauth2(adminToken).when().get("/products").then().statusCode(200);
         given().auth().oauth2(adminToken).when().get("/analytics/sales-by-month").then().statusCode(403);
+        given().auth().oauth2(adminToken).when().get("/company/members").then().statusCode(403);
     }
 }

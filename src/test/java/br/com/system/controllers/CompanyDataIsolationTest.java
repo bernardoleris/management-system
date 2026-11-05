@@ -156,7 +156,7 @@ class CompanyDataIsolationTest extends AbstractIntegrationTest {
                           "phone": "11988887777",
                           "login": "%s",
                           "password": "secret123",
-                          "permissionId": 1
+                          "role": "COMPANY_OWNER"
                         }
                         """.formatted(login))
                 .when().post("/administrators")

@@ -12,12 +12,10 @@ import br.com.system.exception.ResourceNotFoundException;
 import br.com.system.mapper.ObjectMapper;
 import br.com.system.model.Administrator;
 import br.com.system.model.CompanyMembership;
-import br.com.system.model.Permission;
 import br.com.system.model.UserEntity;
 import br.com.system.repository.AdministratorRepository;
 import br.com.system.repository.CompanyMembershipRepository;
 import br.com.system.repository.CompanyRepository;
-import br.com.system.repository.PermissionRepository;
 import br.com.system.repository.UserEntityRepository;
 import br.com.system.security.CurrentCompany;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +23,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -47,9 +44,6 @@ public class AdministratorServices {
 
     @Autowired
     private UserEntityRepository userEntityRepository;
-
-    @Autowired
-    private PermissionRepository permissionRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -86,15 +80,11 @@ public class AdministratorServices {
             throw new DuplicateResourceException("Login already registered!");
         }
 
-        Permission permission = permissionRepository.findById(dto.getPermissionId())
-                .orElseThrow(() -> new ResourceNotFoundException("No permission found for this ID!"));
-
         UserEntity user = new UserEntity();
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());
         user.setEmail(dto.getEmail());
         user.setPhone(dto.getPhone());
-        user.setPermissions(new ArrayList<>(List.of(permission)));
         userEntityRepository.save(user);
 
         Administrator entity = new Administrator();
@@ -104,7 +94,7 @@ public class AdministratorServices {
         entity.setLastLogin(null);
 
         Administrator savedAdministrator = administratorRepository.save(entity);
-        createMembership(user, permission);
+        createMembership(user, dto.getRole());
         return toResponseDTO(savedAdministrator);
     }
 
@@ -123,20 +113,16 @@ public class AdministratorServices {
             throw new DuplicateResourceException("Login already registered!");
         }
 
-        Permission permission = permissionRepository.findById(dto.getPermissionId())
-                .orElseThrow(() -> new ResourceNotFoundException("No permission found for this ID!"));
-
         user.setFirstName(dto.getFirstName());
         user.setLastName(dto.getLastName());
         user.setEmail(dto.getEmail());
         user.setPhone(dto.getPhone());
-        user.setPermissions(new ArrayList<>(List.of(permission)));
         userEntityRepository.save(user);
 
         entity.setLogin(dto.getLogin());
 
         CompanyMembership membership = findMembership(user.getId());
-        CompanyRole newRole = toCompanyRole(permission);
+        CompanyRole newRole = dto.getRole();
         if (membership.getRole() == CompanyRole.COMPANY_OWNER && newRole != CompanyRole.COMPANY_OWNER) {
             assertNotLastOwner(membership);
         }
@@ -166,11 +152,11 @@ public class AdministratorServices {
         return administrator;
     }
 
-    private void createMembership(UserEntity user, Permission permission) {
+    private void createMembership(UserEntity user, CompanyRole role) {
         CompanyMembership membership = new CompanyMembership();
         membership.setCompany(companyRepository.getReferenceById(currentCompany.getId()));
         membership.setUser(user);
-        membership.setRole(toCompanyRole(permission));
+        membership.setRole(role);
         membership.setActive(true);
         membershipRepository.save(membership);
     }
@@ -178,14 +164,6 @@ public class AdministratorServices {
     private CompanyMembership findMembership(Long userId) {
         return membershipRepository.findByCompanyIdAndUserId(currentCompany.getId(), userId)
                 .orElseThrow(() -> new ResourceNotFoundException("No administrator found for this ID!"));
-    }
-
-    private CompanyRole toCompanyRole(Permission permission) {
-        return switch (permission.getAuthority()) {
-            case "ROLE_OWNER" -> CompanyRole.COMPANY_OWNER;
-            case "ROLE_ADMIN" -> CompanyRole.ADMIN;
-            default -> CompanyRole.OPERATOR;
-        };
     }
 
     private void assertNotLastOwner(CompanyMembership membership) {
@@ -207,10 +185,7 @@ public class AdministratorServices {
 
         if (entity.getUser() != null) {
             dto.setUser(ObjectMapper.parseObject(entity.getUser(), UserEntityResponseDTO.class));
-            dto.setPermissions(entity.getUser().getPermissions()
-                    .stream()
-                    .map(Permission::getAuthority)
-                    .toList());
+            dto.setRole(findMembership(entity.getUser().getId()).getRole());
         }
 
         return dto;

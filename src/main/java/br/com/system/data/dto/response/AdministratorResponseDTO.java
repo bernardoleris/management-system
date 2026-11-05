@@ -3,11 +3,11 @@ package br.com.system.data.dto.response;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import br.com.system.enums.CompanyRole;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -19,7 +19,7 @@ public class AdministratorResponseDTO implements Serializable {
     private Long id;
     private String login;
     private LocalDateTime lastLogin;
-    private List<String> permissions;
+    private CompanyRole role;
     private UserEntityResponseDTO user;
 
     public AdministratorResponseDTO() {}

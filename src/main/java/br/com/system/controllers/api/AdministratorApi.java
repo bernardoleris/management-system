@@ -16,12 +16,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
-@Tag(name = "Administrator", description = "Endpoints for administrator management.")
+@Tag(name = "Administrator", description = "Legacy administrator endpoints scoped to the active company. Prefer /company/members for new integrations.")
 public interface AdministratorApi {
 
     @Operation(
             summary = "List administrators",
-            description = "Returns all registered administrators."
+            description = "Returns administrators linked to the active company."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Administrators found",
@@ -51,7 +51,7 @@ public interface AdministratorApi {
 
     @Operation(
             summary = "Create administrator",
-            description = "Creates a new administrator record."
+            description = "Creates an administrator and its active-company membership using the requested CompanyRole."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Administrator created successfully",
@@ -67,7 +67,7 @@ public interface AdministratorApi {
 
     @Operation(
             summary = "Update administrator",
-            description = "Updates the data for the informed administrator."
+            description = "Updates the administrator and its CompanyRole in the active company."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Administrator updated successfully",

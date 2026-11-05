@@ -21,12 +21,6 @@ VALUES (
     NOW()
 );
 
-INSERT INTO permission (id, description)
-VALUES (1, 'ROLE_OWNER');
-
-INSERT INTO user_permission (user_id, permission_id)
-VALUES (1, 1);
-
 INSERT INTO administrator (id, user_id, login, password, last_login)
 VALUES (
     1,

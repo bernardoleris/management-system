@@ -39,7 +39,7 @@ class AdministratorControllerTest extends AbstractIntegrationTest {
                 .body("id", equalTo(id.intValue()))
                 .body("login", equalTo("admin"))
                 .body("user.email", equalTo("admin@test.com"))
-                .body("permissions", hasItem("ROLE_OWNER"));
+                .body("role", equalTo("COMPANY_OWNER"));
     }
 
     @Test
@@ -59,7 +59,7 @@ class AdministratorControllerTest extends AbstractIntegrationTest {
                     "phone": "11999999999",
                     "login": "%s",
                     "password": "secret123",
-                    "permissionId": 1
+                    "role": "COMPANY_OWNER"
                 }
                 """.formatted(email, login))
                 .when()
@@ -70,7 +70,7 @@ class AdministratorControllerTest extends AbstractIntegrationTest {
                 .body("login", equalTo(login))
                 .body("user.firstName", equalTo("Maria"))
                 .body("user.email", equalTo(email))
-                .body("permissions", hasItem("ROLE_OWNER"));
+                .body("role", equalTo("COMPANY_OWNER"));
     }
 
     @Test
@@ -87,7 +87,7 @@ class AdministratorControllerTest extends AbstractIntegrationTest {
                     "email": "ana.souza@test.com",
                     "phone": "11988887777",
                     "login": "admin_updated",
-                    "permissionId": 1
+                    "role": "COMPANY_OWNER"
                 }
                 """)
                 .when()
@@ -98,7 +98,7 @@ class AdministratorControllerTest extends AbstractIntegrationTest {
                 .body("login", equalTo("admin_updated"))
                 .body("user.firstName", equalTo("Ana"))
                 .body("user.email", equalTo("ana.souza@test.com"))
-                .body("permissions", hasItem("ROLE_OWNER"));
+                .body("role", equalTo("COMPANY_OWNER"));
     }
 
     @Test
@@ -180,7 +180,7 @@ class AdministratorControllerTest extends AbstractIntegrationTest {
                     "phone": "11999990000",
                     "login": "%s",
                     "password": "%s",
-                    "permissionId": 1
+                    "role": "COMPANY_OWNER"
                 }
                 """.formatted(email, login, password))
                 .when()
