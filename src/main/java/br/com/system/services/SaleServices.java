@@ -16,6 +16,7 @@ import br.com.system.repository.ClientRepository;
 import br.com.system.repository.ProductRepository;
 import br.com.system.repository.SaleRepository;
 import br.com.system.repository.CompanyRepository;
+import br.com.system.repository.CompanyMembershipRepository;
 import br.com.system.security.CurrentCompany;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -46,6 +47,9 @@ public class SaleServices {
 
     @Autowired
     private AdministratorRepository administratorRepository;
+
+    @Autowired
+    private CompanyMembershipRepository membershipRepository;
 
     @Autowired
     private ClientRepository clientRepository;
@@ -252,8 +256,13 @@ public class SaleServices {
     }
 
     private Administrator findAdministrator(Long adminId) {
-        return administratorRepository.findById(adminId)
+        Administrator administrator = administratorRepository.findById(adminId)
                 .orElseThrow(() -> new ResourceNotFoundException("No administrator found for this ID!"));
+        if (!membershipRepository.existsByCompanyIdAndUserIdAndActiveTrue(
+                currentCompany.getId(), administrator.getUser().getId())) {
+            throw new ResourceNotFoundException("No administrator found for this ID!");
+        }
+        return administrator;
     }
 
     private Client findClient(Long clientId) {

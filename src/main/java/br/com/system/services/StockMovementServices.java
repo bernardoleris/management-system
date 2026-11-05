@@ -42,6 +42,9 @@ public class StockMovementServices {
     private AdministratorRepository administratorRepository;
 
     @Autowired
+    private CompanyMembershipRepository membershipRepository;
+
+    @Autowired
     private SupplierRepository supplierRepository;
 
     @Autowired
@@ -294,8 +297,13 @@ public class StockMovementServices {
     }
 
     private Administrator findAdministrator(Long adminId) {
-        return administratorRepository.findById(adminId)
+        Administrator administrator = administratorRepository.findById(adminId)
                 .orElseThrow(() -> new ResourceNotFoundException("No administrator found for this ID!"));
+        if (!membershipRepository.existsByCompanyIdAndUserIdAndActiveTrue(
+                currentCompany.getId(), administrator.getUser().getId())) {
+            throw new ResourceNotFoundException("No administrator found for this ID!");
+        }
+        return administrator;
     }
 
     private Supplier findSupplier(Long supplierId) {

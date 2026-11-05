@@ -8,8 +8,12 @@ import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface SaleItemRepository extends JpaRepository<SaleItem, Long> {
+    List<SaleItem> findBySaleIdAndSaleCompanyId(Long saleId, Long companyId);
+
+    Optional<SaleItem> findByIdAndSaleIdAndSaleCompanyId(Long id, Long saleId, Long companyId);
     List<SaleItem> findBySaleId(Long saleId);
 
     boolean existsByProductId(Long productId);

@@ -47,7 +47,7 @@ public class SaleItemServices {
 
         findSale(saleId);
 
-        return saleItemRepository.findBySaleId(saleId).stream()
+        return saleItemRepository.findBySaleIdAndSaleCompanyId(saleId, currentCompany.getId()).stream()
                 .map(this::toResponseDTO)
                 .toList();
     }
@@ -182,13 +182,9 @@ public class SaleItemServices {
 
     private SaleItem findSaleItem(Long saleId, Long itemId) {
         findSale(saleId);
-        SaleItem item = saleItemRepository.findById(itemId)
+        SaleItem item = saleItemRepository.findByIdAndSaleIdAndSaleCompanyId(
+                        itemId, saleId, currentCompany.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("No sale item found for this ID!"));
-
-        if (!item.getSale().getId().equals(saleId)) {
-            throw new ResourceNotFoundException("No sale item found for this sale!");
-        }
-
         return item;
     }
 

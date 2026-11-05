@@ -5,16 +5,21 @@ import br.com.system.data.dto.request.AdministratorRequestDTO;
 import br.com.system.data.dto.request.ChangePasswordRequestDTO;
 import br.com.system.data.dto.response.AdministratorResponseDTO;
 import br.com.system.data.dto.response.UserEntityResponseDTO;
+import br.com.system.enums.CompanyRole;
 import br.com.system.exception.BusinessException;
 import br.com.system.exception.DuplicateResourceException;
 import br.com.system.exception.ResourceNotFoundException;
 import br.com.system.mapper.ObjectMapper;
 import br.com.system.model.Administrator;
+import br.com.system.model.CompanyMembership;
 import br.com.system.model.Permission;
 import br.com.system.model.UserEntity;
 import br.com.system.repository.AdministratorRepository;
+import br.com.system.repository.CompanyMembershipRepository;
+import br.com.system.repository.CompanyRepository;
 import br.com.system.repository.PermissionRepository;
 import br.com.system.repository.UserEntityRepository;
+import br.com.system.security.CurrentCompany;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,6 +37,15 @@ public class AdministratorServices {
     private AdministratorRepository administratorRepository;
 
     @Autowired
+    private CompanyMembershipRepository membershipRepository;
+
+    @Autowired
+    private CompanyRepository companyRepository;
+
+    @Autowired
+    private CurrentCompany currentCompany;
+
+    @Autowired
     private UserEntityRepository userEntityRepository;
 
     @Autowired
@@ -44,7 +58,11 @@ public class AdministratorServices {
     public List<AdministratorResponseDTO> findAll() {
         logger.info("Finding all administrators!");
 
-        return administratorRepository.findAll().stream()
+        return membershipRepository.findByCompanyIdOrderByIdAsc(currentCompany.getId()).stream()
+                .map(CompanyMembership::getUser)
+                .map(UserEntity::getId)
+                .map(administratorRepository::findByUserId)
+                .flatMap(java.util.Optional::stream)
                 .map(this::toResponseDTO)
                 .toList();
     }
@@ -85,7 +103,9 @@ public class AdministratorServices {
         entity.setPassword(passwordEncoder.encode(dto.getPassword()));
         entity.setLastLogin(null);
 
-        return toResponseDTO(administratorRepository.save(entity));
+        Administrator savedAdministrator = administratorRepository.save(entity);
+        createMembership(user, permission);
+        return toResponseDTO(savedAdministrator);
     }
 
     @Transactional
@@ -115,6 +135,14 @@ public class AdministratorServices {
 
         entity.setLogin(dto.getLogin());
 
+        CompanyMembership membership = findMembership(user.getId());
+        CompanyRole newRole = toCompanyRole(permission);
+        if (membership.getRole() == CompanyRole.COMPANY_OWNER && newRole != CompanyRole.COMPANY_OWNER) {
+            assertNotLastOwner(membership);
+        }
+        membership.setRole(newRole);
+        membershipRepository.save(membership);
+
         return toResponseDTO(administratorRepository.save(entity));
     }
 
@@ -123,14 +151,52 @@ public class AdministratorServices {
         logger.info("Toggling administrator active status!");
 
         Administrator entity = findEntityById(id);
-        UserEntity user = entity.getUser();
-        user.setActive(!user.getActive());
-        userEntityRepository.save(user);
+        CompanyMembership membership = findMembership(entity.getUser().getId());
+        if (Boolean.TRUE.equals(membership.getActive())) {
+            assertNotLastOwner(membership);
+        }
+        membership.setActive(!Boolean.TRUE.equals(membership.getActive()));
+        membershipRepository.save(membership);
     }
 
     private Administrator findEntityById(Long id) {
-        return administratorRepository.findById(id)
+        Administrator administrator = administratorRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("No administrator found for this ID!"));
+        findMembership(administrator.getUser().getId());
+        return administrator;
+    }
+
+    private void createMembership(UserEntity user, Permission permission) {
+        CompanyMembership membership = new CompanyMembership();
+        membership.setCompany(companyRepository.getReferenceById(currentCompany.getId()));
+        membership.setUser(user);
+        membership.setRole(toCompanyRole(permission));
+        membership.setActive(true);
+        membershipRepository.save(membership);
+    }
+
+    private CompanyMembership findMembership(Long userId) {
+        return membershipRepository.findByCompanyIdAndUserId(currentCompany.getId(), userId)
+                .orElseThrow(() -> new ResourceNotFoundException("No administrator found for this ID!"));
+    }
+
+    private CompanyRole toCompanyRole(Permission permission) {
+        return switch (permission.getAuthority()) {
+            case "ROLE_OWNER" -> CompanyRole.COMPANY_OWNER;
+            case "ROLE_ADMIN" -> CompanyRole.ADMIN;
+            default -> CompanyRole.OPERATOR;
+        };
+    }
+
+    private void assertNotLastOwner(CompanyMembership membership) {
+        if (membership.getRole() != CompanyRole.COMPANY_OWNER) {
+            return;
+        }
+        long owners = membershipRepository.countByCompanyIdAndRoleAndActiveTrue(
+                currentCompany.getId(), CompanyRole.COMPANY_OWNER);
+        if (owners <= 1) {
+            throw new BusinessException("A company must have at least one active owner!");
+        }
     }
 
     private AdministratorResponseDTO toResponseDTO(Administrator entity) {

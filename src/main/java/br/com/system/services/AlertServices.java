@@ -9,6 +9,7 @@ import br.com.system.model.Product;
 import br.com.system.repository.AdministratorRepository;
 import br.com.system.repository.AlertRepository;
 import br.com.system.repository.CompanyRepository;
+import br.com.system.repository.CompanyMembershipRepository;
 import br.com.system.repository.ProductRepository;
 import br.com.system.security.CurrentCompany;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,9 @@ public class AlertServices {
 
     @Autowired
     private CompanyRepository companyRepository;
+
+    @Autowired
+    private CompanyMembershipRepository membershipRepository;
 
     @Autowired
     private CurrentCompany currentCompany;
@@ -156,8 +160,13 @@ public class AlertServices {
     }
 
     private Administrator findAdministrator(Long adminId) {
-        return administratorRepository.findById(adminId)
+        Administrator administrator = administratorRepository.findById(adminId)
                 .orElseThrow(() -> new ResourceNotFoundException("No administrator found for this ID!"));
+        if (!membershipRepository.existsByCompanyIdAndUserIdAndActiveTrue(
+                currentCompany.getId(), administrator.getUser().getId())) {
+            throw new ResourceNotFoundException("No administrator found for this ID!");
+        }
+        return administrator;
     }
 
     private AlertResponseDTO toResponseDTO(Alert entity) {
