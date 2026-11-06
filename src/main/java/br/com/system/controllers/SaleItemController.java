@@ -5,7 +5,6 @@ import br.com.system.data.dto.request.SaleItemRequestDTO;
 import br.com.system.data.dto.response.SaleItemResponseDTO;
 import br.com.system.services.SaleItemServices;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +16,9 @@ import java.util.List;
 @RequestMapping("/sales/{saleId}/items")
 public class SaleItemController implements SaleItemApi {
 
-    @Autowired
-    private SaleItemServices service;
+    private final SaleItemServices service;
+
+    public SaleItemController(SaleItemServices service) { this.service = service; }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Override

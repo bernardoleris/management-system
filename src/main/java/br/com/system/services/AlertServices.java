@@ -14,7 +14,6 @@ import br.com.system.repository.ProductRepository;
 import br.com.system.security.CurrentCompany;
 import br.com.system.security.TenantPrincipal;
 import org.springframework.security.core.Authentication;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -26,23 +25,28 @@ import java.util.logging.Logger;
 public class AlertServices {
     private final Logger logger = Logger.getLogger(AlertServices.class.getName());
 
-    @Autowired
-    private AlertRepository alertRepository;
+    private final AlertRepository alertRepository;
 
-    @Autowired
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
-    @Autowired
-    private AdministratorRepository administratorRepository;
+    private final AdministratorRepository administratorRepository;
 
-    @Autowired
-    private CompanyRepository companyRepository;
+    private final CompanyRepository companyRepository;
 
-    @Autowired
-    private CompanyMembershipRepository membershipRepository;
+    private final CompanyMembershipRepository membershipRepository;
 
-    @Autowired
-    private CurrentCompany currentCompany;
+    private final CurrentCompany currentCompany;
+
+    public AlertServices(AlertRepository alertRepository, ProductRepository productRepository,
+                         AdministratorRepository administratorRepository, CompanyRepository companyRepository,
+                         CompanyMembershipRepository membershipRepository, CurrentCompany currentCompany) {
+        this.alertRepository = alertRepository;
+        this.productRepository = productRepository;
+        this.administratorRepository = administratorRepository;
+        this.companyRepository = companyRepository;
+        this.membershipRepository = membershipRepository;
+        this.currentCompany = currentCompany;
+    }
 
     public List<AlertResponseDTO> findAll() {
         logger.info("Finding alerts!");

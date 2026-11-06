@@ -11,7 +11,6 @@ import br.com.system.model.*;
 import br.com.system.repository.*;
 import br.com.system.security.CurrentCompany;
 import br.com.system.security.TenantPrincipal;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -27,29 +26,37 @@ import java.util.logging.Logger;
 public class StockMovementServices {
     private final Logger logger = Logger.getLogger(StockMovementServices.class.getName());
 
-    @Autowired
-    private StockMovementRepository stockMovementRepository;
+    private final StockMovementRepository stockMovementRepository;
 
-    @Autowired
-    private CompanyRepository companyRepository;
+    private final CompanyRepository companyRepository;
 
-    @Autowired
-    private CurrentCompany currentCompany;
+    private final CurrentCompany currentCompany;
 
-    @Autowired
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
-    @Autowired
-    private AdministratorRepository administratorRepository;
+    private final AdministratorRepository administratorRepository;
 
-    @Autowired
-    private CompanyMembershipRepository membershipRepository;
+    private final CompanyMembershipRepository membershipRepository;
 
-    @Autowired
-    private SupplierRepository supplierRepository;
+    private final SupplierRepository supplierRepository;
 
-    @Autowired
-    private InventoryService inventoryService;
+    private final InventoryService inventoryService;
+
+    public StockMovementServices(StockMovementRepository stockMovementRepository,
+                                 CompanyRepository companyRepository, CurrentCompany currentCompany,
+                                 ProductRepository productRepository,
+                                 AdministratorRepository administratorRepository,
+                                 CompanyMembershipRepository membershipRepository,
+                                 SupplierRepository supplierRepository, InventoryService inventoryService) {
+        this.stockMovementRepository = stockMovementRepository;
+        this.companyRepository = companyRepository;
+        this.currentCompany = currentCompany;
+        this.productRepository = productRepository;
+        this.administratorRepository = administratorRepository;
+        this.membershipRepository = membershipRepository;
+        this.supplierRepository = supplierRepository;
+        this.inventoryService = inventoryService;
+    }
 
     @Transactional(readOnly = true)
     public Page<StockMovementResponseDTO> findAll(Pageable pageable) {

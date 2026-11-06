@@ -8,7 +8,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,14 +22,20 @@ import java.util.List;
 @Component
 public class JwtTokenFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private JwtTokenProvider tokenProvider;
+    private final JwtTokenProvider tokenProvider;
 
-    @Autowired
-    private CustomUserDetailsService userDetailsService;
+    private final CustomUserDetailsService userDetailsService;
 
-    @Autowired
-    private CompanyMembershipRepository companyMembershipRepository;
+    private final CompanyMembershipRepository companyMembershipRepository;
+
+    public JwtTokenFilter(
+            JwtTokenProvider tokenProvider,
+            CustomUserDetailsService userDetailsService,
+            CompanyMembershipRepository companyMembershipRepository) {
+        this.tokenProvider = tokenProvider;
+        this.userDetailsService = userDetailsService;
+        this.companyMembershipRepository = companyMembershipRepository;
+    }
 
     @Override
     protected void doFilterInternal(

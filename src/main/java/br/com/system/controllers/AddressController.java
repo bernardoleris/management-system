@@ -5,7 +5,6 @@ import br.com.system.data.dto.request.AddressRequestDTO;
 import br.com.system.data.dto.response.AddressResponseDTO;
 import br.com.system.services.AddressServices;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,8 +19,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/clients/{id}/address")
 public class AddressController implements AddressApi {
-    @Autowired
-    private AddressServices service;
+    private final AddressServices service;
+
+    public AddressController(AddressServices service) { this.service = service; }
 
     @GetMapping
     @Override

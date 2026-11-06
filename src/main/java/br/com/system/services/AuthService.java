@@ -13,7 +13,6 @@ import br.com.system.repository.AdministratorRepository;
 import br.com.system.repository.CompanyMembershipRepository;
 import br.com.system.security.jwt.JwtTokenProvider;
 import br.com.system.security.TenantPrincipal;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.Authentication;
@@ -30,23 +29,32 @@ import java.util.logging.Logger;
 public class AuthService {
     private final Logger logger = Logger.getLogger(AuthService.class.getName());
 
-    @Value("${security.jwt.expiration}")
-    private Long expiration;
+    private final Long expiration;
 
-    @Autowired
-    private AdministratorRepository administratorRepository;
+    private final AdministratorRepository administratorRepository;
 
-    @Autowired
-    private CompanyMembershipRepository companyMembershipRepository;
+    private final CompanyMembershipRepository companyMembershipRepository;
 
-    @Autowired
-    private RefreshTokenService refreshTokenService;
+    private final RefreshTokenService refreshTokenService;
 
-    @Autowired
-    private JwtTokenProvider tokenProvider;
+    private final JwtTokenProvider tokenProvider;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+
+    public AuthService(
+            @Value("${security.jwt.expiration}") Long expiration,
+            AdministratorRepository administratorRepository,
+            CompanyMembershipRepository companyMembershipRepository,
+            RefreshTokenService refreshTokenService,
+            JwtTokenProvider tokenProvider,
+            PasswordEncoder passwordEncoder) {
+        this.expiration = expiration;
+        this.administratorRepository = administratorRepository;
+        this.companyMembershipRepository = companyMembershipRepository;
+        this.refreshTokenService = refreshTokenService;
+        this.tokenProvider = tokenProvider;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     @Transactional
     public LoginResponseDTO login(LoginRequestDTO dto) {

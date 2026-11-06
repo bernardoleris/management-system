@@ -5,7 +5,6 @@ import br.com.system.data.dto.request.AlertRequestDTO;
 import br.com.system.data.dto.response.AlertResponseDTO;
 import br.com.system.services.AlertServices;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +16,9 @@ import java.util.List;
 @RequestMapping("/alerts")
 public class AlertController implements AlertApi {
 
-    @Autowired
-    private AlertServices service;
+    private final AlertServices service;
+
+    public AlertController(AlertServices service) { this.service = service; }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Override

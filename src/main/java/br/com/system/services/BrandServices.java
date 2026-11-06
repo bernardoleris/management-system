@@ -9,7 +9,6 @@ import br.com.system.model.Brand;
 import br.com.system.repository.BrandRepository;
 import br.com.system.repository.CompanyRepository;
 import br.com.system.security.CurrentCompany;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,14 +18,20 @@ import java.util.logging.Logger;
 public class BrandServices {
     private final Logger logger = Logger.getLogger(BrandServices.class.getName());
 
-    @Autowired
-    private BrandRepository brandRepository;
+    private final BrandRepository brandRepository;
 
-    @Autowired
-    private CompanyRepository companyRepository;
+    private final CompanyRepository companyRepository;
 
-    @Autowired
-    private CurrentCompany currentCompany;
+    private final CurrentCompany currentCompany;
+
+    public BrandServices(
+            BrandRepository brandRepository,
+            CompanyRepository companyRepository,
+            CurrentCompany currentCompany) {
+        this.brandRepository = brandRepository;
+        this.companyRepository = companyRepository;
+        this.currentCompany = currentCompany;
+    }
 
     public List<BrandResponseDTO> findAll() {
         logger.info("Finding brands!");

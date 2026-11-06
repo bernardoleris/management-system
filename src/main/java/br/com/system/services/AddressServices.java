@@ -10,7 +10,6 @@ import br.com.system.repository.AddressRepository;
 import br.com.system.repository.ClientRepository;
 import br.com.system.repository.CompanyRepository;
 import br.com.system.security.CurrentCompany;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.logging.Logger;
@@ -19,17 +18,24 @@ import java.util.logging.Logger;
 public class AddressServices {
     private final Logger logger = Logger.getLogger(AddressServices.class.getName());
 
-    @Autowired
-    private AddressRepository addressRepository;
+    private final AddressRepository addressRepository;
 
-    @Autowired
-    private ClientRepository clientRepository;
+    private final ClientRepository clientRepository;
 
-    @Autowired
-    private CompanyRepository companyRepository;
+    private final CompanyRepository companyRepository;
 
-    @Autowired
-    private CurrentCompany currentCompany;
+    private final CurrentCompany currentCompany;
+
+    public AddressServices(
+            AddressRepository addressRepository,
+            ClientRepository clientRepository,
+            CompanyRepository companyRepository,
+            CurrentCompany currentCompany) {
+        this.addressRepository = addressRepository;
+        this.clientRepository = clientRepository;
+        this.companyRepository = companyRepository;
+        this.currentCompany = currentCompany;
+    }
 
     public AddressResponseDTO findByClient(Long clientId) {
         logger.info("Finding address by client!");

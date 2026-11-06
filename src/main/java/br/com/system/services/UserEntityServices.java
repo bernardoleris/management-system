@@ -6,7 +6,6 @@ import br.com.system.mapper.ObjectMapper;
 import br.com.system.model.UserEntity;
 import br.com.system.repository.UserEntityRepository;
 import br.com.system.security.CurrentCompany;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,11 +15,14 @@ import java.util.logging.Logger;
 public class UserEntityServices {
     private final Logger logger = Logger.getLogger(UserEntityServices.class.getName());
 
-    @Autowired
-    private UserEntityRepository repository;
+    private final UserEntityRepository repository;
 
-    @Autowired
-    private CurrentCompany currentCompany;
+    private final CurrentCompany currentCompany;
+
+    public UserEntityServices(UserEntityRepository repository, CurrentCompany currentCompany) {
+        this.repository = repository;
+        this.currentCompany = currentCompany;
+    }
 
     public List<UserEntityResponseDTO> findAll() {
         logger.info("Finding users!");

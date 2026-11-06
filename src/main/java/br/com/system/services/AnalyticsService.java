@@ -10,7 +10,6 @@ import br.com.system.repository.ProductRepository;
 import br.com.system.repository.SaleItemRepository;
 import br.com.system.repository.SaleRepository;
 import br.com.system.security.CurrentCompany;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,17 +26,21 @@ import java.util.logging.Logger;
 public class AnalyticsService {
     private final Logger logger = Logger.getLogger(AnalyticsService.class.getName());
 
-    @Autowired
-    private SaleRepository saleRepository;
+    private final SaleRepository saleRepository;
 
-    @Autowired
-    private SaleItemRepository saleItemRepository;
+    private final SaleItemRepository saleItemRepository;
 
-    @Autowired
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
-    @Autowired
-    private CurrentCompany currentCompany;
+    private final CurrentCompany currentCompany;
+
+    public AnalyticsService(SaleRepository saleRepository, SaleItemRepository saleItemRepository,
+                            ProductRepository productRepository, CurrentCompany currentCompany) {
+        this.saleRepository = saleRepository;
+        this.saleItemRepository = saleItemRepository;
+        this.productRepository = productRepository;
+        this.currentCompany = currentCompany;
+    }
 
     // ─── Vendas por mês ───────────────────────────────────────────────────────
 

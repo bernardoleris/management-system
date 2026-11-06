@@ -6,7 +6,6 @@ import br.com.system.data.dto.response.analytics.ProductWithoutMovementResponseD
 import br.com.system.data.dto.response.analytics.TopProductsResponseDTO;
 import br.com.system.enums.AnalyticsPeriod;
 import br.com.system.services.AnalyticsService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +17,9 @@ import java.util.List;
 @RequestMapping("/analytics")
 public class AnalyticsController implements AnalyticsApi {
 
-    @Autowired
-    private AnalyticsService service;
+    private final AnalyticsService service;
+
+    public AnalyticsController(AnalyticsService service) { this.service = service; }
 
     @GetMapping("/sales-by-month")
     @Override

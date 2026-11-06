@@ -9,7 +9,6 @@ import br.com.system.model.Category;
 import br.com.system.repository.CompanyRepository;
 import br.com.system.repository.CategoryRepository;
 import br.com.system.security.CurrentCompany;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,14 +18,20 @@ import java.util.logging.Logger;
 public class CategoryServices {
     private final Logger logger = Logger.getLogger(CategoryServices.class.getName());
 
-    @Autowired
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
 
-    @Autowired
-    private CompanyRepository companyRepository;
+    private final CompanyRepository companyRepository;
 
-    @Autowired
-    private CurrentCompany currentCompany;
+    private final CurrentCompany currentCompany;
+
+    public CategoryServices(
+            CategoryRepository categoryRepository,
+            CompanyRepository companyRepository,
+            CurrentCompany currentCompany) {
+        this.categoryRepository = categoryRepository;
+        this.companyRepository = companyRepository;
+        this.currentCompany = currentCompany;
+    }
 
     public List<CategoryResponseDTO> findAll() {
         logger.info("Finding categories!");

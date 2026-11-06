@@ -11,7 +11,6 @@ import br.com.system.repository.ProductRepository;
 import br.com.system.repository.SaleItemRepository;
 import br.com.system.repository.SaleRepository;
 import br.com.system.security.CurrentCompany;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,23 +23,28 @@ import java.util.logging.Logger;
 public class SaleItemServices {
     private final Logger logger = Logger.getLogger(SaleItemServices.class.getName());
 
-    @Autowired
-    private SaleItemRepository saleItemRepository;
+    private final SaleItemRepository saleItemRepository;
 
-    @Autowired
-    private SaleRepository saleRepository;
+    private final SaleRepository saleRepository;
 
-    @Autowired
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
-    @Autowired
-    private InventoryService inventoryService;
+    private final InventoryService inventoryService;
 
-    @Autowired
-    private StockMovementServices stockMovementServices;
+    private final StockMovementServices stockMovementServices;
 
-    @Autowired
-    private CurrentCompany currentCompany;
+    private final CurrentCompany currentCompany;
+
+    public SaleItemServices(SaleItemRepository saleItemRepository, SaleRepository saleRepository,
+                            ProductRepository productRepository, InventoryService inventoryService,
+                            StockMovementServices stockMovementServices, CurrentCompany currentCompany) {
+        this.saleItemRepository = saleItemRepository;
+        this.saleRepository = saleRepository;
+        this.productRepository = productRepository;
+        this.inventoryService = inventoryService;
+        this.stockMovementServices = stockMovementServices;
+        this.currentCompany = currentCompany;
+    }
 
     public List<SaleItemResponseDTO> findBySale(Long saleId) {
         logger.info("Finding sale items!");

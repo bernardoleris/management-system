@@ -19,7 +19,6 @@ import br.com.system.repository.CompanyRepository;
 import br.com.system.repository.CompanyMembershipRepository;
 import br.com.system.security.CurrentCompany;
 import br.com.system.security.TenantPrincipal;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
@@ -37,29 +36,35 @@ import java.util.logging.Logger;
 public class SaleServices {
     private final Logger logger = Logger.getLogger(SaleServices.class.getName());
 
-    @Autowired
-    private SaleRepository saleRepository;
+    private final SaleRepository saleRepository;
 
-    @Autowired
-    private CompanyRepository companyRepository;
+    private final CompanyRepository companyRepository;
 
-    @Autowired
-    private CurrentCompany currentCompany;
+    private final CurrentCompany currentCompany;
 
-    @Autowired
-    private AdministratorRepository administratorRepository;
+    private final AdministratorRepository administratorRepository;
 
-    @Autowired
-    private CompanyMembershipRepository membershipRepository;
+    private final CompanyMembershipRepository membershipRepository;
 
-    @Autowired
-    private ClientRepository clientRepository;
+    private final ClientRepository clientRepository;
 
-    @Autowired
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
-    @Autowired
-    private StockMovementServices stockMovementServices;
+    private final StockMovementServices stockMovementServices;
+
+    public SaleServices(SaleRepository saleRepository, CompanyRepository companyRepository,
+                        CurrentCompany currentCompany, AdministratorRepository administratorRepository,
+                        CompanyMembershipRepository membershipRepository, ClientRepository clientRepository,
+                        ProductRepository productRepository, StockMovementServices stockMovementServices) {
+        this.saleRepository = saleRepository;
+        this.companyRepository = companyRepository;
+        this.currentCompany = currentCompany;
+        this.administratorRepository = administratorRepository;
+        this.membershipRepository = membershipRepository;
+        this.clientRepository = clientRepository;
+        this.productRepository = productRepository;
+        this.stockMovementServices = stockMovementServices;
+    }
 
     @Transactional(readOnly = true)
     public Page<SaleResponseDTO> findAll(Pageable pageable) {

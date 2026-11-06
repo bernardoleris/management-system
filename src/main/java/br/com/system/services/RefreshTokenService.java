@@ -4,7 +4,6 @@ import br.com.system.exception.BusinessException;
 import br.com.system.model.Administrator;
 import br.com.system.model.RefreshToken;
 import br.com.system.repository.RefreshTokenRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,11 +16,16 @@ import java.util.logging.Logger;
 public class RefreshTokenService {
     private final Logger logger = Logger.getLogger(RefreshTokenService.class.getName());
 
-    @Value("${security.jwt.refresh-expiration}")
-    private Long refreshExpiration;
+    private final Long refreshExpiration;
 
-    @Autowired
-    private RefreshTokenRepository refreshTokenRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
+
+    public RefreshTokenService(
+            @Value("${security.jwt.refresh-expiration}") Long refreshExpiration,
+            RefreshTokenRepository refreshTokenRepository) {
+        this.refreshExpiration = refreshExpiration;
+        this.refreshTokenRepository = refreshTokenRepository;
+    }
 
     @Transactional
     public RefreshToken generate(Administrator administrator) {

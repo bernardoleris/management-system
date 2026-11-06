@@ -9,7 +9,6 @@ import br.com.system.repository.CompanyRepository;
 import br.com.system.model.Supplier;
 import br.com.system.repository.SupplierRepository;
 import br.com.system.security.CurrentCompany;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,14 +19,20 @@ public class SupplierServices {
 
     private final Logger logger = Logger.getLogger(SupplierServices.class.getName());
 
-    @Autowired
-    private SupplierRepository supplierRepository;
+    private final SupplierRepository supplierRepository;
 
-    @Autowired
-    private CompanyRepository companyRepository;
+    private final CompanyRepository companyRepository;
 
-    @Autowired
-    private CurrentCompany currentCompany;
+    private final CurrentCompany currentCompany;
+
+    public SupplierServices(
+            SupplierRepository supplierRepository,
+            CompanyRepository companyRepository,
+            CurrentCompany currentCompany) {
+        this.supplierRepository = supplierRepository;
+        this.companyRepository = companyRepository;
+        this.currentCompany = currentCompany;
+    }
 
     public Page<SupplierResponseDTO> findAll(Pageable pageable) {
         logger.info("Finding all suppliers!");

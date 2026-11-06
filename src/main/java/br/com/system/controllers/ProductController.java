@@ -5,7 +5,6 @@ import br.com.system.data.dto.request.ProductRequestDTO;
 import br.com.system.data.dto.response.ProductResponseDTO;
 import br.com.system.services.ProductServices;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -18,8 +17,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/products")
 public class ProductController implements ProductApi {
 
-    @Autowired
-    private ProductServices service;
+    private final ProductServices service;
+
+    public ProductController(ProductServices service) { this.service = service; }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Override

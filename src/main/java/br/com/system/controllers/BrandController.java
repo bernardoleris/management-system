@@ -5,7 +5,6 @@ import br.com.system.data.dto.request.BrandRequestDTO;
 import br.com.system.data.dto.response.BrandResponseDTO;
 import br.com.system.services.BrandServices;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +16,11 @@ import java.util.List;
 @RequestMapping("/brands")
 public class BrandController implements BrandApi {
 
-    @Autowired
-    private BrandServices service;
+    private final BrandServices service;
+
+    public BrandController(BrandServices service) {
+        this.service = service;
+    }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Override

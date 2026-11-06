@@ -11,7 +11,6 @@ import br.com.system.model.Product;
 import br.com.system.model.Supplier;
 import br.com.system.repository.*;
 import br.com.system.security.CurrentCompany;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,32 +22,40 @@ import java.util.logging.Logger;
 public class ProductServices {
     private final Logger logger = Logger.getLogger(ProductServices.class.getName());
 
-    @Autowired
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
 
-    @Autowired
-    private CompanyRepository companyRepository;
+    private final CompanyRepository companyRepository;
 
-    @Autowired
-    private CurrentCompany currentCompany;
+    private final CurrentCompany currentCompany;
 
-    @Autowired
-    private CategoryRepository categoryRepository;
+    private final CategoryRepository categoryRepository;
 
-    @Autowired
-    private BrandRepository brandRepository;
+    private final BrandRepository brandRepository;
 
-    @Autowired
-    private SupplierRepository supplierRepository;
+    private final SupplierRepository supplierRepository;
 
-    @Autowired
-    private SaleItemRepository saleItemRepository;
+    private final SaleItemRepository saleItemRepository;
 
-    @Autowired
-    private StockMovementItemRepository stockMovementItemRepository;
+    private final StockMovementItemRepository stockMovementItemRepository;
 
-    @Autowired
-    private AlertRepository alertRepository;
+    private final AlertRepository alertRepository;
+
+    public ProductServices(ProductRepository productRepository, CompanyRepository companyRepository,
+                           CurrentCompany currentCompany, CategoryRepository categoryRepository,
+                           BrandRepository brandRepository, SupplierRepository supplierRepository,
+                           SaleItemRepository saleItemRepository,
+                           StockMovementItemRepository stockMovementItemRepository,
+                           AlertRepository alertRepository) {
+        this.productRepository = productRepository;
+        this.companyRepository = companyRepository;
+        this.currentCompany = currentCompany;
+        this.categoryRepository = categoryRepository;
+        this.brandRepository = brandRepository;
+        this.supplierRepository = supplierRepository;
+        this.saleItemRepository = saleItemRepository;
+        this.stockMovementItemRepository = stockMovementItemRepository;
+        this.alertRepository = alertRepository;
+    }
 
     @Transactional(readOnly = true)
     public Page<ProductResponseDTO> findAll(Pageable pageable) {

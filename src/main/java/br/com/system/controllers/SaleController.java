@@ -6,7 +6,6 @@ import br.com.system.data.dto.response.SaleResponseDTO;
 import br.com.system.enums.SaleStatus;
 import br.com.system.services.SaleServices;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -19,8 +18,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/sales")
 public class SaleController implements SaleApi {
 
-    @Autowired
-    private SaleServices service;
+    private final SaleServices service;
+
+    public SaleController(SaleServices service) { this.service = service; }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Override

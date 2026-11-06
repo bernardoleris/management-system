@@ -6,7 +6,6 @@ import br.com.system.data.dto.response.StockMovementResponseDTO;
 import br.com.system.enums.MovementType;
 import br.com.system.services.StockMovementServices;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -19,8 +18,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/stock-movements")
 public class StockMovementController implements StockMovementApi {
 
-    @Autowired
-    private StockMovementServices service;
+    private final StockMovementServices service;
+
+    public StockMovementController(StockMovementServices service) { this.service = service; }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Override

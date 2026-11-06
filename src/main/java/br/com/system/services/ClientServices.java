@@ -17,7 +17,6 @@ import br.com.system.repository.ClientRepository;
 import br.com.system.repository.CompanyRepository;
 import br.com.system.repository.UserEntityRepository;
 import br.com.system.security.CurrentCompany;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,20 +27,28 @@ import java.util.logging.Logger;
 public class ClientServices {
     private final Logger logger = Logger.getLogger(ClientServices.class.getName());
 
-    @Autowired
-    private ClientRepository clientRepository;
+    private final ClientRepository clientRepository;
 
-    @Autowired
-    private UserEntityRepository userRepository;
+    private final UserEntityRepository userRepository;
 
-    @Autowired
-    private AddressRepository addressRepository;
+    private final AddressRepository addressRepository;
 
-    @Autowired
-    private CompanyRepository companyRepository;
+    private final CompanyRepository companyRepository;
 
-    @Autowired
-    private CurrentCompany currentCompany;
+    private final CurrentCompany currentCompany;
+
+    public ClientServices(
+            ClientRepository clientRepository,
+            UserEntityRepository userRepository,
+            AddressRepository addressRepository,
+            CompanyRepository companyRepository,
+            CurrentCompany currentCompany) {
+        this.clientRepository = clientRepository;
+        this.userRepository = userRepository;
+        this.addressRepository = addressRepository;
+        this.companyRepository = companyRepository;
+        this.currentCompany = currentCompany;
+    }
 
     @Transactional(readOnly = true)
     public Page<ClientResponseDTO> findAll(Pageable pageable) {

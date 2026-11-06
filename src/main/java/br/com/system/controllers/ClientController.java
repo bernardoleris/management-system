@@ -5,7 +5,6 @@ import br.com.system.data.dto.request.ClientRequestDTO;
 import br.com.system.data.dto.response.ClientResponseDTO;
 import br.com.system.services.ClientServices;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -18,8 +17,9 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/clients")
 public class ClientController implements ClientApi {
 
-    @Autowired
-    private ClientServices service;
+    private final ClientServices service;
+
+    public ClientController(ClientServices service) { this.service = service; }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Override

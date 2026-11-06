@@ -3,7 +3,6 @@ package br.com.system.controllers;
 import br.com.system.controllers.api.UserEntityApi;
 import br.com.system.data.dto.response.UserEntityResponseDTO;
 import br.com.system.services.UserEntityServices;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,8 +12,11 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserEntityController implements UserEntityApi {
 
-    @Autowired
-    private UserEntityServices service;
+    private final UserEntityServices service;
+
+    public UserEntityController(UserEntityServices service) {
+        this.service = service;
+    }
 
     @GetMapping(
             produces = MediaType.APPLICATION_JSON_VALUE

@@ -3,14 +3,16 @@ package br.com.system.services;
 import br.com.system.exception.InsufficientStockException;
 import br.com.system.model.Product;
 import br.com.system.repository.ProductRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 public class InventoryService {
 
-    @Autowired
-    private ProductRepository productRepository;
+    private final ProductRepository productRepository;
+
+    public InventoryService(ProductRepository productRepository) {
+        this.productRepository = productRepository;
+    }
 
     public void increase(Product product, int quantity) {
         product.setQuantity(product.getQuantity() + quantity);

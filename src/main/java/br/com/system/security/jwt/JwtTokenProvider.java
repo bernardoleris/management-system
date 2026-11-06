@@ -12,11 +12,16 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    @Value("${security.jwt.secret}")
-    private String secret;
+    private final String secret;
 
-    @Value("${security.jwt.expiration}")
-    private Long expiration;
+    private final Long expiration;
+
+    public JwtTokenProvider(
+            @Value("${security.jwt.secret}") String secret,
+            @Value("${security.jwt.expiration}") Long expiration) {
+        this.secret = secret;
+        this.expiration = expiration;
+    }
 
     // ─── Gera o token ─────────────────────────────────────────────────────────
 

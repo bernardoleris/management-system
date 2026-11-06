@@ -5,7 +5,6 @@ import br.com.system.data.dto.request.CategoryRequestDTO;
 import br.com.system.data.dto.response.CategoryResponseDTO;
 import br.com.system.services.CategoryServices;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +16,11 @@ import java.util.List;
 @RequestMapping("/categories")
 public class CategoryController implements CategoryApi {
 
-    @Autowired
-    private CategoryServices service;
+    private final CategoryServices service;
+
+    public CategoryController(CategoryServices service) {
+        this.service = service;
+    }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @Override

@@ -16,7 +16,6 @@ import br.com.system.repository.CompanyMembershipRepository;
 import br.com.system.repository.CompanyRepository;
 import br.com.system.repository.UserEntityRepository;
 import br.com.system.security.CurrentCompany;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,23 +24,32 @@ import java.util.List;
 
 @Service
 public class CompanyMembershipServices {
-    @Autowired
-    private CompanyMembershipRepository membershipRepository;
+    private final CompanyMembershipRepository membershipRepository;
 
-    @Autowired
-    private CompanyRepository companyRepository;
+    private final CompanyRepository companyRepository;
 
-    @Autowired
-    private UserEntityRepository userRepository;
+    private final UserEntityRepository userRepository;
 
-    @Autowired
-    private AdministratorRepository administratorRepository;
+    private final AdministratorRepository administratorRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
 
-    @Autowired
-    private CurrentCompany currentCompany;
+    private final CurrentCompany currentCompany;
+
+    public CompanyMembershipServices(
+            CompanyMembershipRepository membershipRepository,
+            CompanyRepository companyRepository,
+            UserEntityRepository userRepository,
+            AdministratorRepository administratorRepository,
+            PasswordEncoder passwordEncoder,
+            CurrentCompany currentCompany) {
+        this.membershipRepository = membershipRepository;
+        this.companyRepository = companyRepository;
+        this.userRepository = userRepository;
+        this.administratorRepository = administratorRepository;
+        this.passwordEncoder = passwordEncoder;
+        this.currentCompany = currentCompany;
+    }
 
     @Transactional(readOnly = true)
     public List<CompanyMemberResponseDTO> findAll() {
