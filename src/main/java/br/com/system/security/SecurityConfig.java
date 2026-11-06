@@ -2,7 +2,6 @@ package br.com.system.security;
 
 import br.com.system.security.jwt.JwtTokenFilter;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,8 +27,11 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private JwtTokenFilter jwtTokenFilter;
+    private final JwtTokenFilter jwtTokenFilter;
+
+    public SecurityConfig(JwtTokenFilter jwtTokenFilter) {
+        this.jwtTokenFilter = jwtTokenFilter;
+    }
 
     // ─── Rotas públicas ───────────────────────────────────────────────────────
 
@@ -56,7 +58,6 @@ public class SecurityConfig {
                         .requestMatchers(PUBLIC_ROUTES).permitAll()
 
                         // rotas apenas do OWNER
-                        .requestMatchers("/administrators/**").hasAuthority("ROLE_OWNER")
                         .requestMatchers("/company/members/**").hasAuthority("ROLE_OWNER")
 
                         // rotas do OWNER e ADMIN

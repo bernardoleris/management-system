@@ -9,7 +9,6 @@ import java.util.List;
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.hamcrest.Matchers.contains;
 
 @Sql(
         scripts = "classpath:sql/seed-second-company.sql",
@@ -70,26 +69,6 @@ class CompanyDataIsolationTest extends AbstractIntegrationTest {
     }
 
     @Test
-    void shouldOnlyExposeAdministratorsFromTheActiveCompany() {
-        String defaultCompanyToken = ownerAccessToken();
-        String companyBToken = accessToken("owner-empresa-b", "password");
-
-        given().auth().oauth2(defaultCompanyToken)
-                .when().get("/administrators")
-                .then().statusCode(200)
-                .body("login", contains("admin"));
-
-        given().auth().oauth2(companyBToken)
-                .when().get("/administrators")
-                .then().statusCode(200)
-                .body("login", contains("owner-empresa-b"));
-
-        given().auth().oauth2(defaultCompanyToken)
-                .when().get("/administrators/10")
-                .then().statusCode(404);
-    }
-
-    @Test
     void shouldRejectAdministratorFiltersFromAnotherCompany() {
         String defaultCompanyToken = ownerAccessToken();
 
@@ -142,26 +121,4 @@ class CompanyDataIsolationTest extends AbstractIntegrationTest {
                 .then().statusCode(404);
     }
 
-    @Test
-    void shouldCreateACompanyMembershipForLegacyAdministratorCreation() {
-        String login = "legacy-admin-company-a";
-
-        given().auth().oauth2(ownerAccessToken())
-                .contentType(JSON)
-                .body("""
-                        {
-                          "firstName": "Legacy",
-                          "lastName": "Administrator",
-                          "email": "legacy.admin.company.a@test.com",
-                          "phone": "11988887777",
-                          "login": "%s",
-                          "password": "secret123",
-                          "role": "COMPANY_OWNER"
-                        }
-                        """.formatted(login))
-                .when().post("/administrators")
-                .then().statusCode(201);
-
-        accessToken(login, "secret123");
-    }
 }

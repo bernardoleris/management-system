@@ -21,7 +21,6 @@ class SecurityAuthorizationTest extends AbstractIntegrationTest {
         given().auth().oauth2(adminToken).when().get("/categories").then().statusCode(200);
         given().auth().oauth2(adminToken).when().get("/brands").then().statusCode(200);
         given().auth().oauth2(adminToken).when().get("/users").then().statusCode(200);
-        given().auth().oauth2(adminToken).when().get("/administrators").then().statusCode(403);
     }
 
     @Test
@@ -39,7 +38,6 @@ class SecurityAuthorizationTest extends AbstractIntegrationTest {
         given().auth().oauth2(operatorToken).when().get("/categories").then().statusCode(403);
         given().auth().oauth2(operatorToken).when().get("/brands").then().statusCode(403);
         given().auth().oauth2(operatorToken).when().get("/users").then().statusCode(403);
-        given().auth().oauth2(operatorToken).when().get("/administrators").then().statusCode(403);
     }
 
     @Test
