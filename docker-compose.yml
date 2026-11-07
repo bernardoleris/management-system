@@ -18,7 +18,7 @@ services:
       retries: 5
 
   app:
-    build: .
+    build: ./backend
     container_name: stock-app
     restart: always
     ports:

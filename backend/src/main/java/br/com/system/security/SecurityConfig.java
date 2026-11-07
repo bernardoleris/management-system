@@ -1,9 +1,12 @@
 package br.com.system.security;
 
+import br.com.system.exception.ExceptionResponse;
 import br.com.system.security.jwt.JwtTokenFilter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -20,7 +23,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Date;
 import java.util.List;
 
 @Configuration
@@ -28,9 +30,14 @@ import java.util.List;
 public class SecurityConfig {
 
     private final JwtTokenFilter jwtTokenFilter;
+    private final List<String> allowedOrigins;
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    public SecurityConfig(JwtTokenFilter jwtTokenFilter) {
+    public SecurityConfig(
+            JwtTokenFilter jwtTokenFilter,
+            @Value("${app.cors.allowed-origins:http://localhost:3000}") List<String> allowedOrigins) {
         this.jwtTokenFilter = jwtTokenFilter;
+        this.allowedOrigins = allowedOrigins;
     }
 
     // ─── Rotas públicas ───────────────────────────────────────────────────────
@@ -90,7 +97,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of("http://localhost:3000"));
+        config.setAllowedOrigins(allowedOrigins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         config.setAllowCredentials(true);
@@ -119,29 +126,22 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationEntryPoint authenticationEntryPoint() {
-        return (request, response, authException) -> {
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-            response.setContentType("application/json");
-            response.getWriter().write(
-                    "{\"timestamp\": \"" + new Date() + "\", " +
-                            "\"status\": 401, " +
-                            "\"message\": \"Authentication required!\", " +
-                            "\"details\": \"uri=" + request.getRequestURI() + "\"}"
-            );
-        };
+        return (request, response, authException) -> writeError(
+                response, HttpServletResponse.SC_UNAUTHORIZED, "Authentication required!", request.getRequestURI());
     }
 
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
-        return (request, response, accessDeniedException) -> {
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.setContentType("application/json");
-            response.getWriter().write(
-                    "{\"timestamp\": \"" + new Date() + "\", " +
-                            "\"status\": 403, " +
-                            "\"message\": \"Access denied! You don't have permission to access this resource.\", " +
-                            "\"details\": \"uri=" + request.getRequestURI() + "\"}"
-            );
-        };
+        return (request, response, accessDeniedException) -> writeError(
+                response, HttpServletResponse.SC_FORBIDDEN,
+                "Access denied! You don't have permission to access this resource.", request.getRequestURI());
+    }
+
+    private void writeError(HttpServletResponse response, int status, String message, String requestUri)
+            throws java.io.IOException {
+        response.setStatus(status);
+        response.setContentType("application/json");
+        OBJECT_MAPPER.writeValue(response.getOutputStream(),
+                new ExceptionResponse(new java.util.Date(), status, message, "uri=" + requestUri));
     }
 }

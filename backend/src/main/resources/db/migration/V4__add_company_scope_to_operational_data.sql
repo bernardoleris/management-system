@@ -44,11 +44,52 @@ UPDATE alert CROSS JOIN company
 SET alert.company_id = company.id
 WHERE company.slug = 'default';
 
-ALTER TABLE category DROP INDEX uk_category_name;
-ALTER TABLE brand DROP INDEX uk_brand_name;
-ALTER TABLE supplier DROP INDEX uk_supplier_cnpj;
-ALTER TABLE product DROP INDEX uk_product_barcode;
-ALTER TABLE client DROP INDEX uk_client_document;
+-- Drop the legacy single-column unique keys by column, not by a generated
+-- Hibernate index name. Existing installations may have different names.
+SET @legacy_index = (SELECT index_name FROM information_schema.statistics
+    WHERE table_schema = DATABASE() AND table_name = 'category'
+      AND column_name = 'name' AND seq_in_index = 1 AND non_unique = 0
+      AND index_name <> 'PRIMARY' LIMIT 1);
+SET @ddl = IF(@legacy_index IS NULL, 'SELECT 1', CONCAT('ALTER TABLE category DROP INDEX `', @legacy_index, '`'));
+PREPARE migration_stmt FROM @ddl;
+EXECUTE migration_stmt;
+DEALLOCATE PREPARE migration_stmt;
+
+SET @legacy_index = (SELECT index_name FROM information_schema.statistics
+    WHERE table_schema = DATABASE() AND table_name = 'brand'
+      AND column_name = 'name' AND seq_in_index = 1 AND non_unique = 0
+      AND index_name <> 'PRIMARY' LIMIT 1);
+SET @ddl = IF(@legacy_index IS NULL, 'SELECT 1', CONCAT('ALTER TABLE brand DROP INDEX `', @legacy_index, '`'));
+PREPARE migration_stmt FROM @ddl;
+EXECUTE migration_stmt;
+DEALLOCATE PREPARE migration_stmt;
+
+SET @legacy_index = (SELECT index_name FROM information_schema.statistics
+    WHERE table_schema = DATABASE() AND table_name = 'supplier'
+      AND column_name = 'cnpj' AND seq_in_index = 1 AND non_unique = 0
+      AND index_name <> 'PRIMARY' LIMIT 1);
+SET @ddl = IF(@legacy_index IS NULL, 'SELECT 1', CONCAT('ALTER TABLE supplier DROP INDEX `', @legacy_index, '`'));
+PREPARE migration_stmt FROM @ddl;
+EXECUTE migration_stmt;
+DEALLOCATE PREPARE migration_stmt;
+
+SET @legacy_index = (SELECT index_name FROM information_schema.statistics
+    WHERE table_schema = DATABASE() AND table_name = 'product'
+      AND column_name = 'barcode' AND seq_in_index = 1 AND non_unique = 0
+      AND index_name <> 'PRIMARY' LIMIT 1);
+SET @ddl = IF(@legacy_index IS NULL, 'SELECT 1', CONCAT('ALTER TABLE product DROP INDEX `', @legacy_index, '`'));
+PREPARE migration_stmt FROM @ddl;
+EXECUTE migration_stmt;
+DEALLOCATE PREPARE migration_stmt;
+
+SET @legacy_index = (SELECT index_name FROM information_schema.statistics
+    WHERE table_schema = DATABASE() AND table_name = 'client'
+      AND column_name = 'document_number' AND seq_in_index = 1 AND non_unique = 0
+      AND index_name <> 'PRIMARY' LIMIT 1);
+SET @ddl = IF(@legacy_index IS NULL, 'SELECT 1', CONCAT('ALTER TABLE client DROP INDEX `', @legacy_index, '`'));
+PREPARE migration_stmt FROM @ddl;
+EXECUTE migration_stmt;
+DEALLOCATE PREPARE migration_stmt;
 
 ALTER TABLE address
     ADD CONSTRAINT fk_address_company FOREIGN KEY (company_id) REFERENCES company (id),

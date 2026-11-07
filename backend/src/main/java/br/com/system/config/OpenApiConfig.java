@@ -19,7 +19,10 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Sistema de Gestão de Estoque — REST API")
                         .version("v1.0")
-                        .description("API REST para gerenciamento de estoque, vendas, clientes e fornecedores."))
+                        .description("API REST para gerenciamento de estoque, vendas, clientes e fornecedores. " +
+                                "Fluxo multiempresa: faça login, use o access token Bearer retornado para consultar " +
+                                "GET /auth/companies e, ao selecionar outra empresa, chame POST /auth/switch-company. " +
+                                "Substitua o access token pelo token retornado na troca, pois ele define a empresa e o papel ativos."))
                 .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
                 .components(new Components()
                         .addSecuritySchemes("Bearer Authentication", new SecurityScheme()

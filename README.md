@@ -1,6 +1,6 @@
 # Sistema de Gestão de Estoque
 
-API REST para apoiar pequenos comércios no controle de estoque, produtos, clientes, fornecedores, vendas, movimentações e alertas.
+Aplicação de gestão de estoque para pequenos comércios, composta por uma API REST e um frontend web.
 
 O sistema possui autenticação por JWT, controle de acesso por papéis e suporte a múltiplas empresas, mantendo os dados operacionais isolados pela empresa ativa.
 
@@ -16,6 +16,27 @@ O sistema possui autenticação por JWT, controle de acesso por papéis e suport
 - Docker e Docker Compose
 - JUnit 5, Rest Assured e Testcontainers
 - OpenAPI / Swagger
+
+## Estrutura
+
+```text
+backend/             API Spring Boot, migrations e testes
+frontend/            Aplicação web
+docs/                Documentação de arquitetura e domínio
+docker-compose.yml   Infraestrutura local
+```
+
+O frontend será mantido em `frontend/` como um projeto independente. A base visual e os componentes reutilizáveis serão implementados em código, sem depender de Figma.
+
+### Desenvolvimento do frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Use `npm run build` para gerar a versão de produção e `npm run lint` para verificar o código.
 
 ## Executar
 
@@ -40,6 +61,7 @@ docker compose up --build
 ## Testes
 
 ```bash
+cd backend
 mvn test
 ```
 

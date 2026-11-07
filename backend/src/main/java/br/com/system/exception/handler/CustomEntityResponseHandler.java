@@ -25,7 +25,7 @@ public class CustomEntityResponseHandler extends ResponseEntityExceptionHandler 
     public ResponseEntity<ExceptionResponse> handleAllExceptions(
             Exception ex, WebRequest request) {
         ExceptionResponse response = new ExceptionResponse(
-                new Date(), ex.getMessage(), request.getDescription(false));
+                new Date(), HttpStatus.INTERNAL_SERVER_ERROR.value(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
@@ -34,7 +34,7 @@ public class CustomEntityResponseHandler extends ResponseEntityExceptionHandler 
     public ResponseEntity<ExceptionResponse> handleNotFoundExceptions(
             Exception ex, WebRequest request) {
         ExceptionResponse response = new ExceptionResponse(
-                new Date(), ex.getMessage(), request.getDescription(false));
+                new Date(), HttpStatus.NOT_FOUND.value(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
 
@@ -43,7 +43,7 @@ public class CustomEntityResponseHandler extends ResponseEntityExceptionHandler 
     public ResponseEntity<ExceptionResponse> handleBusinessExceptions(
             Exception ex, WebRequest request) {
         ExceptionResponse response = new ExceptionResponse(
-                new Date(), ex.getMessage(), request.getDescription(false));
+                new Date(), HttpStatus.BAD_REQUEST.value(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
@@ -52,7 +52,7 @@ public class CustomEntityResponseHandler extends ResponseEntityExceptionHandler 
     public ResponseEntity<ExceptionResponse> handleDuplicateExceptions(
             Exception ex, WebRequest request) {
         ExceptionResponse response = new ExceptionResponse(
-                new Date(), ex.getMessage(), request.getDescription(false));
+                new Date(), HttpStatus.CONFLICT.value(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(response, HttpStatus.CONFLICT);
     }
 
@@ -61,7 +61,7 @@ public class CustomEntityResponseHandler extends ResponseEntityExceptionHandler 
     public ResponseEntity<ExceptionResponse> handleInsufficientStockExceptions(
             Exception ex, WebRequest request) {
         ExceptionResponse response = new ExceptionResponse(
-                new Date(), ex.getMessage(), request.getDescription(false));
+                new Date(), HttpStatus.UNPROCESSABLE_ENTITY.value(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(response, HttpStatus.UNPROCESSABLE_ENTITY);
     }
 
@@ -80,7 +80,7 @@ public class CustomEntityResponseHandler extends ResponseEntityExceptionHandler 
                 .toList();
 
         ExceptionResponse response = new ExceptionResponse(
-                new Date(), "Validation failed", errors.toString());
+                new Date(), HttpStatus.BAD_REQUEST.value(), "Validation failed", errors.toString());
         return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 }

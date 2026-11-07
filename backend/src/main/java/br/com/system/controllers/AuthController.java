@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.security.SecurityRequirements;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +33,8 @@ public class AuthController {
 
     public AuthController(AuthService service) { this.service = service; }
 
-    @Operation(summary = "Login", description = "Authenticates the administrator and returns a JWT token and refresh token.")
+    @Operation(summary = "Login", description = "Authenticates the user and returns access and refresh tokens for the first active company.")
+    @SecurityRequirements
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Authenticated successfully",
                     content = @Content(mediaType = "application/json",
@@ -46,6 +48,7 @@ public class AuthController {
     }
 
     @Operation(summary = "Refresh token", description = "Generates a new access token using the refresh token.")
+    @SecurityRequirements
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Token refreshed successfully",
                     content = @Content(mediaType = "application/json",
@@ -58,7 +61,7 @@ public class AuthController {
         return ResponseEntity.ok(service.refreshToken(dto.getRefreshToken(), dto.getCompanyId()));
     }
 
-    @Operation(summary = "Logout", description = "Revokes the refresh token and logs out the administrator.")
+    @Operation(summary = "Logout", description = "Revokes the refresh token for the authenticated user.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "Logged out successfully", content = @Content),
             @ApiResponse(responseCode = "400", description = "Invalid refresh token", content = @Content),
@@ -70,11 +73,23 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "List available companies", description = "Lists active companies available to the authenticated user. Use this after login or before switching the active company.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Available companies retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Authentication required", content = @Content)
+    })
     @GetMapping("/companies")
     public List<AvailableCompanyResponseDTO> availableCompanies() {
         return service.availableCompanies();
     }
 
+    @Operation(summary = "Switch active company", description = "Issues a new access token scoped to the selected active company. The client must replace its current access token with the returned token.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Active company switched successfully",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = SwitchCompanyResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "No active access to the requested company", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Authentication required", content = @Content)
+    })
     @PostMapping("/switch-company")
     public ResponseEntity<SwitchCompanyResponseDTO> switchCompany(
             @RequestBody @Valid SwitchCompanyRequestDTO dto) {
