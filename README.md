@@ -1,46 +1,17 @@
 # Sistema de Gestão de Estoque
 
-Aplicação de gestão de estoque para pequenos comércios, composta por uma API REST e um frontend web.
-
-O sistema possui autenticação por JWT, controle de acesso por papéis e suporte a múltiplas empresas, mantendo os dados operacionais isolados pela empresa ativa.
+Aplicação de gestão de estoque para pequenos comércios, composta por uma API REST e um frontend web. O sistema usa JWT, controle de acesso por papéis e suporte a múltiplas empresas, com dados operacionais isolados pela empresa ativa.
 
 ## Tecnologias
 
-- Java 21
-- Spring Boot 4
-- Spring Security e JWT
-- Spring Data JPA / Hibernate
-- MySQL 8
-- Flyway
-- Maven
-- Docker e Docker Compose
-- JUnit 5, Rest Assured e Testcontainers
-- OpenAPI / Swagger
+- Java 21, Spring Boot 4, Spring Security, Spring Data JPA e Hibernate
+- MySQL 8 e Flyway
+- React, TypeScript e Vite
+- Docker Compose e OpenAPI / Swagger
 
-## Estrutura
+## Executar localmente
 
-```text
-backend/             API Spring Boot, migrations e testes
-frontend/            Aplicação web
-docs/                Documentação de arquitetura e domínio
-docker-compose.yml   Infraestrutura local
-```
-
-O frontend será mantido em `frontend/` como um projeto independente. A base visual e os componentes reutilizáveis serão implementados em código, sem depender de Figma.
-
-### Desenvolvimento do frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Use `npm run build` para gerar a versão de produção e `npm run lint` para verificar o código.
-
-## Executar
-
-Crie o arquivo `.env` na raiz do projeto:
+Crie o `.env` na raiz:
 
 ```env
 DB_PASSWORD=uma_senha_segura
@@ -49,14 +20,32 @@ JWT_EXPIRATION=3600000
 JWT_REFRESH_EXPIRATION=604800000
 ```
 
-Inicie a aplicação:
+Inicie os serviços:
 
 ```bash
 docker compose up --build
 ```
 
-- API: `http://localhost:8080`
-- Documentação: `http://localhost:8080/swagger-ui.html`
+- API e Swagger: `http://localhost:8080/swagger-ui.html`
+- Mailpit local: `http://localhost:8025`
+- Frontend: inicie com `cd frontend`, `npm install` e `npm run dev`; por padrão, fica em `http://localhost:3000`.
+
+## Cadastro de empresa e proprietário
+
+O cadastro é feito pela tela `http://localhost:3000/register` ou pela rota pública `POST /auth/register` no Swagger. Informe nome da empresa, dados do proprietário, login e senha. A API cria a empresa, o usuário, o administrador e o vínculo de proprietário como pendentes, e envia uma confirmação para o e-mail informado. Em desenvolvimento, abra o Mailpit em `http://localhost:8025` e acesse o link de confirmação. A empresa e o acesso são ativados após a confirmação; então é possível entrar usando login ou e-mail e a senha escolhida.
+
+O cadastro não cria planos, cobranças ou usuários de demonstração. O proprietário pode adicionar membros pela rota autenticada `POST /company/members`; o convite por e-mail será implementado depois.
+
+Para outro servidor SMTP, configure `MAIL_HOST`, `MAIL_PORT`, `MAIL_USERNAME`, `MAIL_PASSWORD`, `MAIL_AUTH`, `MAIL_STARTTLS`, `MAIL_FROM` e `APP_FRONTEND_URL`. Use HTTPS para o frontend em produção.
+
+## Desenvolvimento do frontend
+
+```bash
+cd frontend
+npm install
+npm run dev
+npm run build
+```
 
 ## Testes
 
@@ -65,4 +54,4 @@ cd backend
 mvn test
 ```
 
-Os testes de integração utilizam MySQL com Testcontainers e exigem Docker Desktop em execução.
+Os testes de integração usam MySQL com Testcontainers e exigem Docker Desktop em execução.

@@ -55,6 +55,7 @@ export function AppShell({ children }: PropsWithChildren) {
         <div className="nav-caption">OPERAÇÃO</div>
         {session?.role !== 'OPERATOR' && <NavLink className="nav-link" to="/overview"><span aria-hidden="true">◫</span> Visão geral</NavLink>}
         <NavLink className="nav-link" to="/sales"><span aria-hidden="true">↗</span> Vendas</NavLink>
+        <NavLink className="nav-link" to="/account/password"><span aria-hidden="true">♙</span> Minha senha</NavLink>
         <div className="sidebar-push" />
         <div className="sidebar-user"><div className="avatar">{session?.login.slice(0, 1).toUpperCase()}</div><div className="user-meta"><strong>{session?.login}</strong><span>{session?.role === 'COMPANY_OWNER' ? 'Proprietário' : session?.role === 'ADMIN' ? 'Administrador' : 'Operador'}</span></div><button className="icon-button logout-button" aria-label="Sair da conta" onClick={() => void onLogout()}>↪</button></div>
       </aside>

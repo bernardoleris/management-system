@@ -60,7 +60,9 @@ public class AuthService {
     public LoginResponseDTO login(LoginRequestDTO dto) {
         logger.info("Authenticating administrator: " + dto.getLogin());
 
-        Administrator administrator = administratorRepository.findByLogin(dto.getLogin())
+        String identifier = dto.getLogin().trim();
+        Administrator administrator = administratorRepository.findByLoginIgnoreCase(identifier)
+                .or(() -> administratorRepository.findByUserEmailIgnoreCase(identifier))
                 .orElseThrow(() -> new BusinessException("Invalid login or password!"));
 
         if (!passwordEncoder.matches(dto.getPassword(), administrator.getPassword())) {
@@ -167,7 +169,8 @@ public class AuthService {
                 administrator.getLogin(),
                 administrator.getUser().getId(),
                 membership.getCompany().getId(),
-                membership.getId()
+                membership.getId(),
+                administrator.getTokenVersion() == null ? 0 : administrator.getTokenVersion()
         );
     }
 

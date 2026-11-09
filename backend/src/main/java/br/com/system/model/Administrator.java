@@ -35,6 +35,9 @@ public class Administrator implements Serializable {
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Column(name = "token_version", nullable = false)
+    private Integer tokenVersion = 0;
+
     @Column(name = "last_login")
     private LocalDateTime lastLogin;
 }

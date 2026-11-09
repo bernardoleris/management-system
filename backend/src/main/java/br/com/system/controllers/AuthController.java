@@ -1,12 +1,20 @@
 package br.com.system.controllers;
 
 import br.com.system.data.dto.request.LoginRequestDTO;
+import br.com.system.data.dto.request.ChangePasswordRequestDTO;
+import br.com.system.data.dto.request.ForgotPasswordRequestDTO;
+import br.com.system.data.dto.request.EmailTokenRequestDTO;
+import br.com.system.data.dto.request.OwnerRegistrationRequestDTO;
 import br.com.system.data.dto.request.RefreshTokenRequestDTO;
+import br.com.system.data.dto.request.ResendVerificationRequestDTO;
+import br.com.system.data.dto.request.ResetPasswordRequestDTO;
 import br.com.system.data.dto.request.SwitchCompanyRequestDTO;
 import br.com.system.data.dto.response.AvailableCompanyResponseDTO;
 import br.com.system.data.dto.response.LoginResponseDTO;
 import br.com.system.data.dto.response.SwitchCompanyResponseDTO;
 import br.com.system.services.AuthService;
+import br.com.system.services.PasswordManagementService;
+import br.com.system.services.OwnerRegistrationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -30,8 +38,88 @@ import java.util.List;
 public class AuthController {
 
     private final AuthService service;
+    private final PasswordManagementService passwordManagementService;
+    private final OwnerRegistrationService registrationService;
 
-    public AuthController(AuthService service) { this.service = service; }
+    public AuthController(AuthService service, PasswordManagementService passwordManagementService,
+                          OwnerRegistrationService registrationService) {
+        this.service = service;
+        this.passwordManagementService = passwordManagementService;
+        this.registrationService = registrationService;
+    }
+
+    @Operation(summary = "Register a company owner", description = "Creates a company and owner account in a pending state, then sends an email verification link. No plan or billing data is created.")
+    @SecurityRequirements
+    @ApiResponses({
+            @ApiResponse(responseCode = "202", description = "Registration accepted; check the email inbox"),
+            @ApiResponse(responseCode = "400", description = "Registration data is invalid", content = @Content),
+            @ApiResponse(responseCode = "409", description = "Login or email already in use", content = @Content)
+    })
+    @PostMapping("/register")
+    public ResponseEntity<Void> register(@RequestBody @Valid OwnerRegistrationRequestDTO dto) {
+        registrationService.register(dto);
+        return ResponseEntity.accepted().build();
+    }
+
+    @Operation(summary = "Verify account email", description = "Consumes a single-use email verification token and activates the company owner account.")
+    @SecurityRequirements
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Email verified"),
+            @ApiResponse(responseCode = "400", description = "Verification token is invalid or expired", content = @Content)
+    })
+    @PostMapping("/verify-email")
+    public ResponseEntity<Void> verifyEmail(@RequestBody @Valid EmailTokenRequestDTO dto) {
+        registrationService.verify(dto.getToken());
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Resend verification email", description = "Sends another verification link for a pending account. The response does not reveal whether an account exists.")
+    @SecurityRequirements
+    @ApiResponses({
+            @ApiResponse(responseCode = "202", description = "Request accepted"),
+            @ApiResponse(responseCode = "400", description = "Email is invalid", content = @Content)
+    })
+    @PostMapping("/resend-verification")
+    public ResponseEntity<Void> resendVerification(@RequestBody @Valid ResendVerificationRequestDTO dto) {
+        registrationService.resend(dto.getEmail());
+        return ResponseEntity.accepted().build();
+    }
+
+    @Operation(summary = "Request password recovery", description = "Sends a one-time password reset link when the email belongs to an active account. The response is the same whether or not the account exists.")
+    @SecurityRequirements
+    @ApiResponses({
+            @ApiResponse(responseCode = "202", description = "Request accepted"),
+            @ApiResponse(responseCode = "400", description = "Invalid email", content = @Content)
+    })
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Void> forgotPassword(@RequestBody @Valid ForgotPasswordRequestDTO dto) {
+        passwordManagementService.requestPasswordReset(dto.getEmail());
+        return ResponseEntity.accepted().build();
+    }
+
+    @Operation(summary = "Reset password", description = "Changes the password using a valid single-use reset token.")
+    @SecurityRequirements
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Password reset successfully"),
+            @ApiResponse(responseCode = "400", description = "Reset token is invalid, expired, or password is invalid", content = @Content)
+    })
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@RequestBody @Valid ResetPasswordRequestDTO dto) {
+        passwordManagementService.resetPassword(dto.getToken(), dto.getNewPassword());
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Change password", description = "Changes the authenticated user's password after verifying the current password and revokes all refresh sessions.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Password changed successfully"),
+            @ApiResponse(responseCode = "400", description = "Current password is incorrect or new password is invalid", content = @Content),
+            @ApiResponse(responseCode = "401", description = "Authentication required", content = @Content)
+    })
+    @PostMapping("/change-password")
+    public ResponseEntity<Void> changePassword(@RequestBody @Valid ChangePasswordRequestDTO dto) {
+        passwordManagementService.changePassword(dto.getCurrentPassword(), dto.getNewPassword());
+        return ResponseEntity.noContent().build();
+    }
 
     @Operation(summary = "Login", description = "Authenticates the user and returns access and refresh tokens for the first active company.")
     @SecurityRequirements

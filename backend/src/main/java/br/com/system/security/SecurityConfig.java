@@ -44,7 +44,12 @@ public class SecurityConfig {
 
     private static final String[] PUBLIC_ROUTES = {
             "/auth/login",
+            "/auth/register",
+            "/auth/verify-email",
+            "/auth/resend-verification",
             "/auth/refresh-token",
+            "/auth/forgot-password",
+            "/auth/reset-password",
             "/swagger-ui.html",
             "/swagger-ui/**",
             "/api-docs/**",

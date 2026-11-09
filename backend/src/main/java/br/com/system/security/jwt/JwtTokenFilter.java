@@ -3,6 +3,8 @@ package br.com.system.security.jwt;
 import br.com.system.security.CustomUserDetailsService;
 import br.com.system.security.TenantPrincipal;
 import br.com.system.model.CompanyMembership;
+import br.com.system.model.Administrator;
+import br.com.system.repository.AdministratorRepository;
 import br.com.system.repository.CompanyMembershipRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -27,14 +29,17 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private final CustomUserDetailsService userDetailsService;
 
     private final CompanyMembershipRepository companyMembershipRepository;
+    private final AdministratorRepository administratorRepository;
 
     public JwtTokenFilter(
             JwtTokenProvider tokenProvider,
             CustomUserDetailsService userDetailsService,
-            CompanyMembershipRepository companyMembershipRepository) {
+            CompanyMembershipRepository companyMembershipRepository,
+            AdministratorRepository administratorRepository) {
         this.tokenProvider = tokenProvider;
         this.userDetailsService = userDetailsService;
         this.companyMembershipRepository = companyMembershipRepository;
+        this.administratorRepository = administratorRepository;
     }
 
     @Override
@@ -62,6 +67,16 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                     .orElse(null);
 
             if (membership == null) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            Administrator administrator = administratorRepository.findByUserId(userId).orElse(null);
+            Integer tokenVersion = tokenProvider.getTokenVersionFromToken(token);
+            int currentTokenVersion = administrator == null || administrator.getTokenVersion() == null
+                    ? 0 : administrator.getTokenVersion();
+            if (administrator == null || (tokenVersion == null ? currentTokenVersion != 0 :
+                    tokenVersion != currentTokenVersion)) {
                 filterChain.doFilter(request, response);
                 return;
             }

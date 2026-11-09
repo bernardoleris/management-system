@@ -17,6 +17,9 @@ public interface CompanyMembershipRepository extends JpaRepository<CompanyMember
 
     Optional<CompanyMembership> findByCompanyIdAndUserId(Long companyId, Long userId);
 
+    Optional<CompanyMembership> findFirstByUserIdAndRoleOrderByIdAsc(
+            Long userId, br.com.system.enums.CompanyRole role);
+
     boolean existsByCompanyIdAndUserIdAndActiveTrue(Long companyId, Long userId);
 
     Optional<CompanyMembership> findByIdAndUserIdAndCompanyIdAndActiveTrue(

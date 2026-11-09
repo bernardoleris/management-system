@@ -12,6 +12,7 @@ interface AuthContextValue {
   request: <T>(path: string, options?: RequestInit) => Promise<T>
   loadCompanies: () => Promise<AvailableCompany[]>
   switchCompany: (companyId: number) => Promise<void>
+  changePassword: (currentPassword: string, newPassword: string) => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null)
@@ -120,7 +121,14 @@ export function AuthProvider({ children }: PropsWithChildren) {
     clearSession()
   }, [clearSession])
 
-  return <AuthContext.Provider value={{ session, login, logout, request, loadCompanies, switchCompany }}>{children}</AuthContext.Provider>
+  const changePassword = useCallback(async (currentPassword: string, newPassword: string) => {
+    await request<void>('/auth/change-password', {
+      method: 'POST', body: jsonBody({ currentPassword, newPassword }),
+    })
+    clearSession()
+  }, [clearSession, request])
+
+  return <AuthContext.Provider value={{ session, login, logout, request, loadCompanies, switchCompany, changePassword }}>{children}</AuthContext.Provider>
 }
 
 export function useAuth(): AuthContextValue {

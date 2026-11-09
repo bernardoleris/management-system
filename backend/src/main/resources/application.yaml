@@ -8,6 +8,18 @@ spring:
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
 
+  mail:
+    host: ${MAIL_HOST:}
+    port: ${MAIL_PORT:1025}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    properties:
+      mail.smtp.auth: ${MAIL_AUTH:false}
+      mail.smtp.starttls.enable: ${MAIL_STARTTLS:false}
+      mail.smtp.connectiontimeout: 5000
+      mail.smtp.timeout: 3000
+      mail.smtp.writetimeout: 5000
+
   jpa:
     open-in-view: false
     hibernate:
@@ -44,5 +56,7 @@ security:
     refresh-expiration: ${JWT_REFRESH_EXPIRATION}
 
 app:
+  frontend-url: ${APP_FRONTEND_URL:http://localhost:3000}
+  mail-from: ${MAIL_FROM:no-reply@estocai.local}
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}

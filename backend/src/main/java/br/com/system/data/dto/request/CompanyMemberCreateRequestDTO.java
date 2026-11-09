@@ -32,7 +32,7 @@ public class CompanyMemberCreateRequestDTO {
     private String login;
 
     @NotBlank
-    @Size(min = 6)
+    @Size(min = 12, max = 72, message = "Password must contain between 12 and 72 characters")
     private String password;
 
     @NotNull
