@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { ApiError, jsonBody } from '../api/http'
 import type { Client, Page, PaymentMethod, Product, Sale } from '../api/contracts'
 import { useAuth } from '../auth/AuthContext'
+import './NewSaleDialog.css'
 
 interface CartLine { product: Product; quantity: number }
 interface Props { open: boolean; onClose: () => void; onCompleted: () => void }
