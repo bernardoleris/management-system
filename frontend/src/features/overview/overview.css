@@ -1,0 +1,63 @@
+.overview-heading { align-items: center; gap: 20px; }
+.overview-heading > .button-primary { min-height: 44px; padding: 0 17px; font-size: 13px; white-space: nowrap; }
+.overview-grid { gap: 16px; margin-bottom: 20px; }
+.overview-page .metric-card { min-height: 182px; padding: 22px; border-radius: 13px; }
+.overview-page .metric-icon { width: 40px; height: 40px; margin-bottom: 15px; border-radius: 11px; font-size: 17px; }
+.overview-page .metric-icon-orange { font-size: 12px; }
+.overview-page .metric-label { color: #647168; font-size: 13px; }
+.overview-page .metric-card > strong { margin: 8px 0 5px; font-size: 28px; }
+.overview-page .metric-card > small { color: #78847c; font-size: 12px; }
+.overview-page .metric-guidance {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-content: start;
+  align-items: start;
+  column-gap: 14px;
+}
+.overview-page .metric-guidance .metric-icon { grid-column: 1; grid-row: 1; margin: 0; }
+.overview-page .metric-guidance-copy { display: grid; min-width: 0; grid-column: 2; gap: 7px; }
+.overview-page .metric-guidance-copy .metric-label { margin-top: 2px; }
+.overview-page .metric-guidance-copy > strong { margin: 0; font-size: 21px; line-height: 1.3; overflow-wrap: anywhere; }
+.overview-page .metric-guidance-copy > small { max-width: 32ch; margin: 0; line-height: 1.5; }
+.overview-page .overview-recent .data-card-header { padding: 21px 24px; }
+.overview-page .overview-recent .data-card-header h2 { font-size: 17px; }
+.overview-page .overview-recent .data-card-header p { font-size: 12px; }
+.overview-page .overview-recent .data-card-header .button-secondary { min-height: 40px; padding: 0 15px; font-size: 13px; }
+.overview-page .recent-list { padding: 0 24px; }
+.overview-page .recent-row { display: grid; grid-template-columns: 38px minmax(0, 1fr) auto; min-width: 0; min-height: 76px; gap: 14px; }
+.overview-page .recent-icon { width: 38px; height: 38px; font-size: 16px; }
+.overview-page .recent-copy { min-width: 0; gap: 5px; }
+.overview-page .recent-copy strong { overflow: hidden; font-size: 14px; text-overflow: ellipsis; white-space: nowrap; }
+.overview-page .recent-copy small { overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.overview-page .recent-value { flex: none; font-size: 14px; white-space: nowrap; }
+.overview-page .table-state { min-height: 240px; font-size: 14px; }
+.overview-page .empty-state h3 { font-size: 18px; }
+.overview-page .empty-state p { font-size: 13px; }
+.overview-page .empty-state .button-primary { min-height: 44px; padding: 0 17px; font-size: 13px; }
+.overview-page .overview-recent .table-state.empty-state {
+  min-height: 280px;
+  align-content: center;
+  justify-items: center;
+  gap: 12px;
+  padding: 40px 28px;
+  text-align: center;
+}
+.overview-page .overview-recent .empty-state h3 { max-width: 34ch; margin: 0; line-height: 1.4; }
+.overview-page .overview-recent .empty-state p { max-width: 48ch; margin: 0; line-height: 1.65; }
+.overview-page .overview-recent .empty-state .button-primary { margin-top: 6px; }
+@media (max-width: 760px) {
+  .overview-heading { align-items: flex-start; flex-direction: column; }
+  .overview-heading > .button-primary { width: 100%; }
+  .overview-page .metric-card { min-height: 165px; padding: 17px; }
+  .overview-page .metric-guidance { grid-template-columns: 40px minmax(0, 1fr); column-gap: 12px; }
+  .overview-page .metric-guidance-copy > strong { font-size: 19px; }
+  .overview-page .metric-guidance-copy > small { font-size: 12px; }
+  .overview-page .overview-recent .data-card-header { padding: 17px; }
+  .overview-page .recent-list { padding: 0 17px; }
+  .overview-page .recent-row { grid-template-columns: 34px minmax(0, 1fr) auto; min-height: 72px; gap: 10px; }
+  .overview-page .recent-icon { width: 34px; height: 34px; }
+  .overview-page .recent-copy strong { font-size: 13px; }
+  .overview-page .recent-copy small { font-size: 11px; }
+  .overview-page .recent-value { font-size: 13px; }
+  .overview-page .overview-recent .table-state.empty-state { min-height: 250px; padding: 32px 22px; }
+}

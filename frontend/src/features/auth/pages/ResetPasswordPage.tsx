@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react'
 import { Link } from 'react-router-dom'
-import { ApiError, apiRequest, jsonBody } from '../api/http'
+import { ApiError, apiRequest, jsonBody } from '../../../api/http'
 
 export function ResetPasswordPage() {
   const [token] = useState(() => new URLSearchParams(window.location.search).get('token') ?? '')

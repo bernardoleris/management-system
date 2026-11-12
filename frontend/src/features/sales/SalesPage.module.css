@@ -1,0 +1,245 @@
+.featureScope :global(.sales-count) {
+  padding-bottom: 4px;
+  color: #828d87;
+  font-size: 12px;
+}
+
+.featureScope :global(.sales-table-wrap) {
+  overflow: auto;
+}
+
+.featureScope :global(.sales-table) {
+  width: 100%;
+  border-collapse: collapse;
+  white-space: nowrap;
+}
+
+.featureScope :global(.sales-table th) {
+  padding: 13px 17px;
+  background: #fafbfa;
+  color: #89938d;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .055em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.featureScope :global(.sales-table td) {
+  padding: 16px 17px;
+  border-top: 1px solid #f0f2f1;
+  color: #59645e;
+  font-size: 12px;
+}
+
+.featureScope :global(.sales-table tbody tr:hover) {
+  background: #fcfdfc;
+}
+
+.featureScope :global(.sales-table .sale-id) {
+  color: #27332d;
+  font-weight: 700;
+}
+
+.featureScope :global(.amount-cell) {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.featureScope :global(.status-pill) {
+  display: inline-flex;
+  padding: 5px 8px;
+  border-radius: 100px;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.featureScope :global(.table-state) {
+  display: grid;
+  min-height: 180px;
+  place-content: center;
+  justify-items: center;
+  color: #839088;
+  font-size: 13px;
+}
+
+.featureScope :global(.empty-state h3) {
+  margin: 12px 0 4px;
+  color: #344139;
+  font-family: Manrope,sans-serif;
+  font-size: 15px;
+}
+
+.featureScope :global(.empty-state p) {
+  margin: 0;
+  color: #88928d;
+  font-size: 12px;
+}
+
+.featureScope :global(.empty-icon) {
+  font-size: 27px;
+  color: #8ba99c;
+}
+
+.featureScope :global(.table-pagination) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  border-top: 1px solid #eef1ef;
+  color: #8a948e;
+  font-size: 11px;
+}
+
+.featureScope :global(.table-pagination>div) {
+  display: flex;
+  gap: 8px;
+}
+
+.featureScope :global(.table-pagination .button-secondary) {
+  min-height: 32px;
+  font-size: 11px;
+}
+
+.featureScope :global(.sales-table) {
+  min-width: 780px;
+}
+
+.featureScope :global(.sales-count) {
+  font-size: 10px;
+}
+
+.featureScope :global(.table-pagination) {
+  padding: 12px;
+  gap: 8px;
+  font-size: 9px;
+}
+
+.featureScope :global(.table-pagination .button-secondary) {
+  padding: 0 8px;
+}
+
+.featureScope :global(.data-card-header) {
+  padding: 21px 24px;
+}
+
+.featureScope :global(.data-card-header h2) {
+  font-size: 17px;
+}
+
+.featureScope :global(.data-card-header p) {
+  font-size: 12px;
+}
+
+.featureScope :global(.refresh-button) {
+  min-height: 40px;
+  padding: 0 15px;
+  font-size: 13px;
+}
+
+.featureScope :global(.sales-table) {
+  min-width: 900px;
+}
+
+.featureScope :global(.sales-table th) {
+  padding: 14px 17px;
+  font-size: 11px;
+}
+
+.featureScope :global(.sales-table td) {
+  padding: 16px 17px;
+  font-size: 14px;
+}
+
+.featureScope :global(.sales-table .sale-id) {
+  font-size: 14px;
+}
+
+.featureScope :global(.status-pill) {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.featureScope :global(.table-state) {
+  min-height: 240px;
+  font-size: 14px;
+}
+
+.featureScope :global(.empty-state h3) {
+  font-size: 18px;
+}
+
+.featureScope :global(.empty-state p) {
+  font-size: 13px;
+}
+
+.featureScope :global(.table-pagination) {
+  padding: 16px 20px;
+  font-size: 12px;
+}
+
+.featureScope :global(.table-pagination .button-secondary) {
+  min-height: 40px;
+  padding: 0 14px;
+  font-size: 13px;
+}
+
+.featureScope :global(.sales-heading) {
+  align-items: center;
+  gap: 20px;
+}
+
+.featureScope :global(.sales-heading-actions) {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.featureScope :global(.sales-heading-actions .button-primary) {
+  min-height: 44px;
+  padding: 0 17px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.featureScope :global(.sales-heading-actions .button-primary span) {
+  font-size: 18px;
+}
+
+.featureScope :global(.empty-state .button-primary) {
+  min-height: 44px;
+  margin-top: 8px;
+  padding: 0 17px;
+  font-size: 13px;
+}
+
+@media (max-width: 760px) {
+  .featureScope :global(.data-card-header) {
+    padding: 17px;
+  }
+  .featureScope :global(.sales-heading) {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .featureScope :global(.sales-heading-actions) {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .featureScope :global(.sales-heading-actions .button-primary) {
+    flex: 1;
+  }
+  .featureScope :global(.sales-table) {
+    min-width: 900px;
+  }
+  .featureScope :global(.table-pagination) {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .featureScope :global(.table-pagination > div) {
+    width: 100%;
+  }
+  .featureScope :global(.table-pagination .button-secondary) {
+    flex: 1;
+  }
+}

@@ -1,0 +1,771 @@
+.featureScope :global(.operations-heading) {
+  align-items: flex-end;
+  gap: 20px;
+}
+
+.featureScope :global(.operations-heading > .button-primary) {
+  min-height: 44px;
+  white-space: nowrap;
+}
+
+.featureScope :global(.operations-card-header) {
+  gap: 18px;
+}
+
+.featureScope :global(.operations-card-header > div:first-child) {
+  min-width: 0;
+}
+
+.featureScope :global(.operation-filter) {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #6f7b73;
+  font-size: 12px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.featureScope :global(.operation-filter select) {
+  min-height: 40px;
+  min-width: 150px;
+  padding: 0 32px 0 11px;
+  border: 1px solid #dfe6e1;
+  border-radius: 8px;
+  background: white;
+  color: #344139;
+  font: inherit;
+}
+
+.featureScope :global(.operations-table-wrap) {
+  overflow-x: auto;
+}
+
+.featureScope :global(.operations-table) {
+  width: 100%;
+  min-width: 790px;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.featureScope :global(.operations-table th) {
+  padding: 13px 17px;
+  background: #fafbfa;
+  color: #78847c;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .045em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.featureScope :global(.operations-table td) {
+  padding: 15px 17px;
+  border-top: 1px solid #f0f2f1;
+  color: #536057;
+  font-size: 13px;
+  vertical-align: middle;
+}
+
+.featureScope :global(.operations-table tbody tr:hover) {
+  background: #fcfdfc;
+}
+
+.featureScope :global(.movement-pagination) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  padding: 16px 20px;
+  border-top: 1px solid #eef1ef;
+  color: #718078;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.featureScope :global(.movement-pagination > div) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.featureScope :global(.movement-pagination .button-secondary) {
+  min-height: 40px;
+  padding: 0 14px;
+  font-size: 13px;
+}
+
+.featureScope :global(.operations-table td small) {
+  display: block;
+  margin-top: 3px;
+  color: #89938d;
+  font-size: 11px;
+}
+
+.featureScope :global(.operation-type) {
+  display: inline-flex;
+  align-items: center;
+  min-height: 26px;
+  padding: 4px 9px;
+  border-radius: 100px;
+  background: #edf2f0;
+  color: #56645b;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.featureScope :global(.operation-entry) {
+  background: #eaf5f0;
+  color: #147558;
+}
+
+.featureScope :global(.operation-exit) {
+  background: #fff1f0;
+  color: #a32b21;
+}
+
+.featureScope :global(.operation-adjustment) {
+  background: #fff4df;
+  color: #96631a;
+}
+
+.featureScope :global(.operation-sale) {
+  background: #edf2fb;
+  color: #365c91;
+}
+
+.featureScope :global(.operation-actions) {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.featureScope :global(.operation-actions .text-action) {
+  margin-left: 8px;
+}
+
+.featureScope :global(.operations-state) {
+  display: grid;
+  min-height: 240px;
+  align-content: center;
+  justify-items: center;
+  gap: 10px;
+  padding: 26px;
+  color: #657269;
+  font-size: 14px;
+  text-align: center;
+}
+
+.featureScope :global(.operations-state h3) {
+  margin: 0;
+  color: #2f3c34;
+  font-family: Manrope, sans-serif;
+  font-size: 18px;
+}
+
+.featureScope :global(.operations-state p) {
+  max-width: 48ch;
+  margin: 0 0 4px;
+  color: #718078;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.featureScope :global(.operations-empty-icon) {
+  display: grid;
+  width: 48px;
+  height: 48px;
+  place-items: center;
+  border-radius: 14px;
+  background: #eaf5f0;
+  color: #168267;
+  font-size: 24px;
+}
+
+.featureScope :global(.operations-notice) {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 16px;
+  padding: 12px 15px;
+  border: 1px solid #cfe4d8;
+  border-radius: 9px;
+  background: #f1f8f4;
+  color: #245941;
+  font-size: 13px;
+}
+
+.featureScope :global(.operations-notice button) {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font-size: 20px;
+}
+
+.featureScope :global(.movement-detail-content) {
+  padding: 6px 28px 22px;
+  color: #536057;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.featureScope :global(.movement-detail-content > p) {
+  margin: 7px 0;
+  overflow-wrap: anywhere;
+}
+
+.featureScope :global(.movement-detail-content h3) {
+  margin: 20px 0 8px;
+  color: #2f3c34;
+  font-family: Manrope, sans-serif;
+  font-size: 15px;
+}
+
+.featureScope :global(.movement-detail-content ul) {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.featureScope :global(.movement-detail-content li) {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 11px 0;
+  border-top: 1px solid #edf0ee;
+}
+
+.featureScope :global(.movement-detail-content li strong) {
+  color: #344139;
+  text-align: right;
+}
+
+.featureScope :global(.movement-form-dialog) {
+  width: min(720px, 100%);
+}
+
+.featureScope :global(.movement-form-dialog .product-form) {
+  padding: 22px 28px 0;
+}
+
+.featureScope :global(.movement-form-dialog .product-form-grid) {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 17px 16px;
+  padding-bottom: 22px;
+}
+
+.featureScope :global(.movement-form-dialog .product-form-grid label) {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: 7px;
+  color: #344139;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.featureScope :global(.movement-form-dialog .product-form-wide) {
+  grid-column: 1 / -1;
+}
+
+.featureScope :global(.movement-form-dialog .product-form-grid label small) {
+  color: #78847c;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.featureScope :global(.movement-form-dialog .product-form-grid input),
+.featureScope :global(.movement-form-dialog .product-form-grid select),
+.featureScope :global(.movement-form-dialog .product-form-grid textarea) {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid #dfe6e1;
+  border-radius: 8px;
+  background: white;
+  color: #29352e;
+  font: inherit;
+}
+
+.featureScope :global(.movement-form-dialog .product-form-grid textarea) {
+  min-height: 90px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.featureScope :global(.movement-form-dialog .product-form-grid input:focus),
+.featureScope :global(.movement-form-dialog .product-form-grid select:focus),
+.featureScope :global(.movement-form-dialog .product-form-grid textarea:focus) {
+  border-color: #3b9e7f;
+  box-shadow: 0 0 0 3px #1886661b;
+  outline: none;
+}
+
+.featureScope :global(.movement-form-dialog .product-form-grid input::placeholder),
+.featureScope :global(.movement-form-dialog .product-form-grid textarea::placeholder) {
+  color: #909b94;
+}
+
+.featureScope :global(.movement-form-dialog .product-form-message) {
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border: 1px solid #dce9e1;
+  border-radius: 8px;
+  background: #f4f9f6;
+  color: #4e6255;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.featureScope :global(.movement-form-dialog .form-alert + .form-alert) {
+  margin-top: 10px;
+}
+
+.featureScope :global(.movement-add-wrap) {
+  display: flex;
+  align-items: end;
+}
+
+.featureScope :global(.movement-add-wrap .button-secondary) {
+  min-height: 44px;
+}
+
+.featureScope :global(.movement-cart) {
+  display: grid;
+  gap: 0;
+  padding: 13px 14px;
+  border: 1px solid #e4ebe6;
+  border-radius: 9px;
+  background: #f9fbf9;
+}
+
+.featureScope :global(.movement-cart > strong) {
+  margin-bottom: 5px;
+  color: #38463d;
+  font-size: 12px;
+}
+
+.featureScope :global(.movement-cart > div) {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid #e9eeea;
+}
+
+.featureScope :global(.movement-cart > div > span) {
+  display: grid;
+  flex: 1;
+  gap: 3px;
+  color: #354139;
+  font-size: 13px;
+}
+
+.featureScope :global(.movement-cart > div small) {
+  color: #78847c;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.featureScope :global(.movement-cart > div > strong) {
+  color: #344139;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.featureScope :global(.movement-cart button) {
+  min-height: 34px;
+  border: 0;
+  background: transparent;
+  color: #9a3a2e;
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.featureScope :global(.movement-delete-button) {
+  border-color: #9d371b;
+  background: #9d371b;
+  color: white;
+}
+
+.featureScope :global(.movement-delete-button:hover) {
+  background: #842d17;
+}
+
+.featureScope :global(.alert-view-tabs) {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid #e8ede9;
+  border-radius: 9px;
+  background: #f7f9f7;
+}
+
+.featureScope :global(.alert-view-tabs button) {
+  min-height: 34px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #6b776f;
+  font-size: 12px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.featureScope :global(.alert-view-tabs button.selected) {
+  background: white;
+  box-shadow: 0 1px 3px #20352a1a;
+  color: #176b50;
+}
+
+.featureScope :global(.alert-list) {
+  display: grid;
+}
+
+.featureScope :global(.alert-row) {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 19px 22px;
+  border-top: 1px solid #edf0ee;
+}
+
+.featureScope :global(.alert-row:first-child) {
+  border-top: 0;
+}
+
+.featureScope :global(.alert-symbol) {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: none;
+  place-items: center;
+  border-radius: 11px;
+  background: #fff4df;
+  color: #96631a;
+  font-size: 19px;
+  font-weight: 800;
+}
+
+.featureScope :global(.alert-symbol-empty) {
+  background: #fff1f0;
+  color: #a32b21;
+}
+
+.featureScope :global(.alert-main) {
+  min-width: 0;
+  flex: 1;
+}
+
+.featureScope :global(.alert-title-line) {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.featureScope :global(.alert-title-line h3) {
+  margin: 0;
+  color: #2f3c34;
+  font-family: Manrope, sans-serif;
+  font-size: 15px;
+}
+
+.featureScope :global(.alert-kind),
+.featureScope :global(.alert-disabled-tag) {
+  display: inline-flex;
+  padding: 4px 8px;
+  border-radius: 99px;
+  background: #fff4df;
+  color: #96631a;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.featureScope :global(.alert-kind-empty) {
+  background: #fff1f0;
+  color: #a32b21;
+}
+
+.featureScope :global(.alert-disabled-tag) {
+  background: #f0f2f1;
+  color: #657269;
+}
+
+.featureScope :global(.alert-unread-dot) {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #168267;
+}
+
+.featureScope :global(.alert-main p) {
+  margin: 7px 0 6px;
+  color: #536057;
+  font-size: 13px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.featureScope :global(.alert-main small) {
+  color: #89938d;
+  font-size: 11px;
+}
+
+.featureScope :global(.alert-actions) {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.featureScope :global(.alert-actions .text-action) {
+  min-height: 36px;
+}
+
+.featureScope :global(.alert-read .alert-title-line h3) {
+  color: #657269;
+  font-weight: 600;
+}
+
+.featureScope :global(.alert-inactive) {
+  background: #fbfcfb;
+}
+
+.featureScope :global(.alert-inactive .alert-main p) {
+  color: #7d8981;
+}
+
+.featureScope :global(.field-hint) {
+  display: block;
+  margin-top: 5px;
+  color: #78847c;
+  font-size: 11px;
+  font-weight: 400;
+}
+
+.featureScope :global(.operations-heading .button-primary:focus-visible),
+.featureScope :global(.alert-view-tabs button:focus-visible),
+.featureScope :global(.operations-table button:focus-visible),
+.featureScope :global(.movement-cart button:focus-visible) {
+  outline: 3px solid #16826755;
+  outline-offset: 2px;
+}
+
+.featureScope :global(.operations-heading) {
+  align-items: center;
+}
+
+.featureScope :global(.operations-heading > .button-primary) {
+  min-height: 44px;
+  padding: 0 17px;
+  font-size: 13px;
+}
+
+.featureScope :global(.operations-card-header) {
+  padding: 21px 24px;
+}
+
+.featureScope :global(.operations-card-header h2) {
+  font-size: 17px;
+}
+
+.featureScope :global(.operations-card-header p) {
+  font-size: 12px;
+}
+
+.featureScope :global(.operation-filter) {
+  font-size: 13px;
+}
+
+.featureScope :global(.operation-filter select) {
+  min-height: 42px;
+  font-size: 13px;
+}
+
+.featureScope :global(.operations-table td) {
+  font-size: 14px;
+}
+
+.featureScope :global(.operations-table td small) {
+  font-size: 12px;
+}
+
+.featureScope :global(.operation-type) {
+  font-size: 12px;
+}
+
+.featureScope :global(.alert-view-tabs button) {
+  min-height: 38px;
+  padding: 0 13px;
+  font-size: 13px;
+}
+
+.featureScope :global(.alert-row) {
+  gap: 16px;
+  padding: 21px 24px;
+}
+
+.featureScope :global(.alert-symbol) {
+  width: 42px;
+  height: 42px;
+  font-size: 20px;
+}
+
+.featureScope :global(.alert-title-line h3) {
+  font-size: 16px;
+}
+
+.featureScope :global(.alert-kind),
+.featureScope :global(.alert-disabled-tag) {
+  font-size: 11px;
+}
+
+.featureScope :global(.alert-main p) {
+  font-size: 14px;
+}
+
+.featureScope :global(.alert-main small) {
+  font-size: 12px;
+}
+
+.featureScope :global(.alert-actions .text-action) {
+  font-size: 13px;
+}
+
+.featureScope :global(.movement-detail-content) {
+  font-size: 14px;
+}
+
+.featureScope :global(.movement-form-dialog .product-form-grid label) {
+  font-size: 13px;
+}
+
+.featureScope :global(.movement-cart > strong),
+.featureScope :global(.movement-cart > div > strong) {
+  font-size: 13px;
+}
+
+.featureScope :global(.movement-cart > div > span) {
+  font-size: 14px;
+}
+
+.featureScope :global(.movement-cart button) {
+  font-size: 13px;
+}
+
+@media (max-width: 760px) {
+  .featureScope :global(.operations-heading) {
+    align-items: flex-start;
+  }
+  .featureScope :global(.alert-row) {
+    padding: 17px;
+  }
+}
+
+@media (max-width: 900px) {
+  .featureScope :global(.movement-form-dialog .product-form) {
+    padding: 18px 20px 0;
+  }
+  .featureScope :global(.operations-table) {
+    min-width: 740px;
+  }
+  .featureScope :global(.alert-row) {
+    flex-wrap: wrap;
+  }
+  .featureScope :global(.alert-actions) {
+    width: 100%;
+    padding-left: 52px;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 760px) {
+  .featureScope :global(.operations-heading) {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .featureScope :global(.operations-heading > .button-primary) {
+    width: 100%;
+  }
+  .featureScope :global(.operations-card-header) {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .featureScope :global(.operation-filter) {
+    justify-content: space-between;
+  }
+  .featureScope :global(.operation-filter select) {
+    flex: 1;
+  }
+  .featureScope :global(.movement-pagination) {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .featureScope :global(.movement-pagination > div) {
+    width: 100%;
+  }
+  .featureScope :global(.movement-pagination .button-secondary) {
+    flex: 1;
+  }
+  .featureScope :global(.alert-view-tabs) {
+    width: 100%;
+  }
+  .featureScope :global(.alert-view-tabs button) {
+    flex: 1;
+    padding: 0 5px;
+  }
+  .featureScope :global(.alert-row) {
+    padding: 16px;
+    gap: 11px;
+  }
+  .featureScope :global(.alert-actions) {
+    padding-left: 49px;
+    gap: 4px 12px;
+  }
+  .featureScope :global(.movement-detail-content) {
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+  .featureScope :global(.movement-form-dialog .product-form-grid) {
+    grid-template-columns: 1fr 1fr;
+  }
+  .featureScope :global(.movement-form-dialog .product-form-wide) {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .featureScope :global(.movement-form-dialog .product-form-grid) {
+    grid-template-columns: 1fr;
+  }
+  .featureScope :global(.movement-form-dialog .product-form-wide) {
+    grid-column: auto;
+  }
+  .featureScope :global(.movement-add-wrap .button-secondary) {
+    width: 100%;
+  }
+  .featureScope :global(.movement-cart > div) {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+  .featureScope :global(.movement-cart > div > span) {
+    flex-basis: calc(100% - 100px);
+  }
+  .featureScope :global(.alert-symbol) {
+    width: 34px;
+    height: 34px;
+  }
+  .featureScope :global(.alert-title-line h3) {
+    flex-basis: 100%;
+  }
+  .featureScope :global(.alert-actions) {
+    padding-left: 45px;
+  }
+}

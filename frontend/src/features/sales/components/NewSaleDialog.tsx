@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
-import { ApiError, jsonBody } from '../api/http'
-import type { Client, Page, PaymentMethod, Product, Sale } from '../api/contracts'
-import { useAuth } from '../auth/AuthContext'
-import './NewSaleDialog.css'
+import { ApiError, jsonBody } from '../../../api/http'
+import type { Client, Page, PaymentMethod, Product, Sale } from '../../../api/contracts'
+import { useAuth } from '../../../auth/AuthContext'
+import { Dialog, DialogFooter, DialogHeader } from '../../../shared/ui/Dialog'
+import styles from './NewSaleDialog.module.css'
 
 interface CartLine { product: Product; quantity: number }
 interface Props { open: boolean; onClose: () => void; onCompleted: () => void }
@@ -44,13 +45,6 @@ export function NewSaleDialog({ open, onClose, onCompleted }: Props) {
       setError(reason instanceof ApiError ? reason.message : 'Não foi possível carregar produtos e clientes.')
     }).finally(() => setLoading(false))
   }, [open, request])
-
-  useEffect(() => {
-    if (!open) return
-    const onKeyDown = (event: KeyboardEvent) => { if (event.key === 'Escape' && !saving) onClose() }
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [open, saving, onClose])
 
   const filteredProducts = useMemo(() => {
     const normalized = query.trim().toLocaleLowerCase('pt-BR')
@@ -120,9 +114,9 @@ export function NewSaleDialog({ open, onClose, onCompleted }: Props) {
   if (!open) return null
 
   return (
-    <div className="dialog-backdrop" onMouseDown={(event) => { if (event.target === event.currentTarget && !saving) onClose() }}>
-      <section className="sale-dialog" role="dialog" aria-modal="true" aria-labelledby="sale-dialog-title">
-        <header className="dialog-header"><div><span className="dialog-kicker">VENDA RÁPIDA</span><h2 id="sale-dialog-title">Nova venda</h2><p>Registre uma venda sem sair do que você estava fazendo.</p></div><button className="icon-button close-dialog" aria-label="Fechar venda" disabled={saving} onClick={onClose}>×</button></header>
+      <div className={styles.featureScope}>
+      <Dialog labelledBy="sale-dialog-title" className="sale-dialog" onClose={onClose} closeOnBackdrop={!saving} closeOnEscape={!saving && !confirmComplete}>
+        <DialogHeader className="dialog-header"><div><span className="dialog-kicker">VENDA RÁPIDA</span><h2 id="sale-dialog-title">Nova venda</h2><p>Registre uma venda sem sair do que você estava fazendo.</p></div><button className="icon-button close-dialog" aria-label="Fechar venda" disabled={saving} onClick={onClose}>×</button></DialogHeader>
         <div className="sale-dialog-body">
           <div className="sale-entry-column">
             <form className="product-search" onSubmit={(event) => void lookupBarcode(event)}><label htmlFor="product-search">Adicionar produto</label><div className="search-field"><span aria-hidden="true">⌕</span><input id="product-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Busque pelo nome ou leia o código" autoComplete="off" autoFocus /><button type="submit" className="sr-only">Buscar código de barras</button></div></form>
@@ -139,9 +133,9 @@ export function NewSaleDialog({ open, onClose, onCompleted }: Props) {
             <div className="sale-totals"><div><span>Subtotal</span><span>{money.format(subtotal)}</span></div><div><span>Desconto</span><span>− {money.format(discountValue)}</span></div><div className="grand-total"><strong>Total</strong><strong>{money.format(total)}</strong></div></div>
           </div>
         </div>
-        <footer className="dialog-footer"><button className="button-secondary" disabled={saving || !cart.length} onClick={() => void submit('PENDING')}>Salvar pendente</button><button className="button-primary" disabled={saving || !cart.length} onClick={() => setConfirmComplete(true)}>{saving ? 'Registrando…' : 'Concluir venda'}</button></footer>
-        {confirmComplete && <div className="confirm-overlay"><div className="confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="confirm-title"><h3 id="confirm-title">Concluir venda?</h3><p>O estoque será atualizado e a venda ficará registrada como concluída.</p><div><button className="button-secondary" disabled={saving} onClick={() => setConfirmComplete(false)}>Voltar</button><button className="button-primary" disabled={saving} onClick={() => void submit('COMPLETED')}>{saving ? 'Concluindo…' : 'Confirmar venda'}</button></div></div></div>}
-      </section>
-    </div>
+        <DialogFooter className="dialog-footer"><button className="button-secondary" disabled={saving || !cart.length} onClick={() => void submit('PENDING')}>Salvar pendente</button><button className="button-primary" disabled={saving || !cart.length} onClick={() => setConfirmComplete(true)}>{saving ? 'Registrando…' : 'Concluir venda'}</button></DialogFooter>
+        {confirmComplete && <Dialog labelledBy="confirm-title" role="alertdialog" variant="confirmation" className="confirm-card" onClose={() => setConfirmComplete(false)} closeOnBackdrop={false} closeOnEscape={!saving}><h3 id="confirm-title">Concluir venda?</h3><p>O estoque será atualizado e a venda ficará registrada como concluída.</p><div><button className="button-secondary" disabled={saving} onClick={() => setConfirmComplete(false)}>Voltar</button><button className="button-primary" disabled={saving} onClick={() => void submit('COMPLETED')}>{saving ? 'Concluindo…' : 'Confirmar venda'}</button></div></Dialog>}
+      </Dialog>
+      </div>
   )
 }

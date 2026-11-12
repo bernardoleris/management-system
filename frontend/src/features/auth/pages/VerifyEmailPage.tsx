@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { ApiError, apiRequest, jsonBody } from '../api/http'
+import { ApiError, apiRequest, jsonBody } from '../../../api/http'
 
 type VerificationState = 'loading' | 'verified' | 'invalid'
 

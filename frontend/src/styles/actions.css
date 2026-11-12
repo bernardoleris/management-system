@@ -1,0 +1,23 @@
+.text-action {
+  min-height: 36px;
+  padding: 0 3px;
+  border: 0;
+  background: transparent;
+  color: #147558;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.text-action:hover:not(:disabled) {
+  color: #0d5b43;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.text-action:disabled {
+  color: #7d8981;
+}
+
+.text-action-muted {
+  color: #7b6750;
+}

@@ -1,0 +1,795 @@
+.featureScope :global(.product-search label) {
+  margin: 0 0 7px;
+  color: #435047;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.featureScope :global(.sale-dialog) {
+  position: relative;
+  display: flex;
+  width: min(1060px,100%);
+  max-height: min(790px,calc(100vh - 40px));
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #e7ece8;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 28px 100px #06150f45;
+}
+
+.featureScope :global(.dialog-header) {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 23px 27px 19px;
+  border-bottom: 1px solid #edf0ee;
+}
+
+.featureScope :global(.dialog-kicker) {
+  color: #c04c1d;
+  font-size: 9px;
+  font-weight: 750;
+  letter-spacing: .12em;
+}
+
+.featureScope :global(.dialog-header h2) {
+  margin: 6px 0 4px;
+  font-family: Manrope,sans-serif;
+  font-size: 23px;
+  letter-spacing: -.045em;
+}
+
+.featureScope :global(.dialog-header p) {
+  margin: 0;
+  color: #7c8781;
+  font-size: 11px;
+}
+
+.featureScope :global(.close-dialog) {
+  font-size: 25px;
+}
+
+.featureScope :global(.sale-dialog-body) {
+  display: grid;
+  min-height: 0;
+  grid-template-columns: 1.02fr .98fr;
+  overflow: auto;
+}
+
+.featureScope :global(.sale-entry-column) {
+  min-width: 0;
+  padding: 20px 23px;
+  border-right: 1px solid #edf0ee;
+}
+
+.featureScope :global(.search-field) {
+  display: flex;
+  height: 42px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 11px;
+  border: 1px solid #dfe6e1;
+  border-radius: 8px;
+}
+
+.featureScope :global(.search-field>span) {
+  color: #89958e;
+  font-size: 19px;
+}
+
+.featureScope :global(.search-field input) {
+  width: 100%;
+  border: 0;
+  outline: none;
+  color: #27332d;
+  font-size: 11px;
+}
+
+.featureScope :global(.search-field input::placeholder) {
+  color: #a0a9a3;
+}
+
+.featureScope :global(.product-results) {
+  max-height: 310px;
+  overflow-y: auto;
+  margin-top: 13px;
+}
+
+.featureScope :global(.product-result) {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 6px;
+  border: 0;
+  border-bottom: 1px solid #f0f2f0;
+  background: white;
+  text-align: left;
+}
+
+.featureScope :global(.product-result:hover:not(:disabled)) {
+  background: #f8fbf9;
+}
+
+.featureScope :global(.product-glyph) {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  place-items: center;
+  border-radius: 9px;
+  background: #edf5f0;
+  color: #32856c;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.featureScope :global(.product-result-info) {
+  display: grid;
+  min-width: 0;
+  flex: 1;
+  gap: 4px;
+}
+
+.featureScope :global(.product-result-info strong) {
+  overflow: hidden;
+  color: #354139;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.featureScope :global(.product-result-info small) {
+  overflow: hidden;
+  color: #8a958e;
+  font-size: 9px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.featureScope :global(.product-result-price) {
+  color: #344239;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.featureScope :global(.add-product) {
+  display: grid;
+  width: 23px;
+  height: 23px;
+  place-items: center;
+  border-radius: 7px;
+  background: #f2f6f3;
+  color: #438a70;
+  font-size: 15px;
+}
+
+.featureScope :global(.empty-products),
+.featureScope :global(.inline-loading) {
+  padding: 28px 10px;
+  color: #89938d;
+  font-size: 11px;
+  text-align: center;
+}
+
+.featureScope :global(.sale-summary-column) {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: 20px 23px;
+}
+
+.featureScope :global(.cart-heading) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.featureScope :global(.cart-heading h3) {
+  margin: 0;
+  font-family: Manrope,sans-serif;
+  font-size: 13px;
+}
+
+.featureScope :global(.cart-heading>span) {
+  color: #89938d;
+  font-size: 10px;
+}
+
+.featureScope :global(.cart-lines) {
+  min-height: 96px;
+  max-height: 184px;
+  overflow: auto;
+  margin-top: 9px;
+}
+
+.featureScope :global(.cart-empty) {
+  display: grid;
+  min-height: 95px;
+  align-content: center;
+  justify-items: center;
+  gap: 4px;
+  border: 1px dashed #dfe6e1;
+  border-radius: 9px;
+  color: #818d85;
+}
+
+.featureScope :global(.cart-empty>span) {
+  color: #92a79b;
+  font-size: 21px;
+}
+
+.featureScope :global(.cart-empty strong) {
+  font-size: 10px;
+}
+
+.featureScope :global(.cart-empty small) {
+  font-size: 9px;
+}
+
+.featureScope :global(.cart-line) {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) auto auto;
+  align-items: center;
+  gap: 9px;
+  padding: 10px 2px;
+  border-bottom: 1px solid #eff1ef;
+}
+
+.featureScope :global(.cart-line-main) {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.featureScope :global(.cart-line-main strong) {
+  overflow: hidden;
+  color: #364139;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.featureScope :global(.cart-line-main small) {
+  color: #89938d;
+  font-size: 9px;
+}
+
+.featureScope :global(.quantity-control) {
+  display: flex;
+  height: 26px;
+  align-items: center;
+  border: 1px solid #e4e9e5;
+  border-radius: 6px;
+}
+
+.featureScope :global(.quantity-control button) {
+  width: 25px;
+  height: 24px;
+  border: 0;
+  background: transparent;
+  color: #627068;
+  font-size: 12px;
+}
+
+.featureScope :global(.quantity-control span) {
+  min-width: 17px;
+  color: #47544c;
+  font-size: 10px;
+  text-align: center;
+}
+
+.featureScope :global(.line-total) {
+  color: #364139;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.featureScope :global(.sale-fields) {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 11px;
+  margin: 14px 0;
+}
+
+.featureScope :global(.sale-fields label) {
+  display: grid;
+  min-width: 0;
+  gap: 5px;
+  color: #647168;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.featureScope :global(.sale-fields select),
+.featureScope :global(.sale-fields input) {
+  width: 100%;
+  height: 34px;
+  min-width: 0;
+  padding: 0 8px;
+  border: 1px solid #e1e7e2;
+  border-radius: 6px;
+  background: white;
+  color: #445149;
+  font-size: 9px;
+}
+
+.featureScope :global(.sale-fields select:focus),
+.featureScope :global(.sale-fields input:focus) {
+  border-color: #48a386;
+  outline: 2px solid #18866620;
+}
+
+.featureScope :global(.sale-totals) {
+  display: grid;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid #edf0ee;
+}
+
+.featureScope :global(.sale-totals>div) {
+  display: flex;
+  justify-content: space-between;
+  color: #7a857e;
+  font-size: 10px;
+}
+
+.featureScope :global(.sale-totals .grand-total) {
+  margin-top: 3px;
+  color: #25332b;
+  font-size: 15px;
+}
+
+.featureScope :global(.grand-total strong:last-child) {
+  font-family: Manrope,sans-serif;
+  font-size: 18px;
+  letter-spacing: -.03em;
+}
+
+.featureScope :global(.dialog-footer) {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+  padding: 14px 23px;
+  border-top: 1px solid #edf0ee;
+  background: #fbfcfb;
+}
+
+.featureScope :global(.dialog-footer .button-primary),
+.featureScope :global(.dialog-footer .button-secondary) {
+  min-height: 39px;
+  padding: 0 16px;
+  font-size: 11px;
+}
+
+.featureScope :global(.dialog-footer .button-primary) {
+  background: var(--orange);
+  border-color: var(--orange);
+}
+
+.featureScope :global(.dialog-footer .button-primary:hover) {
+  background: var(--orange-hover);
+}
+
+.featureScope :global(.confirm-card) {
+  width: min(380px,100%);
+  padding: 23px;
+  border: 1px solid #e7ece8;
+  border-radius: 13px;
+  background: white;
+  box-shadow: 0 18px 50px #0d211b3b;
+}
+
+.featureScope :global(.confirm-card h3) {
+  margin: 0 0 8px;
+  font-family: Manrope,sans-serif;
+  font-size: 17px;
+}
+
+.featureScope :global(.confirm-card p) {
+  margin: 0;
+  color: #77827b;
+  font-size: 11px;
+  line-height: 1.6;
+}
+
+.featureScope :global(.confirm-card>div) {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.featureScope :global(.confirm-card .button-primary) {
+  background: var(--orange);
+  border-color: var(--orange);
+  font-size: 10px;
+}
+
+.featureScope :global(.confirm-card .button-secondary) {
+  font-size: 10px;
+}
+
+.featureScope :global(.sale-dialog) {
+  width: 100%;
+  max-height: 94vh;
+  border-radius: 16px 16px 0 0;
+}
+
+.featureScope :global(.sale-dialog-body) {
+  grid-template-columns: 1fr;
+}
+
+.featureScope :global(.sale-entry-column) {
+  padding: 15px 18px;
+  border-right: 0;
+  border-bottom: 1px solid #edf0ee;
+}
+
+.featureScope :global(.product-results) {
+  max-height: 155px;
+}
+
+.featureScope :global(.sale-summary-column) {
+  padding: 15px 18px;
+}
+
+.featureScope :global(.cart-lines) {
+  max-height: 125px;
+}
+
+.featureScope :global(.sale-fields) {
+  gap: 8px;
+}
+
+.featureScope :global(.dialog-header) {
+  padding: 17px 19px;
+}
+
+.featureScope :global(.dialog-header h2) {
+  font-size: 20px;
+}
+
+.featureScope :global(.dialog-footer) {
+  padding: 11px 18px;
+}
+
+.featureScope :global(.sale-fields) {
+  grid-template-columns: 1fr 1fr;
+}
+
+.featureScope :global(.dialog-header p) {
+  font-size: 10px;
+}
+
+.featureScope :global(.sale-dialog) {
+  width: min(1180px, 100%);
+  max-height: min(860px, calc(100vh - 32px));
+}
+
+.featureScope :global(.dialog-header) {
+  padding: 25px 30px 21px;
+}
+
+.featureScope :global(.dialog-kicker) {
+  font-size: 11px;
+}
+
+.featureScope :global(.dialog-header h2) {
+  font-size: 27px;
+}
+
+.featureScope :global(.dialog-header p) {
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.featureScope :global(.sale-dialog-body) {
+  grid-template-columns: minmax(0, 1.04fr) minmax(0, 0.96fr);
+}
+
+.featureScope :global(.sale-entry-column),
+.featureScope :global(.sale-summary-column) {
+  padding: 24px 28px;
+}
+
+.featureScope :global(.search-field) {
+  height: 48px;
+  gap: 10px;
+  padding: 0 14px;
+}
+
+.featureScope :global(.search-field > span) {
+  font-size: 21px;
+}
+
+.featureScope :global(.search-field input) {
+  font-size: 14px;
+}
+
+.featureScope :global(.product-results) {
+  max-height: 350px;
+  margin-top: 15px;
+}
+
+.featureScope :global(.product-result) {
+  min-height: 68px;
+  gap: 12px;
+  padding: 12px 8px;
+}
+
+.featureScope :global(.product-glyph) {
+  width: 42px;
+  height: 42px;
+  font-size: 15px;
+}
+
+.featureScope :global(.product-result-info) {
+  gap: 5px;
+}
+
+.featureScope :global(.product-result-info strong) {
+  font-size: 14px;
+}
+
+.featureScope :global(.product-result-info small) {
+  font-size: 12px;
+}
+
+.featureScope :global(.product-result-price) {
+  font-size: 13px;
+}
+
+.featureScope :global(.add-product) {
+  width: 34px;
+  height: 34px;
+  font-size: 19px;
+}
+
+.featureScope :global(.empty-products),
+.featureScope :global(.inline-loading) {
+  font-size: 14px;
+}
+
+.featureScope :global(.cart-heading h3) {
+  font-size: 17px;
+}
+
+.featureScope :global(.cart-heading > span) {
+  font-size: 13px;
+}
+
+.featureScope :global(.cart-lines) {
+  max-height: 220px;
+  margin-top: 12px;
+}
+
+.featureScope :global(.cart-empty) {
+  min-height: 120px;
+  gap: 7px;
+}
+
+.featureScope :global(.cart-empty > span) {
+  font-size: 25px;
+}
+
+.featureScope :global(.cart-empty strong) {
+  font-size: 13px;
+}
+
+.featureScope :global(.cart-empty small) {
+  font-size: 12px;
+}
+
+.featureScope :global(.cart-line) {
+  gap: 12px;
+  padding: 13px 2px;
+}
+
+.featureScope :global(.cart-line-main) {
+  gap: 5px;
+}
+
+.featureScope :global(.cart-line-main strong) {
+  font-size: 13px;
+}
+
+.featureScope :global(.cart-line-main small) {
+  font-size: 12px;
+}
+
+.featureScope :global(.quantity-control) {
+  height: 34px;
+}
+
+.featureScope :global(.quantity-control button) {
+  width: 34px;
+  height: 32px;
+  font-size: 17px;
+}
+
+.featureScope :global(.quantity-control span) {
+  min-width: 24px;
+  font-size: 13px;
+}
+
+.featureScope :global(.line-total) {
+  font-size: 13px;
+}
+
+.featureScope :global(.sale-fields) {
+  gap: 13px 14px;
+  margin: 18px 0;
+}
+
+.featureScope :global(.sale-fields label) {
+  gap: 7px;
+  font-size: 12px;
+}
+
+.featureScope :global(.sale-fields select),
+.featureScope :global(.sale-fields input) {
+  height: 42px;
+  padding: 0 11px;
+  font-size: 13px;
+}
+
+.featureScope :global(.sale-totals) {
+  gap: 10px;
+  padding-top: 16px;
+}
+
+.featureScope :global(.sale-totals > div) {
+  font-size: 13px;
+}
+
+.featureScope :global(.sale-totals .grand-total) {
+  font-size: 17px;
+}
+
+.featureScope :global(.grand-total strong:last-child) {
+  font-size: 21px;
+}
+
+.featureScope :global(.dialog-footer) {
+  gap: 12px;
+  padding: 16px 28px;
+}
+
+.featureScope :global(.dialog-footer .button-primary),
+.featureScope :global(.dialog-footer .button-secondary) {
+  min-height: 46px;
+  padding: 0 18px;
+  font-size: 13px;
+}
+
+.featureScope :global(.confirm-card h3) {
+  font-size: 19px;
+}
+
+.featureScope :global(.confirm-card p) {
+  font-size: 14px;
+}
+
+.featureScope :global(.confirm-card .button-primary),
+.featureScope :global(.confirm-card .button-secondary) {
+  min-height: 42px;
+  padding: 0 14px;
+  font-size: 12px;
+}
+
+@media (max-width: 760px) {
+  .featureScope :global(.sale-dialog) {
+    max-height: 96vh;
+  }
+  .featureScope :global(.sale-dialog-body) {
+    grid-template-columns: 1fr;
+  }
+  .featureScope :global(.sale-entry-column),
+.featureScope :global(.sale-summary-column) {
+    padding: 20px;
+  }
+  .featureScope :global(.product-results) {
+    max-height: 220px;
+  }
+  .featureScope :global(.cart-lines) {
+    max-height: 190px;
+  }
+  .featureScope :global(.dialog-footer) {
+    padding: 14px 20px;
+  }
+}
+
+@media (max-width: 500px) {
+  .featureScope :global(.dialog-header) {
+    padding: 18px 20px 16px;
+  }
+  .featureScope :global(.dialog-header h2) {
+    font-size: 24px;
+  }
+  .featureScope :global(.dialog-header p) {
+    max-width: 30ch;
+    font-size: 13px;
+  }
+  .featureScope :global(.sale-entry-column),
+.featureScope :global(.sale-summary-column) {
+    padding: 17px 18px;
+  }
+  .featureScope :global(.sale-fields) {
+    grid-template-columns: 1fr;
+  }
+  .featureScope :global(.dialog-footer) {
+    gap: 8px;
+    padding: 12px 16px;
+  }
+  .featureScope :global(.dialog-footer .button-primary),
+.featureScope :global(.dialog-footer .button-secondary) {
+    flex: 1;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+}
+
+.featureScope :global(.sale-entry-column),
+.featureScope :global(.sale-summary-column) {
+  font-size: 14px;
+}
+
+.featureScope :global(.sale-dialog .search-field) {
+  min-height: 50px;
+}
+
+.featureScope :global(.sale-dialog .product-result-info strong) {
+  font-size: 15px;
+}
+
+.featureScope :global(.sale-dialog .product-result-info small),
+.featureScope :global(.sale-dialog .cart-line-main small),
+.featureScope :global(.sale-dialog .cart-empty small) {
+  font-size: 13px;
+}
+
+.featureScope :global(.sale-dialog .cart-line-main strong) {
+  font-size: 14px;
+}
+
+.featureScope :global(.sale-dialog .sale-fields label) {
+  font-size: 13px;
+}
+
+.featureScope :global(.sale-dialog .sale-fields select),
+.featureScope :global(.sale-dialog .sale-fields input) {
+  min-height: 46px;
+  font-size: 14px;
+}
+
+.featureScope :global(.sale-dialog .sale-totals > div) {
+  font-size: 14px;
+}
+
+.featureScope :global(.sale-dialog .sale-totals .grand-total) {
+  font-size: 18px;
+}
+
+.featureScope :global(.sale-dialog .grand-total strong:last-child) {
+  font-size: 23px;
+}
+
+.featureScope :global(.sale-dialog .dialog-footer .button-primary),
+.featureScope :global(.sale-dialog .dialog-footer .button-secondary) {
+  min-height: 48px;
+  font-size: 14px;
+}
+
+.featureScope :global(.sale-dialog .confirm-card p) {
+  font-size: 15px;
+}
+
+.featureScope :global(.sale-dialog .confirm-card .button-primary),
+.featureScope :global(.sale-dialog .confirm-card .button-secondary) {
+  min-height: 44px;
+  font-size: 13px;
+}
