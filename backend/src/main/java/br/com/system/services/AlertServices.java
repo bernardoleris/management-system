@@ -197,6 +197,7 @@ public class AlertServices {
         if (entity.getAdmin() != null) {
             dto.setAdminId(entity.getAdmin().getId());
             dto.setAdminLogin(entity.getAdmin().getLogin());
+            dto.setAdminName(entity.getAdmin().getUser().getFirstName() + " " + entity.getAdmin().getUser().getLastName());
         }
 
         return dto;

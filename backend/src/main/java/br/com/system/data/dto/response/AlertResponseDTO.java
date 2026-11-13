@@ -19,6 +19,7 @@ public class AlertResponseDTO implements Serializable {
     private String productName;
     private Long adminId;
     private String adminLogin;
+    private String adminName;
     private AlertType type;
     private Integer minimumQuantity;
     private String message;

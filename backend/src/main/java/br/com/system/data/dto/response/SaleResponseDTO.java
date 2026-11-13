@@ -26,6 +26,7 @@ public class SaleResponseDTO implements Serializable {
     private String notes;
     private Long adminId;
     private String adminLogin;
+    private String adminName;
     private Long clientId;
     private String clientDocumentNumber;
     private List<SaleItemResponseDTO> items;

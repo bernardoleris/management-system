@@ -298,6 +298,7 @@ public class SaleServices {
         if (entity.getAdmin() != null) {
             dto.setAdminId(entity.getAdmin().getId());
             dto.setAdminLogin(entity.getAdmin().getLogin());
+            dto.setAdminName(entity.getAdmin().getUser().getFirstName() + " " + entity.getAdmin().getUser().getLastName());
         }
 
         if (entity.getClient() != null) {

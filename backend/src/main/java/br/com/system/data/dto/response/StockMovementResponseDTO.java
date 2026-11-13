@@ -29,6 +29,7 @@ public class StockMovementResponseDTO implements Serializable {
 
     private Long adminId;
     private String adminLogin;
+    private String adminName;
 
     private Long supplierId;
     private String supplierTradeName;
