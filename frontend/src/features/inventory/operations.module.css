@@ -387,13 +387,15 @@
 }
 
 .featureScope :global(.movement-delete-button) {
-  border-color: #9d371b;
-  background: #9d371b;
-  color: white;
+  border-color: #f0c6c2;
+  background: #fff5f4;
+  color: #a32b21;
 }
 
 .featureScope :global(.movement-delete-button:hover) {
-  background: #842d17;
+  border-color: #e6aaa4;
+  background: #fde9e7;
+  color: #8f2118;
 }
 
 .featureScope :global(.alert-view-tabs) {
@@ -767,5 +769,64 @@
   }
   .featureScope :global(.alert-actions) {
     padding-left: 45px;
+  }
+}
+
+.featureScope :global(.movement-add-step) {
+  display: grid;
+  gap: 13px;
+  padding: 15px;
+  border: 1px solid #e2e9e4;
+  border-radius: 10px;
+  background: #f8fbf9;
+}
+
+.featureScope :global(.movement-add-step-heading) {
+  display: grid;
+  gap: 4px;
+}
+
+.featureScope :global(.movement-add-step-heading strong) {
+  color: #344139;
+  font-size: 13px;
+}
+
+.featureScope :global(.movement-add-step-heading small) {
+  color: #78847c;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.45;
+}
+
+.featureScope :global(.movement-add-step-controls) {
+  display: grid;
+  grid-template-columns: minmax(140px, .7fr) minmax(220px, 1fr);
+  align-items: end;
+  gap: 12px;
+}
+
+.featureScope :global(.movement-add-step-controls .button-primary) {
+  min-height: 44px;
+  white-space: nowrap;
+}
+
+@keyframes movement-item-arrive {
+  0% { transform: translateY(-4px); background: #e9f6ee; }
+  100% { transform: translateY(0); background: transparent; }
+}
+
+.featureScope :global(.movement-cart-item-added) {
+  animation: movement-item-arrive 1.2s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .featureScope :global(.movement-cart-item-added) {
+    animation: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .featureScope :global(.movement-add-step-controls) {
+    grid-template-columns: 1fr;
   }
 }

@@ -3,7 +3,7 @@ import '../styles/actions.css'
 import '../styles/password-flows.css'
 import './shell.css'
 import { useEffect } from 'react'
-import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
+import { BrowserRouter, Navigate, Outlet, Route, Routes, useLocation } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { AuthProvider, useAuth } from '../auth/AuthContext'
 import { AppShell } from './AppShell'
@@ -38,12 +38,12 @@ function LoginRoute() {
 
 function OverviewRoute() {
   const { session } = useAuth()
-  return session?.role === 'OPERATOR' ? <Navigate to="/sales" replace /> : <AppShell><OverviewPage /></AppShell>
+  return session?.role === 'OPERATOR' ? <Navigate to="/sales" replace /> : <OverviewPage />
 }
 
 function CatalogDataRoute() {
   const { session } = useAuth()
-  return session?.role === 'OPERATOR' ? <Navigate to="/sales" replace /> : <AppShell><CatalogDataPage /></AppShell>
+  return session?.role === 'OPERATOR' ? <Navigate to="/sales" replace /> : <CatalogDataPage />
 }
 
 function AppRoutes() {
@@ -61,14 +61,16 @@ function AppRoutes() {
       <Route path="/verify-email" element={<VerifyEmailPage />} />
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password" element={<ResetPasswordPage />} />
-      <Route path="/account/password" element={<RequireAuth><AppShell><ChangePasswordPage /></AppShell></RequireAuth>} />
       <Route path="/" element={<HomeRedirect />} />
-      <Route path="/overview" element={<RequireAuth><OverviewRoute /></RequireAuth>} />
-      <Route path="/sales" element={<RequireAuth><AppShell><SalesPage /></AppShell></RequireAuth>} />
-      <Route path="/products" element={<RequireAuth><AppShell><ProductsPage /></AppShell></RequireAuth>} />
-      <Route path="/stock-movements" element={<RequireAuth><AppShell><StockMovementsPage /></AppShell></RequireAuth>} />
-      <Route path="/alerts" element={<RequireAuth><AppShell><AlertsPage /></AppShell></RequireAuth>} />
-      <Route path="/catalog-data" element={<RequireAuth><CatalogDataRoute /></RequireAuth>} />
+      <Route element={<RequireAuth><AppShell><Outlet /></AppShell></RequireAuth>}>
+        <Route path="account/password" element={<ChangePasswordPage />} />
+        <Route path="overview" element={<OverviewRoute />} />
+        <Route path="sales" element={<SalesPage />} />
+        <Route path="products" element={<ProductsPage />} />
+        <Route path="stock-movements" element={<StockMovementsPage />} />
+        <Route path="alerts" element={<AlertsPage />} />
+        <Route path="catalog-data" element={<CatalogDataRoute />} />
+      </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

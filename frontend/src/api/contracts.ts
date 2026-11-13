@@ -123,6 +123,7 @@ export interface Sale {
   totalValue: number
   notes: string | null
   adminLogin: string
+  adminName: string | null
   clientId: number | null
   clientDocumentNumber: string | null
   items: SaleItem[]
@@ -151,6 +152,7 @@ export interface StockMovement {
   date: string
   adminId: number | null
   adminLogin: string | null
+  adminName: string | null
   supplierId: number | null
   supplierTradeName: string | null
   saleId: number | null
@@ -174,6 +176,7 @@ export interface StockAlert {
   productName: string
   adminId: number | null
   adminLogin: string | null
+  adminName: string | null
   type: AlertType
   minimumQuantity: number
   message: string

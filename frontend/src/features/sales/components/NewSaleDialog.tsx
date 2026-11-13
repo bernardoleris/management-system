@@ -16,6 +16,8 @@ export function NewSaleDialog({ open, onClose, onCompleted }: Props) {
   const [products, setProducts] = useState<Product[]>([])
   const [clients, setClients] = useState<Client[]>([])
   const [query, setQuery] = useState('')
+  const [selectedProductId, setSelectedProductId] = useState<number | null>(null)
+  const [selectedQuantity, setSelectedQuantity] = useState('1')
   const [cart, setCart] = useState<CartLine[]>([])
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('PIX')
   const [clientId, setClientId] = useState('')
@@ -55,16 +57,37 @@ export function NewSaleDialog({ open, onClose, onCompleted }: Props) {
   const subtotal = cart.reduce((sum, line) => sum + line.product.salePrice * line.quantity, 0)
   const discountValue = Math.min(Math.max(Number(discount) || 0, 0), subtotal)
   const total = Math.max(0, subtotal - discountValue)
+  const selectedProduct = products.find((product) => product.id === selectedProductId) ?? null
+  const selectedProductInCart = selectedProduct ? cart.find((line) => line.product.id === selectedProduct.id) : undefined
+  const selectedProductAvailable = selectedProduct ? Math.max(0, selectedProduct.quantity - (selectedProductInCart?.quantity ?? 0)) : 0
 
-  function addProduct(product: Product) {
+  function selectProduct(product: Product) {
     setError('')
     if (product.quantity < 1) { setError(`${product.name} está sem estoque disponível.`); return }
-    const existing = cart.find((line) => line.product.id === product.id)
-    if (existing && existing.quantity >= product.quantity) { setError(`Estoque disponível de ${product.name}: ${product.quantity}.`); return }
+    setSelectedProductId(product.id)
+    setSelectedQuantity('1')
+  }
+
+  function addSelectedProduct() {
+    if (!selectedProduct) return
+    const amount = Number(selectedQuantity)
+    if (!Number.isInteger(amount) || amount < 1) {
+      setError('Informe uma quantidade inteira maior que zero.')
+      return
+    }
+    if (amount > selectedProductAvailable) {
+      setError(`Você pediu ${amount} un. de ${selectedProduct.name}, mas só há ${selectedProductAvailable} un. disponíveis para adicionar.`)
+      return
+    }
+    setError('')
     setCart((current) => {
-      if (existing) return current.map((line) => line.product.id === product.id ? { ...line, quantity: Math.min(product.quantity, line.quantity + 1) } : line)
-      return [...current, { product, quantity: 1 }]
+      const existing = current.find((line) => line.product.id === selectedProduct.id)
+      if (existing) return current.map((line) => line.product.id === selectedProduct.id ? { ...line, quantity: line.quantity + amount } : line)
+      return [...current, { product: selectedProduct, quantity: amount }]
     })
+    setSelectedProductId(null)
+    setSelectedQuantity('1')
+    setQuery('')
   }
 
   async function lookupBarcode(event: FormEvent<HTMLFormElement>) {
@@ -73,7 +96,8 @@ export function NewSaleDialog({ open, onClose, onCompleted }: Props) {
     if (!barcode) return
     try {
       const product = await request<Product>(`/products/barcode/${encodeURIComponent(barcode)}`)
-      addProduct(product)
+      setProducts((current) => current.some((item) => item.id === product.id) ? current : [...current, product])
+      selectProduct(product)
       setQuery('')
     } catch (reason) {
       setError(reason instanceof ApiError ? reason.message : 'Produto não encontrado pelo código de barras.')
@@ -119,16 +143,21 @@ export function NewSaleDialog({ open, onClose, onCompleted }: Props) {
         <DialogHeader className="dialog-header"><div><span className="dialog-kicker">VENDA RÁPIDA</span><h2 id="sale-dialog-title">Nova venda</h2><p>Registre uma venda sem sair do que você estava fazendo.</p></div><button className="icon-button close-dialog" aria-label="Fechar venda" disabled={saving} onClick={onClose}>×</button></DialogHeader>
         <div className="sale-dialog-body">
           <div className="sale-entry-column">
-            <form className="product-search" onSubmit={(event) => void lookupBarcode(event)}><label htmlFor="product-search">Adicionar produto</label><div className="search-field"><span aria-hidden="true">⌕</span><input id="product-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Busque pelo nome ou leia o código" autoComplete="off" autoFocus /><button type="submit" className="sr-only">Buscar código de barras</button></div></form>
+            <form className="product-search" onSubmit={(event) => void lookupBarcode(event)}><label htmlFor="product-search">1. Busque e selecione um produto</label><div className="search-field"><span aria-hidden="true">⌕</span><input id="product-search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Busque pelo nome ou leia o código" autoComplete="off" autoFocus /><button type="submit" className="sr-only">Buscar código de barras</button></div></form>
             {error && <div className="form-alert" role="alert">{error}</div>}
             {success && <div className="form-success" role="status">{success}</div>}
             <div className="product-results" aria-live="polite">
-              {loading ? <div className="inline-loading">Carregando catálogo…</div> : filteredProducts.length ? filteredProducts.map((product) => <button className="product-result" key={product.id} onClick={() => addProduct(product)} disabled={product.quantity < 1}><span className="product-glyph">{product.name.slice(0, 1).toUpperCase()}</span><span className="product-result-info"><strong>{product.name}</strong><small>{product.quantity} em estoque{product.barcode ? ` · ${product.barcode}` : ''}</small></span><span className="product-result-price">{money.format(product.salePrice)}</span><span className="add-product" aria-hidden="true">＋</span></button>) : <div className="empty-products">{products.length ? 'Nenhum produto corresponde à busca.' : 'Nenhum produto ativo disponível.'}</div>}
+              {loading ? <div className="inline-loading">Carregando catálogo…</div> : filteredProducts.length ? filteredProducts.map((product) => <button className={`product-result ${selectedProductId === product.id ? 'product-result-selected' : ''}`} key={product.id} type="button" aria-pressed={selectedProductId === product.id} onClick={() => selectProduct(product)} disabled={product.quantity < 1}><span className="product-glyph">{product.name.slice(0, 1).toUpperCase()}</span><span className="product-result-info"><strong>{product.name}</strong><small>{product.quantity} un. disponíveis{product.barcode ? ` · ${product.barcode}` : ''}</small></span><span className="product-result-price">{money.format(product.salePrice)}</span><span className="add-product">{selectedProductId === product.id ? 'Selecionado' : 'Selecionar'}</span></button>) : <div className="empty-products">{products.length ? 'Nenhum produto corresponde à busca.' : 'Nenhum produto ativo disponível.'}</div>}
             </div>
+            <section className={`product-selection ${selectedProduct ? 'product-selection-active' : ''}`} aria-label="Quantidade do produto selecionado">
+              <div className="product-selection-heading"><strong>2. Defina a quantidade</strong><small>{selectedProduct ? `${selectedProductAvailable} un. disponíveis para adicionar` : 'Selecione um produto na lista acima'}</small></div>
+              {selectedProduct && <div className="selected-product-summary"><span><strong>{selectedProduct.name}</strong><small>{money.format(selectedProduct.salePrice)} por unidade</small></span><label htmlFor="selected-product-quantity">Quantidade<input id="selected-product-quantity" type="number" min="1" max={selectedProductAvailable} step="1" value={selectedQuantity} onChange={(event) => setSelectedQuantity(event.target.value)} disabled={selectedProductAvailable < 1} /></label></div>}
+              <button className="button-primary add-to-cart-button" type="button" disabled={!selectedProduct || selectedProductAvailable < 1 || !Number.isInteger(Number(selectedQuantity)) || Number(selectedQuantity) < 1 || Number(selectedQuantity) > selectedProductAvailable} onClick={addSelectedProduct}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M3 4h2l2.1 11.1h10.8L20 8H6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><circle cx="9" cy="19" r="1.2" fill="currentColor"/><circle cx="17" cy="19" r="1.2" fill="currentColor"/></svg>Adicionar ao carrinho</button>
+            </section>
           </div>
           <div className="sale-summary-column">
-            <div className="cart-heading"><h3>Itens da venda</h3><span>{cart.reduce((count, line) => count + line.quantity, 0)} itens</span></div>
-            <div className="cart-lines">{cart.length === 0 ? <div className="cart-empty"><span aria-hidden="true">▱</span><strong>Seu carrinho está vazio</strong><small>Escolha um produto para começar.</small></div> : cart.map(({ product, quantity }) => <div className="cart-line" key={product.id}><div className="cart-line-main"><strong>{product.name}</strong><small>{money.format(product.salePrice)} cada</small></div><div className="quantity-control"><button aria-label={`Diminuir ${product.name}`} onClick={() => updateQuantity(product.id, quantity - 1)}>−</button><span>{quantity}</span><button aria-label={`Aumentar ${product.name}`} disabled={quantity >= product.quantity} onClick={() => updateQuantity(product.id, quantity + 1)}>＋</button></div><strong className="line-total">{money.format(product.salePrice * quantity)}</strong></div>)}</div>
+            <div className="cart-heading"><h3><svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M3 4h2l2.1 11.1h10.8L20 8H6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/><circle cx="9" cy="19" r="1.2" fill="currentColor"/><circle cx="17" cy="19" r="1.2" fill="currentColor"/></svg>Carrinho da venda</h3><span>{cart.reduce((count, line) => count + line.quantity, 0)} itens</span></div>
+            <div className="cart-lines">{cart.length === 0 ? <div className="cart-empty"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none"><path d="M3 4h2l2.1 11.1h10.8L20 8H6" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/><circle cx="9" cy="19" r="1.2" fill="currentColor"/><circle cx="17" cy="19" r="1.2" fill="currentColor"/></svg><strong>Seu carrinho está vazio</strong><small>Escolha um produto para começar.</small></div> : cart.map(({ product, quantity }) => <div className="cart-line" key={product.id}><div className="cart-line-main"><strong>{product.name}</strong><small>{money.format(product.salePrice)} cada</small></div><div className="quantity-control"><button aria-label={`Diminuir ${product.name}`} onClick={() => updateQuantity(product.id, quantity - 1)}>−</button><span>{quantity}</span><button aria-label={`Aumentar ${product.name}`} disabled={quantity >= product.quantity} onClick={() => updateQuantity(product.id, quantity + 1)}>＋</button></div><strong className="line-total">{money.format(product.salePrice * quantity)}</strong></div>)}</div>
             <div className="sale-fields"><label>Cliente <select value={clientId} onChange={(event) => setClientId(event.target.value)}><option value="">Consumidor não identificado</option>{clients.map((client) => <option key={client.id} value={client.id}>{client.user.firstName} {client.user.lastName} · {client.documentNumber}</option>)}</select></label><label>Pagamento <select value={paymentMethod} onChange={(event) => setPaymentMethod(event.target.value as PaymentMethod)}>{Object.entries(paymentLabels).map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label><label>Desconto (R$) <input type="number" min="0" max={subtotal} step="0.01" value={discount} onChange={(event) => setDiscount(event.target.value)} /></label><label>Observação <input maxLength={200} value={notes} onChange={(event) => setNotes(event.target.value)} placeholder="Opcional" /></label></div>
             <div className="sale-totals"><div><span>Subtotal</span><span>{money.format(subtotal)}</span></div><div><span>Desconto</span><span>− {money.format(discountValue)}</span></div><div className="grand-total"><strong>Total</strong><strong>{money.format(total)}</strong></div></div>
           </div>

@@ -34,8 +34,8 @@
 .reference-form input:focus { border-color: #3b9e7f; box-shadow: 0 0 0 3px #1886661b; outline: none; }
 .reference-form > label small { color: #78847c; font-size: 12px; font-weight: 400; text-align: right; }
 .reference-form .form-alert { margin: 0 28px 16px; }
-.reference-delete-button { border-color: #9d371b; background: #9d371b; color: white; }
-.reference-delete-button:hover { border-color: #842d17; background: #842d17; }
+.reference-delete-button { border-color: #f0c6c2; background: #fff5f4; color: #a32b21; }
+.reference-delete-button:hover { border-color: #e6aaa4; background: #fde9e7; color: #8f2118; }
 .catalog-data-page button:focus-visible { outline: 3px solid #16826755; outline-offset: 2px; }
 @media (max-width: 900px) {
   .catalog-data-table-wrap { display: none; }

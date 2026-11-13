@@ -178,7 +178,7 @@ export function ProductsPage() {
         {canEditProducts && <>
           <button className={cx('text-action')} type="button" onClick={() => setFormProduct(product)}>Editar</button>
           <button
-            className={cx('text-action', product.active && 'text-action-muted')}
+            className={cx('text-action', product.active && 'text-action-danger')}
             type="button"
             disabled={changingProductId === product.id}
             onClick={() => product.active ? setProductToDeactivate(product) : void toggleProduct(product)}
@@ -337,7 +337,7 @@ export function ProductsPage() {
           <DialogConfirmationIcon>!</DialogConfirmationIcon>
           <h2 id="deactivate-title">Desativar produto?</h2>
           <p id="deactivate-description"><strong>{productToDeactivate.name}</strong> deixará de aparecer nas novas vendas. Você pode reativá-lo depois.</p>
-          <DialogFooter><button className={cx('button-secondary')} type="button" onClick={() => setProductToDeactivate(null)}>Cancelar</button><button className={cx('button-primary product-deactivate-confirm')} type="button" disabled={changingProductId === productToDeactivate.id} onClick={() => void toggleProduct(productToDeactivate)}>{changingProductId === productToDeactivate.id ? 'Desativando…' : 'Desativar produto'}</button></DialogFooter>
+          <DialogFooter><button className={cx('button-secondary')} type="button" onClick={() => setProductToDeactivate(null)}>Cancelar</button><button className={cx('button-primary button-danger product-deactivate-confirm')} type="button" disabled={changingProductId === productToDeactivate.id} onClick={() => void toggleProduct(productToDeactivate)}>{changingProductId === productToDeactivate.id ? 'Desativando…' : 'Desativar produto'}</button></DialogFooter>
       </Dialog>}
     </section>
   )

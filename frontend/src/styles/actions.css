@@ -21,3 +21,23 @@
 .text-action-muted {
   color: #7b6750;
 }
+
+.text-action.text-action-danger {
+  color: #b42318;
+}
+
+.text-action.text-action-danger:hover:not(:disabled) {
+  color: #8f2118;
+}
+
+.button-primary.button-danger {
+  border: 1px solid #e8b8b3;
+  background: #fff5f4;
+  color: #a32b21;
+}
+
+.button-primary.button-danger:hover:not(:disabled) {
+  border-color: #d9958e;
+  background: #fde9e7;
+  color: #8f2118;
+}

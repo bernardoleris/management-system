@@ -1,11 +1,13 @@
-import { useEffect, useState, type PropsWithChildren } from 'react'
+import { useCallback, useEffect, useRef, useState, type PropsWithChildren } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { ApiError } from '../api/http'
-import type { AvailableCompany } from '../api/contracts'
+import type { AvailableCompany, StockAlert } from '../api/contracts'
 import { useAuth } from '../auth/AuthContext'
 import { NewSaleDialog } from '../features/sales/components/NewSaleDialog'
 import { Dialog, DialogConfirmationIcon, DialogFooter } from '../shared/ui/Dialog'
 import './notifications.css'
+
+const notificationDate = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
 
 export function AppShell({ children }: PropsWithChildren) {
   const { session, logout, loadCompanies, switchCompany } = useAuth()
@@ -18,7 +20,48 @@ export function AppShell({ children }: PropsWithChildren) {
   const [companyError, setCompanyError] = useState('')
   const [switching, setSwitching] = useState(false)
   const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const [notificationsClosing, setNotificationsClosing] = useState(false)
   const [unreadAlerts, setUnreadAlerts] = useState(0)
+  const [unreadAlertItems, setUnreadAlertItems] = useState<StockAlert[]>([])
+  const [recentAlertIds, setRecentAlertIds] = useState<number[]>([])
+  const [notificationsLoading, setNotificationsLoading] = useState(true)
+  const [notificationError, setNotificationError] = useState('')
+  const [busyAlertId, setBusyAlertId] = useState<number | null>(null)
+  const notificationAnchorRef = useRef<HTMLDivElement>(null)
+  const notificationButtonRef = useRef<HTMLButtonElement>(null)
+  const notificationCloseTimeoutRef = useRef<number | null>(null)
+  const alertHighlightTimeoutRef = useRef<number | null>(null)
+
+  const openNotifications = useCallback(() => {
+    if (notificationCloseTimeoutRef.current !== null) {
+      window.clearTimeout(notificationCloseTimeoutRef.current)
+      notificationCloseTimeoutRef.current = null
+    }
+    setNotificationsClosing(false)
+    setNotificationsOpen(true)
+  }, [])
+
+  const closeNotifications = useCallback((restoreFocus = false) => {
+    if (notificationCloseTimeoutRef.current !== null) window.clearTimeout(notificationCloseTimeoutRef.current)
+    setNotificationsOpen(false)
+    const exitDelay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 150
+    setNotificationsClosing(exitDelay > 0)
+    notificationCloseTimeoutRef.current = window.setTimeout(() => {
+      setNotificationsClosing(false)
+      notificationCloseTimeoutRef.current = null
+    }, exitDelay)
+    if (restoreFocus) window.requestAnimationFrame(() => notificationButtonRef.current?.focus())
+  }, [])
+
+  const toggleNotifications = useCallback(() => {
+    if (notificationsOpen) closeNotifications()
+    else openNotifications()
+  }, [closeNotifications, notificationsOpen, openNotifications])
+
+  useEffect(() => () => {
+    if (notificationCloseTimeoutRef.current !== null) window.clearTimeout(notificationCloseTimeoutRef.current)
+    if (alertHighlightTimeoutRef.current !== null) window.clearTimeout(alertHighlightTimeoutRef.current)
+  }, [])
 
   useEffect(() => {
     let active = true
@@ -28,12 +71,62 @@ export function AppShell({ children }: PropsWithChildren) {
 
   useEffect(() => {
     let active = true
-    const refreshAlerts = () => request<unknown[]>('/alerts/unread').then((items) => { if (active) setUnreadAlerts(items.length) }).catch(() => { if (active) setUnreadAlerts(0) })
+    let knownAlertIds: Set<number> | null = null
+    setNotificationsLoading(true)
+    setUnreadAlertItems([])
+    setUnreadAlerts(0)
+    setNotificationError('')
+    const refreshAlerts = async () => {
+      try {
+        const items = await request<StockAlert[]>('/alerts/unread')
+        if (!active) return
+        const newAlerts = knownAlertIds === null ? [] : items.filter((item) => !knownAlertIds?.has(item.id))
+        const shouldOpen = knownAlertIds === null ? items.length > 0 : newAlerts.length > 0
+        knownAlertIds = new Set(items.map((item) => item.id))
+        setUnreadAlertItems([...items].sort((first, second) => new Date(second.createdAt).getTime() - new Date(first.createdAt).getTime()))
+        setUnreadAlerts(items.length)
+        setNotificationError('')
+        if (newAlerts.length) {
+          setRecentAlertIds(newAlerts.map((item) => item.id))
+          if (alertHighlightTimeoutRef.current !== null) window.clearTimeout(alertHighlightTimeoutRef.current)
+          alertHighlightTimeoutRef.current = window.setTimeout(() => {
+            setRecentAlertIds([])
+            alertHighlightTimeoutRef.current = null
+          }, 1800)
+        }
+        if (shouldOpen) openNotifications()
+      } catch {
+        if (active) {
+          setNotificationError('Não foi possível carregar os alertas.')
+          setUnreadAlertItems([])
+          setUnreadAlerts(0)
+        }
+      } finally {
+        if (active) setNotificationsLoading(false)
+      }
+    }
     void refreshAlerts()
+    const intervalId = window.setInterval(() => { void refreshAlerts() }, 30_000)
     const onAlertsChanged = () => { void refreshAlerts() }
     window.addEventListener('estocai:alerts-changed', onAlertsChanged)
-    return () => { active = false; window.removeEventListener('estocai:alerts-changed', onAlertsChanged) }
-  }, [request, session?.companyId])
+    return () => { active = false; window.clearInterval(intervalId); window.removeEventListener('estocai:alerts-changed', onAlertsChanged) }
+  }, [openNotifications, request, session?.companyId])
+
+  useEffect(() => {
+    if (!notificationsOpen) return
+    function onPointerDown(event: PointerEvent) {
+      if (event.target instanceof Node && !notificationAnchorRef.current?.contains(event.target)) closeNotifications()
+    }
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') closeNotifications(true)
+    }
+    document.addEventListener('pointerdown', onPointerDown)
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown)
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [closeNotifications, notificationsOpen])
 
   useEffect(() => {
     const openSale = () => setSaleOpen(true)
@@ -63,6 +156,21 @@ export function AppShell({ children }: PropsWithChildren) {
     navigate('/login', { replace: true })
   }
 
+  async function markAlertRead(alert: StockAlert) {
+    setBusyAlertId(alert.id)
+    setNotificationError('')
+    try {
+      await request<StockAlert>(`/alerts/${alert.id}/read`, { method: 'PATCH' })
+      setUnreadAlertItems((items) => items.filter((item) => item.id !== alert.id))
+      setUnreadAlerts((count) => Math.max(0, count - 1))
+      window.dispatchEvent(new Event('estocai:alerts-changed'))
+    } catch (error) {
+      setNotificationError(error instanceof ApiError ? error.message : 'Não foi possível marcar o alerta como lido.')
+    } finally {
+      setBusyAlertId(null)
+    }
+  }
+
   return (
     <div className="app-frame">
       <aside className="sidebar">
@@ -87,7 +195,36 @@ export function AppShell({ children }: PropsWithChildren) {
         <div className="sidebar-user"><div className="avatar">{session?.login.slice(0, 1).toUpperCase()}</div><div className="user-meta"><strong>{session?.login}</strong><span>{session?.role === 'COMPANY_OWNER' ? 'Proprietário' : session?.role === 'ADMIN' ? 'Administrador' : 'Operador'}</span></div><button className="icon-button logout-button" aria-label="Sair da conta" onClick={() => setLogoutConfirmOpen(true)}>↪</button></div>
       </aside>
       <main className="main-area">
-        <header className="topbar"><div className="mobile-brand"><span className="brand-mark">e</span> estocaí</div><div className="topbar-company">{session?.companyName}</div><div className="notification-anchor"><button className="notification-button" aria-label={`Alertas${unreadAlerts ? `, ${unreadAlerts} não lidos` : ''}`} aria-expanded={notificationsOpen} onClick={() => setNotificationsOpen((value) => !value)}><span aria-hidden="true">♧</span>{unreadAlerts > 0 && <i aria-label={`${unreadAlerts} alertas não lidos`} />}</button>{notificationsOpen && <section className="notification-popover" aria-label="Central de alertas"><div><strong>Alertas de estoque</strong><button className="icon-button" aria-label="Fechar alertas" onClick={() => setNotificationsOpen(false)}>×</button></div><p>{unreadAlerts ? `Você tem ${unreadAlerts} ${unreadAlerts === 1 ? 'alerta não lido' : 'alertas não lidos'}.` : 'Não há alertas não lidos.'}</p><button className="notification-link" onClick={() => { setNotificationsOpen(false); navigate('/alerts') }}>Abrir alertas</button></section>}</div></header>
+        <header className="topbar">
+          <div className="mobile-brand"><span className="brand-mark">e</span> estocaí</div>
+          <div className="topbar-company">{session?.companyName}</div>
+          <div className="notification-anchor" ref={notificationAnchorRef}>
+            <button ref={notificationButtonRef} className={`notification-button${recentAlertIds.length ? ' notification-button-new' : ''}`} aria-label={`Alertas${unreadAlerts ? `, ${unreadAlerts} não lidos` : ''}`} aria-expanded={notificationsOpen} aria-controls="notification-popover" onClick={toggleNotifications}>
+              <span aria-hidden="true">♧</span>
+              {unreadAlerts > 0 && <i aria-label={`${unreadAlerts} alertas não lidos`} />}
+            </button>
+            {(notificationsOpen || notificationsClosing) && <section id="notification-popover" className={`notification-popover${notificationsClosing ? ' notification-popover-closing' : ''}`} aria-label="Central de alertas" aria-live="polite" aria-hidden={notificationsClosing}>
+              <div className="notification-popover-header">
+                <strong>Alertas de estoque</strong>
+                <button className="icon-button" aria-label="Fechar alertas" onClick={() => closeNotifications(true)}>×</button>
+              </div>
+              {notificationError && <p className="notification-error" role="alert">{notificationError}</p>}
+              {notificationsLoading ? <p role="status">Carregando alertas…</p> : unreadAlertItems.length ? <>
+                <p className="notification-summary">{unreadAlerts} {unreadAlerts === 1 ? 'alerta não lido' : 'alertas não lidos'}</p>
+                <ul className="notification-list">
+                  {unreadAlertItems.slice(0, 5).map((alert) => <li className={recentAlertIds.includes(alert.id) ? 'notification-item-new' : undefined} key={alert.id}>
+                    <div className="notification-item-heading"><strong>{alert.productName}</strong><span className={alert.type === 'OUT_OF_STOCK' ? 'notification-kind notification-kind-empty' : 'notification-kind'}>{alert.type === 'OUT_OF_STOCK' ? 'Sem estoque' : 'Estoque baixo'}</span></div>
+                    <p>{alert.message}</p>
+                    <small>{alert.minimumQuantity} un. · {notificationDate.format(new Date(alert.createdAt))}</small>
+                    <button className="notification-mark-read" disabled={busyAlertId === alert.id} onClick={() => void markAlertRead(alert)}>{busyAlertId === alert.id ? 'Salvando…' : 'Marcar como lido'}</button>
+                  </li>)}
+                </ul>
+                {unreadAlerts > 5 && <small className="notification-more">Mais {unreadAlerts - 5} alertas não lidos</small>}
+              </> : <p>Não há alertas não lidos.</p>}
+              <button className="notification-link" onClick={() => { closeNotifications(); navigate('/alerts') }}>Abrir central de alertas</button>
+            </section>}
+          </div>
+        </header>
         <div className="page-content">{children}</div>
       </main>
       <button className="global-sale-button" type="button" onClick={() => setSaleOpen(true)}><span aria-hidden="true">＋</span> Nova venda</button>
@@ -98,7 +235,7 @@ export function AppShell({ children }: PropsWithChildren) {
         <p id="logout-confirm-description">Sua sessão será encerrada. Você poderá entrar novamente quando quiser.</p>
         <DialogFooter>
           <button className="button-secondary" type="button" disabled={loggingOut} onClick={() => setLogoutConfirmOpen(false)}>Continuar conectado</button>
-          <button className="button-primary" type="button" disabled={loggingOut} onClick={() => void onLogout()}>{loggingOut ? 'Saindo…' : 'Sair da conta'}</button>
+          <button className="button-primary logout-confirm-button" type="button" disabled={loggingOut} onClick={() => void onLogout()}>{loggingOut ? 'Saindo…' : 'Sair da conta'}</button>
         </DialogFooter>
       </Dialog>}
     </div>

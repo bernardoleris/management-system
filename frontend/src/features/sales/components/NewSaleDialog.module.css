@@ -756,6 +756,149 @@
   font-size: 14px;
 }
 
+.featureScope :global(.product-results) {
+  max-height: 245px;
+}
+
+.featureScope :global(.product-result-selected) {
+  background: #f0f8f3;
+  box-shadow: inset 3px 0 #168365;
+}
+
+.featureScope :global(.product-result:focus-visible) {
+  position: relative;
+  z-index: 1;
+  outline: 3px solid #85c9ad;
+  outline-offset: -3px;
+}
+
+.featureScope :global(.add-product) {
+  width: auto;
+  min-width: 66px;
+  height: 30px;
+  padding: 0 9px;
+  background: #f1f5f2;
+  color: #276b53;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.featureScope :global(.product-selection) {
+  display: grid;
+  gap: 12px;
+  margin-top: 13px;
+  padding: 14px;
+  border: 1px solid #e5ebe7;
+  border-radius: 10px;
+  background: #f9fbfa;
+}
+
+.featureScope :global(.product-selection-active) {
+  border-color: #badbc9;
+  background: #f4faf6;
+}
+
+.featureScope :global(.product-selection-heading) {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.featureScope :global(.product-selection-heading strong) {
+  color: #344139;
+  font-size: 12px;
+}
+
+.featureScope :global(.product-selection-heading small),
+.featureScope :global(.selected-product-summary small) {
+  color: #758179;
+  font-size: 10px;
+}
+
+.featureScope :global(.selected-product-summary) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.featureScope :global(.selected-product-summary > span) {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.featureScope :global(.selected-product-summary > span strong) {
+  overflow: hidden;
+  color: #29372f;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.featureScope :global(.selected-product-summary label) {
+  display: grid;
+  flex: none;
+  gap: 4px;
+  color: #536158;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.featureScope :global(.selected-product-summary input) {
+  width: 88px;
+  min-height: 38px;
+  padding: 0 9px;
+  border: 1px solid #d6e1da;
+  border-radius: 7px;
+  background: #fff;
+  color: #29372f;
+  font: inherit;
+  font-size: 13px;
+}
+
+.featureScope :global(.add-to-cart-button) {
+  display: flex;
+  width: 100%;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+}
+
+.featureScope :global(.add-to-cart-button svg),
+.featureScope :global(.cart-heading svg) {
+  width: 19px;
+  height: 19px;
+  flex: none;
+}
+
+.featureScope :global(.cart-heading h3) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.featureScope :global(.cart-heading svg) {
+  color: #248063;
+}
+
+.featureScope :global(.cart-empty svg) {
+  width: 26px;
+  height: 26px;
+  margin-bottom: 3px;
+}
+
+@media (max-width: 760px) {
+  .featureScope :global(.product-selection-heading) {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
 .featureScope :global(.sale-dialog .sale-fields label) {
   font-size: 13px;
 }

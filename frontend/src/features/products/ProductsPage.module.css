@@ -507,13 +507,15 @@
 }
 
 .product-deactivate-confirm {
-  border-color: #9d371b;
-  background: #9d371b;
-  color: white;
+  border-color: #f0c6c2;
+  background: #fff5f4;
+  color: #a32b21;
 }
 
 .product-deactivate-confirm:hover {
-  background: #842d17;
+  border-color: #e6aaa4;
+  background: #fde9e7;
+  color: #8f2118;
 }
 
 @media (max-width: 900px) {
