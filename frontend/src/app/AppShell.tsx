@@ -1,13 +1,31 @@
-import { useCallback, useEffect, useRef, useState, type PropsWithChildren } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState, type PropsWithChildren } from 'react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import { ApiError } from '../api/http'
 import type { AvailableCompany, StockAlert } from '../api/contracts'
 import { useAuth } from '../auth/AuthContext'
+import { applyPreferences, clearAppliedPreferences, readPreferences } from '../features/account/preferences'
 import { NewSaleDialog } from '../features/sales/components/NewSaleDialog'
 import { Dialog, DialogConfirmationIcon, DialogFooter } from '../shared/ui/Dialog'
+import { ThemedSelect } from '../shared/ui/ThemedSelect'
 import './notifications.css'
 
 const notificationDate = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
+
+type NavIconName = 'overview' | 'analytics' | 'products' | 'catalog' | 'sales' | 'movements' | 'alerts' | 'clients' | 'suppliers'
+
+function NavIcon({ name }: { name: NavIconName }) {
+  return <svg className="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false">
+    {name === 'overview' && <><rect x="3.5" y="3.5" width="7" height="7" rx="1.5" /><rect x="13.5" y="3.5" width="7" height="7" rx="1.5" /><rect x="3.5" y="13.5" width="7" height="7" rx="1.5" /><rect x="13.5" y="13.5" width="7" height="7" rx="1.5" /></>}
+    {name === 'analytics' && <><path d="M4 19.5h16" /><path d="M7 16V11m5 5V5m5 11V8" /><path d="m5.5 8.5 5-3 5 2 3-3" /></>}
+    {name === 'products' && <><path d="m12 3 8.5 4.5v9L12 21l-8.5-4.5v-9L12 3Z" /><path d="m3.8 7.7 8.2 4.5 8.2-4.5M12 12.2V21" /></>}
+    {name === 'catalog' && <><path d="m12 3 8.5 4.5L12 12 3.5 7.5 12 3Z" /><path d="m3.5 12 8.5 4.5 8.5-4.5M3.5 16.5 12 21l8.5-4.5" /></>}
+    {name === 'sales' && <><path d="M6 3.5h12v17l-3-2-3 2-3-2-3 2v-17Z" /><path d="M9 8h6M9 12h6M9 16h3" /></>}
+    {name === 'movements' && <><path d="M7 4v15m0 0-4-4m4 4 4-4M17 20V5m0 0-4 4m4-4 4 4" /></>}
+    {name === 'alerts' && <><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" /></>}
+    {name === 'clients' && <><circle cx="9" cy="8" r="3.2" /><path d="M3.5 20v-1.5a5.5 5.5 0 0 1 11 0V20M16 5.2a3.2 3.2 0 0 1 0 6.2m1.2 3a5 5 0 0 1 3.3 4.7V20" /></>}
+    {name === 'suppliers' && <><path d="M3 6h11v11H3zM14 10h4l3 3v4h-7z" /><circle cx="7" cy="18" r="1.8" /><circle cx="18" cy="18" r="1.8" /></>}
+  </svg>
+}
 
 export function AppShell({ children }: PropsWithChildren) {
   const { session, logout, loadCompanies, switchCompany } = useAuth()
@@ -27,8 +45,10 @@ export function AppShell({ children }: PropsWithChildren) {
   const [notificationsLoading, setNotificationsLoading] = useState(true)
   const [notificationError, setNotificationError] = useState('')
   const [busyAlertId, setBusyAlertId] = useState<number | null>(null)
+  const [profileMenuOpen, setProfileMenuOpen] = useState(false)
   const notificationAnchorRef = useRef<HTMLDivElement>(null)
   const notificationButtonRef = useRef<HTMLButtonElement>(null)
+  const profileAnchorRef = useRef<HTMLDivElement>(null)
   const notificationCloseTimeoutRef = useRef<number | null>(null)
   const alertHighlightTimeoutRef = useRef<number | null>(null)
 
@@ -44,7 +64,8 @@ export function AppShell({ children }: PropsWithChildren) {
   const closeNotifications = useCallback((restoreFocus = false) => {
     if (notificationCloseTimeoutRef.current !== null) window.clearTimeout(notificationCloseTimeoutRef.current)
     setNotificationsOpen(false)
-    const exitDelay = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 150
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.dataset.reducedMotion === 'true'
+    const exitDelay = prefersReducedMotion ? 0 : 150
     setNotificationsClosing(exitDelay > 0)
     notificationCloseTimeoutRef.current = window.setTimeout(() => {
       setNotificationsClosing(false)
@@ -68,6 +89,17 @@ export function AppShell({ children }: PropsWithChildren) {
     loadCompanies().then((items) => { if (active) setCompanies(items) }).catch(() => undefined)
     return () => { active = false }
   }, [loadCompanies])
+
+  useLayoutEffect(() => {
+    if (!session) return
+    applyPreferences(readPreferences(session.login))
+    return clearAppliedPreferences
+  }, [session?.login])
+
+  useEffect(() => {
+    if (!session) return
+    setCompanies((items) => items.map((company) => company.companyId === session.companyId ? { ...company, companyName: session.companyName } : company))
+  }, [session?.companyId, session?.companyName])
 
   useEffect(() => {
     let active = true
@@ -129,6 +161,25 @@ export function AppShell({ children }: PropsWithChildren) {
   }, [closeNotifications, notificationsOpen])
 
   useEffect(() => {
+    if (!profileMenuOpen) return
+    function onPointerDown(event: PointerEvent) {
+      if (event.target instanceof Node && !profileAnchorRef.current?.contains(event.target)) setProfileMenuOpen(false)
+    }
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setProfileMenuOpen(false)
+        profileAnchorRef.current?.querySelector<HTMLButtonElement>('.profile-trigger')?.focus()
+      }
+    }
+    document.addEventListener('pointerdown', onPointerDown)
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown)
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [profileMenuOpen])
+
+  useEffect(() => {
     const openSale = () => setSaleOpen(true)
     window.addEventListener('estocai:open-sale', openSale)
     return () => window.removeEventListener('estocai:open-sale', openSale)
@@ -137,6 +188,7 @@ export function AppShell({ children }: PropsWithChildren) {
   async function onCompanyChange(companyId: number) {
     if (companyId === session?.companyId) return
     setCompanyError('')
+    setProfileMenuOpen(false)
     setSwitching(true)
     try {
       await switchCompany(companyId)
@@ -155,6 +207,8 @@ export function AppShell({ children }: PropsWithChildren) {
     setLogoutConfirmOpen(false)
     navigate('/login', { replace: true })
   }
+
+  const roleLabel = session?.role === 'COMPANY_OWNER' ? 'Proprietário' : session?.role === 'ADMIN' ? 'Administrador' : 'Operador'
 
   async function markAlertRead(alert: StockAlert) {
     setBusyAlertId(alert.id)
@@ -178,21 +232,25 @@ export function AppShell({ children }: PropsWithChildren) {
           <span className="brand-mark" aria-hidden="true">e</span><span>estocaí</span>
         </NavLink>
         <label className="company-switcher-label" htmlFor="company-switcher">Empresa ativa</label>
-        <select id="company-switcher" className="company-switcher" value={session?.companyId ?? ''} disabled={switching || companies.length < 2} onChange={(event) => void onCompanyChange(Number(event.target.value))}>
-          {companies.length === 0 && <option value={session?.companyId}>{session?.companyName}</option>}
-          {companies.map((company) => <option value={company.companyId} key={company.companyId}>{company.companyName}</option>)}
-        </select>
+        <ThemedSelect id="company-switcher" className="company-switcher" label="Empresa ativa" value={String(session?.companyId ?? '')} disabled={switching || companies.length < 2} onChange={(value) => void onCompanyChange(Number(value))} options={companies.length === 0 ? [{ value: String(session?.companyId ?? ''), label: session?.companyName ?? '' }] : companies.map((company) => ({ value: String(company.companyId), label: company.companyName }))} />
         {companyError && <p className="switch-error" role="alert">{companyError}</p>}
-        <div className="nav-caption">OPERAÇÃO</div>
-        {session?.role !== 'OPERATOR' && <NavLink className="nav-link" to="/overview"><span aria-hidden="true">◫</span> Visão geral</NavLink>}
-        <NavLink className="nav-link" to="/products"><span aria-hidden="true">▦</span> Produtos</NavLink>
-        {session?.role !== 'OPERATOR' && <NavLink className="nav-link" to="/catalog-data"><span aria-hidden="true">◇</span> Categorias e marcas</NavLink>}
-        <NavLink className="nav-link" to="/sales"><span aria-hidden="true">↗</span> Vendas</NavLink>
-        <NavLink className="nav-link" to="/stock-movements"><span aria-hidden="true">↕</span> Movimentações</NavLink>
-        <NavLink className="nav-link" to="/alerts"><span aria-hidden="true">♧</span> Alertas</NavLink>
-        <NavLink className="nav-link" to="/account/password"><span aria-hidden="true">♙</span> Minha senha</NavLink>
-        <div className="sidebar-push" />
-        <div className="sidebar-user"><div className="avatar">{session?.login.slice(0, 1).toUpperCase()}</div><div className="user-meta"><strong>{session?.login}</strong><span>{session?.role === 'COMPANY_OWNER' ? 'Proprietário' : session?.role === 'ADMIN' ? 'Administrador' : 'Operador'}</span></div><button className="icon-button logout-button" aria-label="Sair da conta" onClick={() => setLogoutConfirmOpen(true)}>↪</button></div>
+        <nav className="sidebar-navigation" aria-label="Navegação principal">
+          <div className="nav-group">
+            <div className="nav-caption">OPERAÇÃO</div>
+            {session?.role !== 'OPERATOR' && <NavLink className="nav-link" to="/overview"><NavIcon name="overview" /> Visão geral</NavLink>}
+            {session?.role !== 'OPERATOR' && <NavLink className="nav-link" to="/analytics"><NavIcon name="analytics" /> Análises</NavLink>}
+            <NavLink className="nav-link" to="/sales"><NavIcon name="sales" /> Vendas</NavLink>
+            <NavLink className="nav-link" to="/products"><NavIcon name="products" /> Produtos</NavLink>
+            <NavLink className="nav-link" to="/stock-movements"><NavIcon name="movements" /> Movimentações</NavLink>
+            <NavLink className="nav-link" to="/alerts"><NavIcon name="alerts" /> Alertas</NavLink>
+          </div>
+          <div className="nav-group">
+            <div className="nav-caption">CADASTROS</div>
+            <NavLink className="nav-link" to="/clients"><NavIcon name="clients" /> Clientes</NavLink>
+            {session?.role !== 'OPERATOR' && <NavLink className="nav-link" to="/suppliers"><NavIcon name="suppliers" /> Fornecedores</NavLink>}
+            {session?.role !== 'OPERATOR' && <NavLink className="nav-link" to="/catalog-data"><NavIcon name="catalog" /> Categorias e marcas</NavLink>}
+          </div>
+        </nav>
       </aside>
       <main className="main-area">
         <header className="topbar">
@@ -222,6 +280,30 @@ export function AppShell({ children }: PropsWithChildren) {
                 {unreadAlerts > 5 && <small className="notification-more">Mais {unreadAlerts - 5} alertas não lidos</small>}
               </> : <p>Não há alertas não lidos.</p>}
               <button className="notification-link" onClick={() => { closeNotifications(); navigate('/alerts') }}>Abrir central de alertas</button>
+            </section>}
+          </div>
+          <div className="profile-anchor" ref={profileAnchorRef}>
+            <button className="profile-trigger" type="button" aria-label={`Conta de ${session?.login ?? 'usuário'}`} aria-expanded={profileMenuOpen} aria-controls="profile-menu" onClick={() => setProfileMenuOpen((open) => !open)}>
+              <span className="profile-avatar" aria-hidden="true">{session?.login.slice(0, 1).toLocaleUpperCase('pt-BR')}</span>
+              <span className="profile-chevron" aria-hidden="true">⌄</span>
+            </button>
+            {profileMenuOpen && <section className="profile-menu" id="profile-menu" aria-label="Menu da conta">
+              <div className="profile-menu-heading">
+                <span className="profile-avatar" aria-hidden="true">{session?.login.slice(0, 1).toLocaleUpperCase('pt-BR')}</span>
+                <span><strong>{session?.login}</strong><small>{roleLabel} · {session?.companyName}</small></span>
+              </div>
+              <NavLink className="profile-menu-link" to="/account/profile" onClick={() => setProfileMenuOpen(false)}>
+                <strong>Minha conta</strong><small>Perfil, segurança e acessibilidade</small>
+              </NavLink>
+              {session?.role === 'COMPANY_OWNER' && <>
+                <NavLink className="profile-menu-link" to="/company-settings" onClick={() => setProfileMenuOpen(false)}>
+                  <strong>Configurações da empresa</strong><small>Dados da empresa ativa</small>
+                </NavLink>
+                <NavLink className="profile-menu-link" to="/members" onClick={() => setProfileMenuOpen(false)}>
+                  <strong>Membros e acessos</strong><small>Equipe e permissões</small>
+                </NavLink>
+              </>}
+              <button className="profile-menu-logout" type="button" onClick={() => { setProfileMenuOpen(false); setLogoutConfirmOpen(true) }}>Sair da conta</button>
             </section>}
           </div>
         </header>

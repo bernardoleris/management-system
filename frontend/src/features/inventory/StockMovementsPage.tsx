@@ -4,6 +4,7 @@ import type { MovementType, Page, Product, StockMovement, StockMovementRequest, 
 import { jsonBody } from '../../api/http'
 import { useAuth } from '../../auth/AuthContext'
 import { Dialog, DialogConfirmationIcon, DialogFooter, DialogHeader } from '../../shared/ui/Dialog'
+import { ThemedSelect } from '../../shared/ui/ThemedSelect'
 import styles from './operations.module.css'
 
 const dateTime = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' })
@@ -56,7 +57,7 @@ export function StockMovementsPage() {
     {notice && <div className="operations-notice" role="status">{notice}<button onClick={() => setNotice('')} aria-label="Fechar aviso">×</button></div>}
     {error && <div className="form-alert" role="alert">{error}<button type="button" onClick={() => { setError(''); setReload((value) => value + 1) }}>Tentar novamente</button></div>}
     <section className="data-card">
-      <div className="data-card-header operations-card-header"><div><h2>Histórico de estoque</h2><p>Ordenado da movimentação mais recente para a mais antiga.</p></div><label className="operation-filter">Tipo<select value={filter} onChange={(event) => changeFilter(event.target.value as MovementType | '')}><option value="">Todos</option><option value="ENTRY">Entrada</option><option value="EXIT">Saída</option><option value="ADJUSTMENT">Ajuste</option><option value="SALE">Venda</option></select></label></div>
+      <div className="data-card-header operations-card-header"><div><h2>Histórico de estoque</h2><p>Ordenado da movimentação mais recente para a mais antiga.</p></div><label className="operation-filter">Tipo<ThemedSelect className="stock-movement-filter-trigger" label="Tipo" value={filter} onChange={(value) => changeFilter(value as MovementType | '')} options={[{ value: '', label: 'Todos' }, { value: 'ENTRY', label: 'Entrada' }, { value: 'EXIT', label: 'Saída' }, { value: 'ADJUSTMENT', label: 'Ajuste' }, { value: 'SALE', label: 'Venda' }]} /></label></div>
       {loading ? <div className="operations-state" role="status">Carregando movimentações…</div> : page?.content.length ? <>
         <div className="operations-table-wrap"><table className="operations-table"><thead><tr><th>Data</th><th>Tipo</th><th>Itens</th><th>Responsável</th><th>Referência</th><th></th></tr></thead><tbody>
           {page.content.map((movement) => <tr key={movement.id}><td>{dateTime.format(new Date(movement.date))}</td><td><span className={`operation-type operation-${movement.type.toLowerCase()}`}>{movement.typeLabel || movementNames[movement.type]}</span></td><td>{movement.items.reduce((total, item) => total + (movement.type === 'ADJUSTMENT' ? Math.abs(item.quantityDifference ?? 0) : item.quantity), 0)} un. <small>em {movement.items.length} {movement.items.length === 1 ? 'produto' : 'produtos'}</small></td><td>{movement.adminName || movement.adminLogin || '—'}</td><td>{movement.supplierTradeName || (movement.saleId ? `Venda #${movement.saleId}` : '—')}</td><td className="operation-actions"><button className="text-action" onClick={() => setDetail(movement)}>Detalhes</button>{movement.type !== 'SALE' && <button className="text-action text-action-danger" onClick={() => setDeleteTarget(movement)}>Remover</button>}</td></tr>)}

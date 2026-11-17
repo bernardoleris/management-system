@@ -28,4 +28,13 @@ public interface SaleItemRepository extends JpaRepository<SaleItem, Long> {
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end,
             Pageable pageable);
+
+    @Query("SELECT si.product.id, MAX(si.sale.date) FROM SaleItem si " +
+            "WHERE si.sale.company.id = :companyId AND si.product.id IN :productIds " +
+            "AND si.sale.status = 'COMPLETED' AND si.sale.date <= :asOf " +
+            "GROUP BY si.product.id")
+    List<Object[]> findLastCompletedSaleDates(
+            @Param("companyId") Long companyId,
+            @Param("productIds") List<Long> productIds,
+            @Param("asOf") LocalDateTime asOf);
 }

@@ -42,7 +42,7 @@ export function NewSaleDialog({ open, onClose, onCompleted }: Props) {
       })),
     ]).then(([productPage, clientPage]) => {
       setProducts(productPage.content)
-      setClients(clientPage.content)
+      setClients(clientPage.content.filter((client) => client.user.active))
     }).catch((reason: unknown) => {
       setError(reason instanceof ApiError ? reason.message : 'Não foi possível carregar produtos e clientes.')
     }).finally(() => setLoading(false))

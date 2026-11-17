@@ -52,7 +52,8 @@ class AuthServiceTest {
     @Test
     void shouldRejectLoginWhenAdministratorDoesNotExist() {
         LoginRequestDTO request = loginRequest();
-        when(administratorRepository.findByLogin("admin")).thenReturn(Optional.empty());
+        when(administratorRepository.findByLoginIgnoreCase("admin")).thenReturn(Optional.empty());
+        when(administratorRepository.findByUserEmailIgnoreCase("admin")).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> authService.login(request))
                 .isInstanceOf(BusinessException.class)
@@ -63,7 +64,7 @@ class AuthServiceTest {
     void shouldRejectLoginWhenPasswordDoesNotMatch() {
         LoginRequestDTO request = loginRequest();
         Administrator administrator = administrator();
-        when(administratorRepository.findByLogin("admin")).thenReturn(Optional.of(administrator));
+        when(administratorRepository.findByLoginIgnoreCase("admin")).thenReturn(Optional.of(administrator));
         when(passwordEncoder.matches("password", "encoded-password")).thenReturn(false);
 
         assertThatThrownBy(() -> authService.login(request))
@@ -78,11 +79,11 @@ class AuthServiceTest {
         Administrator administrator = administrator();
         RefreshToken refreshToken = new RefreshToken();
         refreshToken.setToken("refresh-token");
-        when(administratorRepository.findByLogin("admin")).thenReturn(Optional.of(administrator));
+        when(administratorRepository.findByLoginIgnoreCase("admin")).thenReturn(Optional.of(administrator));
         when(passwordEncoder.matches("password", "encoded-password")).thenReturn(true);
         when(companyMembershipRepository.findByUserIdAndActiveTrueOrderByIdAsc(1L))
                 .thenReturn(List.of(membership(administrator)));
-        when(tokenProvider.generateToken("admin", 1L, 1L, 1L)).thenReturn("access-token");
+        when(tokenProvider.generateToken("admin", 1L, 1L, 1L, 0)).thenReturn("access-token");
         when(refreshTokenService.generate(administrator)).thenReturn(refreshToken);
 
         LoginResponseDTO response = authService.login(request);
@@ -105,7 +106,7 @@ class AuthServiceTest {
         when(refreshTokenService.validate("refresh-token")).thenReturn(refreshToken);
         when(companyMembershipRepository.findByUserIdAndActiveTrueOrderByIdAsc(1L))
                 .thenReturn(List.of(membership(administrator)));
-        when(tokenProvider.generateToken("admin", 1L, 1L, 1L)).thenReturn("new-access-token");
+        when(tokenProvider.generateToken("admin", 1L, 1L, 1L, 0)).thenReturn("new-access-token");
 
         LoginResponseDTO response = authService.refreshToken("refresh-token");
         authService.logout("refresh-token");

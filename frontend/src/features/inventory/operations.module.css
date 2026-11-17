@@ -26,14 +26,11 @@
   white-space: nowrap;
 }
 
-.featureScope :global(.operation-filter select) {
+.featureScope :global(.stock-movement-filter-trigger) {
   min-height: 40px;
   min-width: 150px;
-  padding: 0 32px 0 11px;
-  border: 1px solid #dfe6e1;
+  padding: 0 11px;
   border-radius: 8px;
-  background: white;
-  color: #344139;
   font: inherit;
 }
 
@@ -402,9 +399,9 @@
   display: flex;
   gap: 4px;
   padding: 4px;
-  border: 1px solid #e8ede9;
+  border: 1px solid var(--line);
   border-radius: 9px;
-  background: #f7f9f7;
+  background: var(--surface-muted);
 }
 
 .featureScope :global(.alert-view-tabs button) {
@@ -413,16 +410,21 @@
   border: 0;
   border-radius: 6px;
   background: transparent;
-  color: #6b776f;
+  color: var(--muted);
   font-size: 12px;
   font-weight: 650;
   white-space: nowrap;
 }
 
+.featureScope :global(.alert-view-tabs button:hover:not(.selected)) {
+  background: var(--surface-hover);
+  color: var(--ink);
+}
+
 .featureScope :global(.alert-view-tabs button.selected) {
-  background: white;
+  background: var(--paper);
   box-shadow: 0 1px 3px #20352a1a;
-  color: #176b50;
+  color: var(--green);
 }
 
 .featureScope :global(.alert-list) {
@@ -586,7 +588,7 @@
   font-size: 13px;
 }
 
-.featureScope :global(.operation-filter select) {
+.featureScope :global(.stock-movement-filter-trigger) {
   min-height: 42px;
   font-size: 13px;
 }
@@ -703,7 +705,7 @@
   .featureScope :global(.operation-filter) {
     justify-content: space-between;
   }
-  .featureScope :global(.operation-filter select) {
+  .featureScope :global(.stock-movement-filter-trigger) {
     flex: 1;
   }
   .featureScope :global(.movement-pagination) {

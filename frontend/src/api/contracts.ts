@@ -17,6 +17,60 @@ export interface AvailableCompany {
   role: CompanyRole
 }
 
+export interface CompanySettings {
+  companyId: number
+  legalName: string
+  tradeName: string
+  documentNumber: string | null
+  slug: string
+  email: string | null
+  phone: string | null
+  active: boolean
+  timezone: string
+  currency: string
+  createdAt: string
+}
+
+export interface CompanySettingsRequest {
+  legalName: string
+  tradeName: string
+  documentNumber: string | null
+  email: string | null
+  phone: string | null
+  timezone: string
+}
+
+export interface CompanyMember {
+  membershipId: number
+  userId: number
+  administratorId: number | null
+  login: string | null
+  firstName: string
+  lastName: string
+  email: string
+  role: CompanyRole
+  active: boolean
+}
+
+export interface CompanyMemberCreateRequest {
+  firstName: string
+  lastName: string
+  email: string
+  phone: string | null
+  login: string
+  password: string
+  role: CompanyRole
+}
+
+export interface ExistingCompanyMemberRequest {
+  login: string
+  role: CompanyRole
+}
+
+export interface CompanyMemberRoleRequest {
+  role: CompanyRole
+}
+
 export interface SwitchCompanyResponse {
   companyId: number
   companyName: string
@@ -89,16 +143,48 @@ export interface SupplierOption {
   active: boolean
 }
 
+export interface SupplierRequest {
+  tradeName: string
+  cnpj: string
+  phone: string
+  email: string
+}
+
 export interface Client {
   id: number
   documentType: 'CPF' | 'CNPJ'
   documentNumber: string
+  birthDate: string | null
   user: {
     firstName: string
     lastName: string
     email: string
     phone: string | null
+    active: boolean
   }
+  address: ClientAddress | null
+}
+
+export interface ClientAddress {
+  id?: number
+  street: string
+  number: string
+  complement: string | null
+  neighborhood: string
+  city: string
+  state: string
+  zipCode: string
+}
+
+export interface ClientRequest {
+  firstName: string
+  lastName: string
+  email: string
+  phone: string | null
+  documentType: 'CPF' | 'CNPJ'
+  documentNumber: string
+  birthDate: string | null
+  address?: Omit<ClientAddress, 'id'>
 }
 
 export type PaymentMethod = 'CASH' | 'CREDIT_CARD' | 'DEBIT_CARD' | 'PIX'
@@ -191,6 +277,26 @@ export interface AlertRequest {
   type: AlertType
   minimumQuantity: number
   message: string
+}
+
+export type AnalyticsPeriod = 'LAST_7_DAYS' | 'LAST_30_DAYS' | 'LAST_6_MONTHS' | 'LAST_12_MONTHS' | 'CURRENT_MONTH' | 'CURRENT_YEAR'
+
+export interface AnalyticsChart {
+  labels: string[]
+  data: number[]
+}
+
+export interface TopProductAnalytics {
+  productId: number
+  productName: string
+  totalSold: number
+}
+
+export interface ProductWithoutSales {
+  productId: number
+  productName: string
+  quantity: number
+  daysSinceLastSale: number | null
 }
 
 export interface ApiErrorBody {

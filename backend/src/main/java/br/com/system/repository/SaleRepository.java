@@ -23,19 +23,39 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
 
     Optional<Sale> findByIdAndCompanyId(Long id, Long companyId);
 
-    // vendas por mês
-    @Query("SELECT FUNCTION('MONTH', s.date) as month, COUNT(s) as total " +
+    // Daily sales buckets include the full calendar date so ranges crossing years remain distinct.
+    @Query("SELECT FUNCTION('YEAR', s.date), FUNCTION('MONTH', s.date), FUNCTION('DAY', s.date), COUNT(s) " +
             "FROM Sale s WHERE s.company.id = :companyId AND s.date BETWEEN :start AND :end AND s.status = 'COMPLETED' " +
-            "GROUP BY FUNCTION('MONTH', s.date) ORDER BY month")
+            "GROUP BY FUNCTION('YEAR', s.date), FUNCTION('MONTH', s.date), FUNCTION('DAY', s.date) " +
+            "ORDER BY FUNCTION('YEAR', s.date), FUNCTION('MONTH', s.date), FUNCTION('DAY', s.date)")
+    List<Object[]> countSalesByDay(
+            @Param("companyId") Long companyId,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end);
+
+    // Monthly sales buckets include year and month to avoid merging the same month across years.
+    @Query("SELECT FUNCTION('YEAR', s.date), FUNCTION('MONTH', s.date), COUNT(s) " +
+            "FROM Sale s WHERE s.company.id = :companyId AND s.date BETWEEN :start AND :end AND s.status = 'COMPLETED' " +
+            "GROUP BY FUNCTION('YEAR', s.date), FUNCTION('MONTH', s.date) " +
+            "ORDER BY FUNCTION('YEAR', s.date), FUNCTION('MONTH', s.date)")
     List<Object[]> countSalesByMonth(
             @Param("companyId") Long companyId,
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end);
 
-    // faturamento por mês
-    @Query("SELECT FUNCTION('MONTH', s.date) as month, SUM(s.totalValue) as revenue " +
+    @Query("SELECT FUNCTION('YEAR', s.date), FUNCTION('MONTH', s.date), FUNCTION('DAY', s.date), SUM(s.totalValue) " +
             "FROM Sale s WHERE s.company.id = :companyId AND s.date BETWEEN :start AND :end AND s.status = 'COMPLETED' " +
-            "GROUP BY FUNCTION('MONTH', s.date) ORDER BY month")
+            "GROUP BY FUNCTION('YEAR', s.date), FUNCTION('MONTH', s.date), FUNCTION('DAY', s.date) " +
+            "ORDER BY FUNCTION('YEAR', s.date), FUNCTION('MONTH', s.date), FUNCTION('DAY', s.date)")
+    List<Object[]> revenueByDay(
+            @Param("companyId") Long companyId,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end);
+
+    @Query("SELECT FUNCTION('YEAR', s.date), FUNCTION('MONTH', s.date), SUM(s.totalValue) " +
+            "FROM Sale s WHERE s.company.id = :companyId AND s.date BETWEEN :start AND :end AND s.status = 'COMPLETED' " +
+            "GROUP BY FUNCTION('YEAR', s.date), FUNCTION('MONTH', s.date) " +
+            "ORDER BY FUNCTION('YEAR', s.date), FUNCTION('MONTH', s.date)")
     List<Object[]> revenueByMonth(
             @Param("companyId") Long companyId,
             @Param("start") LocalDateTime start,

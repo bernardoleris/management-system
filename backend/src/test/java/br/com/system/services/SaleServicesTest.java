@@ -7,6 +7,7 @@ import br.com.system.enums.SaleStatus;
 import br.com.system.exception.BusinessException;
 import br.com.system.model.Administrator;
 import br.com.system.model.Product;
+import br.com.system.model.UserEntity;
 import br.com.system.repository.AdministratorRepository;
 import br.com.system.repository.ClientRepository;
 import br.com.system.repository.CompanyRepository;
@@ -185,6 +186,11 @@ class SaleServicesTest {
 
     private void prepareAuthenticatedAdministrator() {
         Administrator administrator = new Administrator();
+        UserEntity user = new UserEntity();
+        user.setId(1L);
+        user.setFirstName("Test");
+        user.setLastName("Administrator");
+        administrator.setUser(user);
         SecurityContextHolder.getContext()
                 .setAuthentication(new TestingAuthenticationToken("admin", null));
         when(administratorRepository.findByLogin("admin")).thenReturn(Optional.of(administrator));

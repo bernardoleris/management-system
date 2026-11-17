@@ -16,7 +16,7 @@ class CompanyMembershipControllerTest extends AbstractIntegrationTest {
         Long membershipId = given().auth().oauth2(ownerAccessToken()).contentType(JSON)
                 .body("""
                         {"firstName":"Team","lastName":"Member","email":"team.member@test.com",
-                         "phone":"11988887777","login":"team-member","password":"secret123","role":"OPERATOR"}
+                         "phone":"11988887777","login":"team-member","password":"secret123456","role":"OPERATOR"}
                         """)
                 .when().post("/company/members")
                 .then().statusCode(201)
@@ -36,7 +36,7 @@ class CompanyMembershipControllerTest extends AbstractIntegrationTest {
                 .then().statusCode(200)
                 .body("role", equalTo("ADMIN"));
 
-        String memberToken = accessToken("team-member", "secret123");
+        String memberToken = accessToken("team-member", "secret123456");
 
         given().auth().oauth2(ownerAccessToken())
                 .when().delete("/company/members/{membershipId}", membershipId)

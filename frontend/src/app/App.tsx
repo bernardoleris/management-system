@@ -19,6 +19,14 @@ import { ProductsPage } from '../features/products/ProductsPage'
 import { StockMovementsPage } from '../features/inventory/StockMovementsPage'
 import { AlertsPage } from '../features/alerts/AlertsPage'
 import { CatalogDataPage } from '../features/catalog-data/CatalogDataPage'
+import { ClientsPage } from '../features/clients/ClientsPage'
+import { SuppliersPage } from '../features/suppliers/SuppliersPage'
+import { MembersPage } from '../features/members/MembersPage'
+import { AnalyticsPage } from '../features/analytics/AnalyticsPage'
+import { CompanySettingsPage } from '../features/settings/CompanySettingsPage'
+import { AccountLayout } from '../features/account/AccountLayout'
+import { AccountPage } from '../features/account/AccountPage'
+import { AccessibilityPage } from '../features/account/AccessibilityPage'
 
 function HomeRedirect() {
   const { session } = useAuth()
@@ -41,9 +49,29 @@ function OverviewRoute() {
   return session?.role === 'OPERATOR' ? <Navigate to="/sales" replace /> : <OverviewPage />
 }
 
+function AnalyticsRoute() {
+  const { session } = useAuth()
+  return session?.role === 'OPERATOR' ? <Navigate to="/sales" replace /> : <AnalyticsPage />
+}
+
 function CatalogDataRoute() {
   const { session } = useAuth()
   return session?.role === 'OPERATOR' ? <Navigate to="/sales" replace /> : <CatalogDataPage />
+}
+
+function SuppliersRoute() {
+  const { session } = useAuth()
+  return session?.role === 'OPERATOR' ? <Navigate to="/sales" replace /> : <SuppliersPage />
+}
+
+function MembersRoute() {
+  const { session } = useAuth()
+  return session?.role === 'COMPANY_OWNER' ? <MembersPage /> : <Navigate to={session?.role === 'OPERATOR' ? '/sales' : '/overview'} replace />
+}
+
+function CompanySettingsRoute() {
+  const { session } = useAuth()
+  return session?.role === 'COMPANY_OWNER' ? <CompanySettingsPage /> : <Navigate to={session?.role === 'OPERATOR' ? '/sales' : '/overview'} replace />
 }
 
 function AppRoutes() {
@@ -63,13 +91,24 @@ function AppRoutes() {
       <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/" element={<HomeRedirect />} />
       <Route element={<RequireAuth><AppShell><Outlet /></AppShell></RequireAuth>}>
-        <Route path="account/password" element={<ChangePasswordPage />} />
+        <Route path="account/password" element={<Navigate to="/account/security" replace />} />
+        <Route path="account" element={<AccountLayout />}>
+          <Route index element={<Navigate to="profile" replace />} />
+          <Route path="profile" element={<AccountPage />} />
+          <Route path="security" element={<ChangePasswordPage />} />
+          <Route path="accessibility" element={<AccessibilityPage />} />
+        </Route>
         <Route path="overview" element={<OverviewRoute />} />
+        <Route path="/analytics" element={<AnalyticsRoute />} />
         <Route path="sales" element={<SalesPage />} />
         <Route path="products" element={<ProductsPage />} />
         <Route path="stock-movements" element={<StockMovementsPage />} />
         <Route path="alerts" element={<AlertsPage />} />
         <Route path="catalog-data" element={<CatalogDataRoute />} />
+        <Route path="suppliers" element={<SuppliersRoute />} />
+        <Route path="members" element={<MembersRoute />} />
+        <Route path="company-settings" element={<CompanySettingsRoute />} />
+        <Route path="/clients" element={<ClientsPage />} />
       </Route>
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

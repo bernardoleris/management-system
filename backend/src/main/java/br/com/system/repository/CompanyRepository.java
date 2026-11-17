@@ -11,4 +11,6 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
     boolean existsBySlug(String slug);
 
     boolean existsByDocumentNumber(String documentNumber);
+
+    boolean existsByDocumentNumberAndIdNot(String documentNumber, Long id);
 }

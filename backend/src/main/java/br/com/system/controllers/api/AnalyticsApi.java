@@ -1,7 +1,7 @@
 package br.com.system.controllers.api;
 
 import br.com.system.data.dto.response.analytics.ChartResponseDTO;
-import br.com.system.data.dto.response.analytics.ProductWithoutMovementResponseDTO;
+import br.com.system.data.dto.response.ProductWithoutSalesResponseDTO;
 import br.com.system.data.dto.response.analytics.TopProductsResponseDTO;
 import br.com.system.enums.AnalyticsPeriod;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,9 +22,9 @@ import java.util.List;
 public interface AnalyticsApi {
 
     @Operation(
-            summary = "Sales by month",
-            description = "Returns the number of completed sales grouped by month. " +
-                    "Use 'period' for predefined ranges or 'start'/'end' for custom dates."
+            summary = "Sales over time",
+            description = "Returns completed sales grouped by day for ranges up to 31 days and by calendar month for longer ranges. " +
+                    "Missing time buckets are included with zero values. Use 'period' for predefined ranges or 'start'/'end' for custom dates."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Data retrieved successfully",
@@ -32,7 +32,7 @@ public interface AnalyticsApi {
                             schema = @Schema(implementation = ChartResponseDTO.class))),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    ResponseEntity<ChartResponseDTO> getSalesByMonth(
+    ResponseEntity<ChartResponseDTO> getSalesOverTime(
             @Parameter(description = "Predefined period", example = "LAST_30_DAYS")
             @RequestParam(required = false) AnalyticsPeriod period,
             @Parameter(description = "Start date (yyyy-MM-dd)", example = "2026-01-01")
@@ -41,9 +41,9 @@ public interface AnalyticsApi {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end);
 
     @Operation(
-            summary = "Revenue by month",
-            description = "Returns the total revenue grouped by month. " +
-                    "Use 'period' for predefined ranges or 'start'/'end' for custom dates."
+            summary = "Revenue over time",
+            description = "Returns completed-sale revenue grouped by day for ranges up to 31 days and by calendar month for longer ranges. " +
+                    "Missing time buckets are included with zero values. Use 'period' for predefined ranges or 'start'/'end' for custom dates."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Data retrieved successfully",
@@ -51,7 +51,7 @@ public interface AnalyticsApi {
                             schema = @Schema(implementation = ChartResponseDTO.class))),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    ResponseEntity<ChartResponseDTO> getRevenueByMonth(
+    ResponseEntity<ChartResponseDTO> getRevenueOverTime(
             @Parameter(description = "Predefined period", example = "LAST_30_DAYS")
             @RequestParam(required = false) AnalyticsPeriod period,
             @Parameter(description = "Start date (yyyy-MM-dd)", example = "2026-01-01")
@@ -100,17 +100,18 @@ public interface AnalyticsApi {
             @RequestParam(defaultValue = "10") int limit);
 
     @Operation(
-            summary = "Products without movement",
-            description = "Returns active products that had no sales in the informed period. " +
+            summary = "Products without sales",
+            description = "Returns active products without a completed sale in the informed period. " +
+                    "daysSinceLastSale is calculated through the request date and is null when the product has never had a completed sale. " +
                     "Use 'period' for predefined ranges or 'start'/'end' for custom dates."
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Data retrieved successfully",
                     content = @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = ProductWithoutMovementResponseDTO.class))),
+                            schema = @Schema(implementation = ProductWithoutSalesResponseDTO.class))),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    ResponseEntity<List<ProductWithoutMovementResponseDTO>> getProductsWithoutMovement(
+    ResponseEntity<List<ProductWithoutSalesResponseDTO>> getProductsWithoutSales(
             @Parameter(description = "Predefined period", example = "LAST_30_DAYS")
             @RequestParam(required = false) AnalyticsPeriod period,
             @Parameter(description = "Start date (yyyy-MM-dd)", example = "2026-01-01")

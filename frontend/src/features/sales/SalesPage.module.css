@@ -37,7 +37,7 @@
 }
 
 .featureScope :global(.sales-table .sale-id) {
-  color: #27332d;
+  color: var(--ink);
   font-weight: 700;
 }
 

@@ -30,13 +30,12 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     boolean existsByCompanyIdAndBarcodeAndIdNot(Long companyId, String barcode, Long id);
 
-    // produtos sem giro
+    // Active products without a completed sale in the selected range.
     @Query("SELECT p FROM Product p WHERE p.company.id = :companyId AND p.active = true " +
-            "AND p.id NOT IN (" +
-            "SELECT DISTINCT si.product.id FROM SaleItem si " +
-            "WHERE si.sale.company.id = :companyId AND si.sale.date BETWEEN :start AND :end" +
-            ")")
-    List<Product> findProductsWithoutMovement(
+            "AND NOT EXISTS (SELECT si.id FROM SaleItem si " +
+            "WHERE si.product.id = p.id AND si.sale.company.id = :companyId " +
+            "AND si.sale.status = 'COMPLETED' AND si.sale.date BETWEEN :start AND :end)")
+    List<Product> findActiveProductsWithoutCompletedSales(
             @Param("companyId") Long companyId,
             @Param("start") LocalDateTime start,
             @Param("end") LocalDateTime end);

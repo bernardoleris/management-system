@@ -3,6 +3,7 @@ import { ApiError } from '../../api/http'
 import type { NamedOption, Page, Product, SupplierOption } from '../../api/contracts'
 import { useAuth } from '../../auth/AuthContext'
 import { Dialog, DialogConfirmationIcon, DialogFooter, DialogHeader } from '../../shared/ui/Dialog'
+import { ThemedSelect } from '../../shared/ui/ThemedSelect'
 import { ProductFormDialog } from './components/ProductFormDialog'
 import styles from './ProductsPage.module.css'
 
@@ -221,24 +222,13 @@ export function ProductsPage() {
 
         <div className={cx('products-filters')} aria-label="Filtros do catálogo">
           <label>Status
-            <select value={status} onChange={(event) => changeStatus(event.target.value as ProductStatus)}>
-              <option value="active">Produtos ativos</option>
-              <option value="all">Todos os produtos</option>
-            </select>
+            <ThemedSelect className="products-filter-trigger" label="Status" value={status} onChange={(value) => changeStatus(value as ProductStatus)} options={[{ value: 'active', label: 'Produtos ativos' }, { value: 'all', label: 'Todos os produtos' }]} />
           </label>
           {canManageReferences && <><label>Filtrar por
-            <select value={filterKind} onChange={(event) => changeFilterKind(event.target.value as FilterKind)}>
-              <option value="">Sem filtro</option>
-              <option value="category">Categoria</option>
-              <option value="brand">Marca</option>
-              <option value="supplier">Fornecedor</option>
-            </select>
+            <ThemedSelect className="products-filter-trigger" label="Filtrar por" value={filterKind} onChange={(value) => changeFilterKind(value as FilterKind)} options={[{ value: '', label: 'Sem filtro' }, { value: 'category', label: 'Categoria' }, { value: 'brand', label: 'Marca' }, { value: 'supplier', label: 'Fornecedor' }]} />
           </label>
           {filterKind && <label className={cx('products-filter-value')}>{filterKind === 'category' ? 'Categoria' : filterKind === 'brand' ? 'Marca' : 'Fornecedor'}
-            <select value={filterId} onChange={(event) => { setFilterId(event.target.value); setPageNumber(0) }} disabled={loadingReferences || filterOptions.length === 0}>
-              <option value="">Selecione</option>
-              {filterOptions.map((option) => <option value={option.id} key={option.id}>{option.name}</option>)}
-            </select>
+            <ThemedSelect className="products-filter-trigger" label={filterKind === 'category' ? 'Categoria' : filterKind === 'brand' ? 'Marca' : 'Fornecedor'} value={filterId} onChange={(value) => { setFilterId(value); setPageNumber(0) }} disabled={loadingReferences || filterOptions.length === 0} options={[{ value: '', label: 'Selecione' }, ...filterOptions.map((option) => ({ value: String(option.id), label: option.name }))]} />
           </label>}
           <span className={cx('products-filter-note')}>Os filtros por categoria, marca e fornecedor mostram produtos ativos.</span>
           </>}

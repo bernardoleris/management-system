@@ -12,6 +12,8 @@ interface AuthContextValue {
   request: <T>(path: string, options?: RequestInit) => Promise<T>
   loadCompanies: () => Promise<AvailableCompany[]>
   switchCompany: (companyId: number) => Promise<void>
+  updateCurrentCompanyName: (name: string) => void
+  updateCurrentRole: (role: CompanyRole) => void
   changePassword: (currentPassword: string, newPassword: string) => Promise<void>
 }
 
@@ -76,6 +78,16 @@ export function AuthProvider({ children }: PropsWithChildren) {
 
   const loadCompanies = useCallback(() => request<AvailableCompany[]>('/auth/companies'), [request])
 
+  const updateCurrentRole = useCallback((role: CompanyRole) => {
+    const current = sessionRef.current
+    if (current) persistSession({ ...current, role })
+  }, [persistSession])
+
+  const updateCurrentCompanyName = useCallback((name: string) => {
+    const current = sessionRef.current
+    if (current) persistSession({ ...current, companyName: name })
+  }, [persistSession])
+
   const login = useCallback(async (loginName: string, password: string) => {
     const response = await apiRequest<LoginResponse>('/auth/login', {
       method: 'POST', body: jsonBody({ login: loginName.trim(), password }),
@@ -128,7 +140,7 @@ export function AuthProvider({ children }: PropsWithChildren) {
     clearSession()
   }, [clearSession, request])
 
-  return <AuthContext.Provider value={{ session, login, logout, request, loadCompanies, switchCompany, changePassword }}>{children}</AuthContext.Provider>
+  return <AuthContext.Provider value={{ session, login, logout, request, loadCompanies, switchCompany, updateCurrentCompanyName, updateCurrentRole, changePassword }}>{children}</AuthContext.Provider>
 }
 
 export function useAuth(): AuthContextValue {

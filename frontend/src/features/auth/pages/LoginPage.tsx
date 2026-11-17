@@ -23,7 +23,11 @@ export function LoginPage() {
       const destination = (location.state as { from?: { pathname?: string } } | null)?.from?.pathname
       navigate(destination || '/', { replace: true })
     } catch (reason) {
-      setError(reason instanceof ApiError ? reason.message : 'Não foi possível entrar. Tente novamente.')
+      if (reason instanceof ApiError && reason.status === 400 && reason.message === 'Invalid login or password!') {
+        setError('Usuário/e-mail ou senha inválidos.')
+      } else {
+        setError(reason instanceof ApiError ? reason.message : 'Não foi possível entrar. Tente novamente.')
+      }
     } finally { setSubmitting(false) }
   }
 

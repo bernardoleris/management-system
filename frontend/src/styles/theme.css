@@ -1,0 +1,536 @@
+﻿/* Shared surfaces and controls read from the active theme tokens. */
+body,
+.app-frame,
+.main-area {
+  background-color: var(--page);
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] :is(
+  .sidebar,
+  .topbar,
+  .profile-menu,
+  .notification-popover,
+  .notification-popover-header,
+  .data-card,
+  .metric-card,
+  .company-switcher,
+  .notification-button,
+  .button-secondary
+) {
+  border-color: var(--line);
+  background-color: var(--paper);
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] .topbar {
+  background-color: color-mix(in srgb, var(--paper) 94%, transparent);
+}
+
+:root[data-theme='dark'] :is(section[role='dialog'], section[role='alertdialog']) {
+  border-color: var(--line);
+  background-color: var(--paper);
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] :is(section[role='dialog'], section[role='alertdialog']) :is(header, footer) {
+  border-color: var(--line);
+  background-color: var(--surface-muted);
+}
+
+:root[data-theme='dark'] :is(section[role='dialog'], section[role='alertdialog']) :is(h1, h2, h3, strong, label) {
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] :is(section[role='dialog'], section[role='alertdialog']) :is(p, small, td, th) {
+  color: var(--muted);
+}
+
+:root[data-theme='dark'] :is(
+  .data-card-header,
+  .profile-menu-heading,
+  .profile-menu-logout,
+  .cardFooter
+) {
+  border-color: var(--line);
+}
+
+:root[data-theme='dark'] :is(h1, h2, h3) {
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] :is(.page-heading p, .eyebrow, .loading, [class*='state'] p) {
+  color: var(--muted);
+}
+
+:root[data-theme='dark'] :is([class*='card'], [class*='Card']):not([class*='status']) {
+  border-color: var(--line);
+  background-color: var(--paper);
+}
+
+:root[data-theme='dark'] :is([class*='card'], [class*='Card']):not([class*='status']) :is(h1, h2, h3, strong, label) {
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] :is([class*='card'], [class*='Card']):not([class*='status']) :is(p, small) {
+  color: var(--muted);
+}
+
+:root[data-theme='dark'] :is(
+  .data-card-header h2,
+  .profile-menu-heading strong,
+  .profile-menu-link strong,
+  .profile-menu-logout,
+  .metric-card > strong,
+  .recent-row strong,
+  .recent-value
+) {
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] :is(
+  .data-card-header p,
+  .profile-menu-heading small,
+  .profile-menu-link small,
+  .topbar-company,
+  .metric-label,
+  .metric-card > small,
+  .recent-row small
+) {
+  color: var(--muted);
+}
+
+:root[data-theme='dark'] .nav-link {
+  color: var(--muted);
+}
+
+:root[data-theme='dark'] :is(.nav-link:hover, .profile-menu-link:hover, .button-secondary:hover) {
+  background-color: var(--surface-hover);
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] :is(.nav-link.active:hover, [class*='navigationLinkActive']:hover) {
+  background-color: var(--green-soft);
+  color: var(--green);
+}
+
+:root[data-theme='dark'] :is(
+  .icon-button:hover,
+  .profile-trigger:hover,
+  .profile-trigger[aria-expanded='true'],
+  [class*='navigationLink']:hover,
+  [class*='notice'] button:hover,
+  .operations-table tbody tr:hover,
+  .sales-table tbody tr:hover,
+  .products-table tbody tr:hover,
+  .data-table tbody tr:hover,
+  .table tbody tr:hover,
+  [class*='table'] tbody tr:hover,
+  [class*='products-table'] tbody tr:hover,
+  .product-result:hover:not(:disabled),
+  [class*='product-deactivate-confirm']:hover
+) {
+  background-color: var(--surface-hover);
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] [class*='featureScope'] :is(
+  .operations-table tbody tr:hover,
+  .sales-table tbody tr:hover
+) {
+  background-color: var(--surface-hover);
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] :is(.reference-delete-button:hover, .movement-delete-button:hover, .logout-button:hover) {
+  border-color: var(--danger);
+  background-color: var(--danger-hover-bg);
+  color: var(--danger);
+}
+
+:root[data-theme='dark'] .profile-menu-logout:hover {
+  background-color: var(--danger-hover-bg);
+  color: var(--danger);
+}
+
+:root[data-theme='dark'] :is(.form-alert, .notification-kind-empty, .alert-kind-empty, .alert-symbol-empty) {
+  border-color: var(--danger);
+  background-color: var(--danger-bg);
+  color: var(--danger);
+}
+
+:root[data-theme='dark'] :is(.form-success, .products-reference-note, .operations-notice, .movement-form-dialog .product-form-message) {
+  border-color: var(--line);
+  background-color: var(--green-soft);
+  color: var(--green);
+}
+
+:root[data-theme='dark'] :is(.operations-empty-icon, .operation-entry, .product-result-selected, .product-stock-preserved, .product-selection-active) {
+  border-color: var(--line);
+  background-color: var(--green-soft);
+  color: var(--green);
+}
+
+:root[data-theme='dark'] :is(.operation-type, .operation-exit, .operation-adjustment, .operation-sale, .alert-kind, .alert-disabled-tag, .alert-symbol) {
+  background-color: var(--surface-muted);
+  color: var(--muted);
+}
+
+:root[data-theme='dark'] :is(.operation-exit, .alert-kind-empty, .alert-symbol-empty) {
+  background-color: var(--danger-bg);
+  color: var(--danger);
+}
+
+:root[data-theme='dark'] :is(.operation-adjustment, .alert-kind, .alert-symbol) {
+  background-color: var(--warning-bg);
+  color: var(--warning);
+}
+
+:root[data-theme='dark'] .operation-sale {
+  background-color: var(--info-bg);
+  color: var(--info);
+}
+
+:root[data-theme='dark'] :is(.movement-cart, .product-selection, .cart-empty, .cart-line, .product-result) {
+  border-color: var(--line);
+  background-color: var(--surface-raised);
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] :is(.product-result:hover:not(:disabled), .cart-line:hover) {
+  background-color: var(--surface-hover);
+}
+
+:root[data-theme='dark'] .product-result-selected {
+  background-color: var(--green-soft);
+}
+
+:root[data-theme='dark'] .add-product {
+  background-color: var(--surface-hover);
+  color: var(--green);
+}
+
+:root[data-theme='dark'] :is(.products-filters, .catalog-data-toolbar, .analytics-chart-data-list, .catalog-data-tabs) {
+  border-color: var(--line);
+  background-color: var(--surface-muted);
+}
+
+:root[data-theme='dark'] .catalog-data-tabs button.selected {
+  background-color: var(--surface-hover);
+  color: var(--green);
+}
+
+:root[data-theme='dark'] :is(.inactive, [class*='inactive']) {
+  background-color: var(--surface-muted);
+  color: var(--muted);
+}
+
+:root[data-theme='dark'] :is([class*='products-filters'], [class*='products-table'] th) {
+  border-color: var(--line);
+  background-color: var(--surface-muted);
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] :is([class*='catalog-data-toolbar'], [class*='analytics-chart-data-list'], [class*='catalog-data-tabs']) {
+  border-color: var(--line);
+  background-color: var(--surface-muted);
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] [class*='catalog-data-tabs'] button.selected {
+  border-color: var(--line);
+  background-color: var(--surface-hover);
+  color: var(--green);
+}
+
+:root[data-theme='dark'] .notification-list li {
+  border-color: var(--line);
+  background-color: var(--surface-raised);
+}
+
+:root[data-theme='dark'] .notification-popover .notification-popover-header {
+  background-color: var(--paper);
+}
+
+:root[data-theme='dark'] .notification-item-new {
+  animation-name: notification-item-arrive-dark;
+}
+
+@keyframes notification-item-arrive-dark {
+  0% {
+    border-color: var(--green);
+    background-color: var(--green-soft);
+  }
+
+  100% {
+    border-color: var(--line);
+    background-color: var(--surface-raised);
+  }
+}
+
+:root[data-theme='dark'] :is(.form-alert, [class*='error'], [class*='Error']) {
+  border-color: var(--danger);
+  background-color: var(--danger-bg);
+  color: var(--danger);
+}
+
+:root[data-theme='dark'] :is(.form-success, [class*='success'], [class*='Success'], [class*='notice']) {
+  border-color: var(--line);
+  background-color: var(--green-soft);
+  color: var(--green);
+}
+
+:root[data-theme='dark'] [class*='statusCard'] {
+  border-color: var(--line);
+  background-color: var(--green-soft);
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] [class*='statusCard'] :is(strong, span, b, i) {
+  color: var(--green);
+}
+
+:root[data-theme='dark'] [class*='products-table'] th {
+  color: var(--muted);
+}
+
+:root[data-theme='dark'] [class*='products-filter-note'] {
+  color: var(--muted);
+}
+
+:root[data-theme='dark'] [class*='products-reference-note'] {
+  border-color: var(--line);
+  background-color: var(--green-soft);
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] [class*='products-create-block'] {
+  border-color: var(--line);
+  background-color: var(--warning-bg);
+  color: var(--warning);
+}
+
+:root[data-theme='dark'] :is([class*='product-status-active'], [class*='product-stock']:not([class*='empty'])) {
+  background-color: var(--green-soft);
+  color: var(--green);
+}
+
+:root[data-theme='dark'] :is([class*='product-status-inactive'], [class*='inactive']) {
+  background-color: var(--surface-muted);
+  color: var(--muted);
+}
+
+:root[data-theme='dark'] [class*='product-stock-empty'] {
+  background-color: var(--danger-bg);
+  color: var(--danger);
+}
+
+:root[data-theme='dark'] :is(.text-action:hover:not(:disabled), .text-action.text-action-danger:hover:not(:disabled)) {
+  color: var(--green);
+}
+
+:root[data-theme='dark'] .text-action.text-action-danger:hover:not(:disabled) {
+  color: var(--danger);
+}
+
+:root[data-theme='dark'] .nav-link.active {
+  background-color: var(--green-soft);
+  color: var(--green);
+}
+
+:root[data-theme='dark'] :is(.status-completed, .status-active, .status-pill.status-completed) {
+  background-color: var(--green-soft);
+  color: var(--green);
+}
+
+:root[data-theme='dark'] :is(.active, [class*='-active'], [class*='Active'], .selected) {
+  background-color: var(--green-soft);
+  color: var(--green);
+}
+
+:root[data-theme='dark'] :is(.alert-view-tabs button.selected, .catalog-data-tabs button.selected) {
+  background-color: var(--surface-hover);
+  color: var(--green);
+}
+
+:root[data-theme='dark'] :is(.metric-icon-green, .recent-icon, .products-empty-icon, .catalog-empty-icon, [class*='empty-icon']) {
+  background-color: var(--green-soft);
+  color: var(--green);
+}
+
+:root[data-theme='dark'] .metric-icon-orange {
+  background-color: var(--warning-bg);
+  color: var(--warning);
+}
+
+:root[data-theme='dark'] :is(.metric-icon-purple, [class*='confirmationIcon']) {
+  background-color: var(--info-bg);
+  color: var(--info);
+}
+
+:root[data-theme='dark'] :is(.status-pending, .notification-kind) {
+  background-color: var(--warning-bg);
+  color: var(--warning);
+}
+
+:root[data-theme='dark'] :is(.status-canceled, .status-inactive) {
+  background-color: var(--surface-hover);
+  color: var(--muted);
+}
+
+:root[data-theme='dark'] :is(.form-alert, .notification-error, .text-action-danger) {
+  color: var(--danger);
+}
+
+:root[data-theme='dark'] .notification-popover :is(p, small) {
+  color: var(--muted);
+}
+
+:root[data-theme='dark'] :is(input, select, textarea):not([type='checkbox']):not([type='radio']) {
+  border-color: var(--line);
+  background-color: var(--paper);
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] :is(input, textarea)::placeholder {
+  color: var(--muted);
+}
+
+:root[data-theme='dark'] table th {
+  border-color: var(--line);
+  background-color: var(--surface-muted);
+  color: var(--muted);
+}
+
+:root[data-theme='dark'] table td {
+  border-color: var(--line);
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] :is([class*='themeOption'], [class*='textScaleOption']) {
+  border-color: var(--line);
+  background-color: var(--surface-raised);
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] :is([class*='themeOption'], [class*='textScaleOption']) :is(strong, span) {
+  color: var(--muted);
+}
+
+:root[data-theme='dark'] :is([class*='themeOption'], [class*='textScaleOption']) strong {
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] :is([class*='themeOptionSelected'], [class*='textScaleOptionSelected']) {
+  border-color: var(--green);
+  background-color: var(--green-soft);
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] :is([class*='infoCard'], [class*='scopeNote'], [class*='passwordInfo']) {
+  border-color: var(--line);
+  background-color: var(--info-bg);
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] :is([class*='infoCard'], [class*='scopeNote'], [class*='passwordInfo']) :is(strong, p) {
+  color: var(--info);
+}
+
+
+html[data-contrast='high'] :is(button, input, select, textarea, a, [role='switch'], [role='tab']) {
+  outline-color: var(--focus-ring);
+}
+
+html[data-contrast='high'] :is(.data-card, .metric-card, .profile-menu, .notification-popover, table, input, select, textarea) {
+  border-width: 2px;
+}
+
+html[data-contrast='high'] :is(
+  .nav-link,
+  .topbar-company,
+  .profile-menu-link small,
+  .page-heading p,
+  .data-card-header p,
+  .pagination,
+  [class*='state'] p
+) {
+  color: var(--ink);
+}
+
+html[data-contrast='high'] :is([class*='card'], [class*='Card']) :is(p, small, label, legend) {
+  color: var(--ink);
+}
+
+html[data-reduced-motion='true'] *,
+html[data-reduced-motion='true'] *::before,
+html[data-reduced-motion='true'] *::after {
+  scroll-behavior: auto !important;
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+html[data-text-scale='large'] .app-frame {
+  zoom: 1.05;
+}
+
+html[data-text-scale='larger'] .app-frame {
+  zoom: 1.1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (max-width: 430px) {
+  html[data-text-scale='large'] .app-frame {
+    zoom: 1.02;
+  }
+
+  html[data-text-scale='larger'] .app-frame {
+    zoom: 1.05;
+  }
+}
+
+:root[data-theme='dark'] select {
+  color-scheme: dark;
+}
+
+:root[data-theme='dark'] :is(option, optgroup) {
+  background-color: var(--paper);
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] option:is(:checked, :hover, :focus) {
+  background-color: var(--surface-hover);
+  color: var(--ink);
+}
+
+:root[data-theme='dark'] .text-action:not(.text-action-danger) {
+  color: var(--green);
+}
+
+:root[data-theme='dark'] .text-action:not(.text-action-danger):hover:not(:disabled) {
+  border-radius: 5px;
+  background-color: var(--surface-hover);
+  color: var(--green);
+}
+
+:root[data-theme='dark'] .text-action.text-action-danger:hover:not(:disabled) {
+  border-radius: 5px;
+  background-color: var(--danger-hover-bg);
+  color: var(--danger);
+}
+
+:root[data-theme='dark'] [class*='featureScope'] .sales-table .sale-id {
+  color: var(--ink);
+}
+

@@ -71,6 +71,7 @@ public class SecurityConfig {
 
                         // rotas apenas do OWNER
                         .requestMatchers("/company/members/**").hasAuthority("ROLE_OWNER")
+                        .requestMatchers("/company/settings/**").hasAuthority("ROLE_OWNER")
 
                         // rotas do OWNER e ADMIN
                         .requestMatchers("/analytics/**").hasAnyAuthority("ROLE_OWNER", "ROLE_ADMIN")

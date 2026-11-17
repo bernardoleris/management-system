@@ -2,7 +2,7 @@ package br.com.system.controllers;
 
 import br.com.system.controllers.api.AnalyticsApi;
 import br.com.system.data.dto.response.analytics.ChartResponseDTO;
-import br.com.system.data.dto.response.analytics.ProductWithoutMovementResponseDTO;
+import br.com.system.data.dto.response.ProductWithoutSalesResponseDTO;
 import br.com.system.data.dto.response.analytics.TopProductsResponseDTO;
 import br.com.system.enums.AnalyticsPeriod;
 import br.com.system.services.AnalyticsService;
@@ -21,22 +21,22 @@ public class AnalyticsController implements AnalyticsApi {
 
     public AnalyticsController(AnalyticsService service) { this.service = service; }
 
-    @GetMapping("/sales-by-month")
+    @GetMapping({"/sales-over-time", "/sales-by-month"})
     @Override
-    public ResponseEntity<ChartResponseDTO> getSalesByMonth(
+    public ResponseEntity<ChartResponseDTO> getSalesOverTime(
             @RequestParam(required = false) AnalyticsPeriod period,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
-        return ResponseEntity.ok(service.getSalesByMonth(period, start, end));
+        return ResponseEntity.ok(service.getSalesOverTime(period, start, end));
     }
 
-    @GetMapping("/revenue-by-month")
+    @GetMapping({"/revenue-over-time", "/revenue-by-month"})
     @Override
-    public ResponseEntity<ChartResponseDTO> getRevenueByMonth(
+    public ResponseEntity<ChartResponseDTO> getRevenueOverTime(
             @RequestParam(required = false) AnalyticsPeriod period,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
-        return ResponseEntity.ok(service.getRevenueByMonth(period, start, end));
+        return ResponseEntity.ok(service.getRevenueOverTime(period, start, end));
     }
 
     @GetMapping("/payment-methods")
@@ -58,12 +58,12 @@ public class AnalyticsController implements AnalyticsApi {
         return ResponseEntity.ok(service.getTopProducts(period, start, end, limit));
     }
 
-    @GetMapping("/products-without-movement")
+    @GetMapping({"/products-without-sales", "/products-without-movement"})
     @Override
-    public ResponseEntity<List<ProductWithoutMovementResponseDTO>> getProductsWithoutMovement(
+    public ResponseEntity<List<ProductWithoutSalesResponseDTO>> getProductsWithoutSales(
             @RequestParam(required = false) AnalyticsPeriod period,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
-        return ResponseEntity.ok(service.getProductsWithoutMovement(period, start, end));
+        return ResponseEntity.ok(service.getProductsWithoutSales(period, start, end));
     }
 }

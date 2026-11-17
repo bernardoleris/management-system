@@ -1,0 +1,95 @@
+.analytics-page { display: grid; gap: 22px; }
+.analytics-page .analytics-heading { align-items: flex-end; gap: 28px; margin-bottom: 5px; }
+.analytics-controls { display: flex; align-items: center; gap: 11px; }
+.analytics-controls .analytics-period-label { color: var(--muted); font-size: 13px; font-weight: 650; }
+.analytics-controls .themed-select-wrap { min-width: 176px; }
+.analytics-controls .themed-select-trigger { min-height: 42px; font-size: 14px; }
+.analytics-controls > button:focus-visible { outline: 3px solid var(--focus-ring); outline-offset: 2px; }
+.analytics-kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 17px; }
+.analytics-kpis .metric-card { min-height: 190px; padding: 22px 23px; }
+.analytics-kpis .metric-icon { margin-bottom: 15px; }
+.analytics-kpis .metric-card > strong { font-size: clamp(24px, 2.2vw, 30px); }
+.analytics-kpis .metric-card > small { font-size: 12px; line-height: 1.5; }
+.analytics-kpis .metric-label { font-size: 14px; }
+.analytics-chart-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 18px; }
+.analytics-chart-card, .analytics-ranking-card { min-width: 0; }
+.analytics-chart-card .data-card-header, .analytics-ranking-card .data-card-header { min-height: 88px; padding: 21px 23px; }
+.analytics-chart-card .data-card-header h2, .analytics-ranking-card .data-card-header h2, .analytics-unsold-card .data-card-header h2 { font-size: 18px; }
+.analytics-chart-card .data-card-header p, .analytics-ranking-card .data-card-header p, .analytics-unsold-card .data-card-header p { font-size: 13px; line-height: 1.5; }
+.analytics-legend { display: inline-flex; flex: none; align-items: center; gap: 8px; color: #65736b; font-size: 12px; white-space: nowrap; }
+.analytics-legend i { width: 10px; height: 10px; border-radius: 3px; background: #13866c; }
+.analytics-legend-revenue i { background: #e3a15f; }
+.analytics-chart-wrap { position: relative; padding: 28px 22px 18px 88px; }
+.analytics-y-labels { position: absolute; top: 24px; bottom: 70px; left: 16px; display: flex; flex-direction: column; justify-content: space-between; color: #68766e; font-size: 12px; font-variant-numeric: tabular-nums; }
+.analytics-bar-chart { display: block; width: 100%; height: 240px; overflow: visible; }
+.analytics-grid-line { stroke: #edf1ee; stroke-dasharray: 3 4; stroke-width: 1; }
+.analytics-bar { transition: opacity .16s ease; }
+.analytics-bar:hover { opacity: .72; }
+.analytics-bar-sales { fill: #13866c; }
+.analytics-bar-revenue { fill: #e3a15f; }
+.analytics-x-labels { display: flex; justify-content: space-between; gap: 3px; margin-top: 8px; color: #68766e; font-size: 12px; }
+.analytics-x-labels span { flex: 1; overflow: hidden; text-align: center; text-overflow: clip; white-space: nowrap; }
+.analytics-chart-data { margin-top: 15px; color: #59675f; font-size: 12px; }
+.analytics-chart-data summary { width: fit-content; cursor: pointer; }
+.analytics-chart-data-list { display: grid; max-height: 220px; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 14px; overflow: auto; margin-top: 10px; padding: 12px; border-radius: 8px; background: #f7f9f8; }
+.analytics-chart-data-list span { display: flex; justify-content: space-between; gap: 10px; }
+.analytics-chart-data-list strong { color: #45534b; font-weight: 650; }
+.analytics-empty-chart, .analytics-empty-list { display: grid; min-height: 270px; place-items: center; padding: 26px; color: #68766e; font-size: 14px; text-align: center; }
+.analytics-ranking-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.analytics-ranking-list { display: grid; gap: 22px; margin: 0; padding: 24px 24px 27px; list-style: none; }
+.analytics-ranking-list li { display: flex; align-items: center; gap: 15px; min-width: 0; }
+.analytics-rank { color: #78857d; font-size: 12px; font-variant-numeric: tabular-nums; }
+.analytics-ranking-main { display: grid; flex: 1; gap: 10px; min-width: 0; }
+.analytics-ranking-label { display: flex; justify-content: space-between; gap: 12px; color: #58665e; font-size: 13px; }
+.analytics-ranking-label strong { overflow: hidden; color: #35433b; font-size: 14px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.analytics-ranking-label span { flex: none; font-variant-numeric: tabular-nums; }
+.analytics-track { height: 9px; overflow: hidden; border-radius: 99px; background: #eff3f0; }
+.analytics-track-fill { display: block; height: 100%; min-width: 2px; border-radius: inherit; background: #13866c; }
+.analytics-track-payment { background: #e3a15f; }
+.analytics-count { flex: none; color: #65736b; font-size: 12px; }
+.analytics-unsold-card { min-width: 0; }
+.analytics-unsold-card .data-card-header { padding: 21px 24px; }
+.table-scroll { overflow-x: auto; }
+.analytics-table { width: 100%; border-collapse: collapse; text-align: left; }
+.analytics-table th { padding: 15px 24px; background: #fafbfa; color: #66736b; font-size: 12px; font-weight: 700; letter-spacing: .035em; text-transform: uppercase; }
+.analytics-table td { padding: 16px 24px; border-top: 1px solid #f0f2f1; color: #536057; font-size: 14px; }
+.analytics-table td:first-child strong { color: #2f3c34; font-size: 14px; }
+.analytics-never-sold { color: #a15726; }
+.analytics-loading { margin: -8px 0 -4px; color: #68766e; font-size: 13px; }
+.analytics-page .table-state { display: grid; min-height: 135px; place-items: center; padding: 24px; color: #68766e; font-size: 14px; }
+.analytics-page .table-state.empty-state { min-height: 180px; align-content: center; justify-items: center; gap: 10px; text-align: center; }
+.analytics-page .empty-state h3 { margin: 0; color: #35433b; font-family: Manrope, sans-serif; font-size: 17px; }
+.analytics-page .empty-state p { margin: 0; color: #68766e; font-size: 13px; line-height: 1.6; }
+
+@media (max-width: 1080px) {
+  .analytics-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .analytics-chart-grid { grid-template-columns: 1fr 1fr; }
+  .analytics-chart-card .data-card-header { align-items: flex-start; gap: 8px; }
+}
+@media (max-width: 760px) {
+  .analytics-page .analytics-heading { align-items: flex-start; flex-direction: column; gap: 14px; }
+  .analytics-controls { width: 100%; flex-wrap: wrap; }
+  .analytics-controls label { margin-right: 2px; font-size: 13px; }
+  .analytics-controls .themed-select-wrap { flex: 1; min-width: 140px; }
+  .analytics-chart-grid, .analytics-ranking-grid { grid-template-columns: 1fr; }
+  .analytics-chart-wrap { padding-left: 82px; }
+  .analytics-chart-card .data-card-header { align-items: center; }
+}
+@media (max-width: 430px) {
+  .analytics-kpis { gap: 9px; }
+  .analytics-kpis .metric-card { min-height: 158px; padding: 15px; }
+  .analytics-kpis .metric-label { min-height: 34px; font-size: 13px; }
+  .analytics-kpis .metric-card > strong { font-size: 21px; }
+  .analytics-kpis .metric-card > small { line-height: 1.4; }
+  .analytics-controls button { flex: 1; }
+  .analytics-chart-card .data-card-header { align-items: flex-start; flex-direction: column; }
+  .analytics-chart-wrap { padding-right: 12px; padding-left: 72px; }
+  .analytics-y-labels { left: 8px; font-size: 11px; }
+  .analytics-x-labels { font-size: 11px; }
+  .analytics-chart-card .data-card-header, .analytics-ranking-card .data-card-header, .analytics-unsold-card .data-card-header { padding: 18px; }
+  .analytics-ranking-list { padding: 20px 18px 22px; }
+  .analytics-table { min-width: 480px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .analytics-bar { transition: none; }
+}
